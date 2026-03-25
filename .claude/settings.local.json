@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -c packages/server/src/index.js)",
+      "Bash(node -c packages/server/src/gameEngine.js)",
+      "Bash(node -c packages/server/src/games/quiz.js)",
+      "Bash(node -c packages/server/src/games/trueFalse.js)",
+      "Bash(node -c packages/server/src/games/countdown.js)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:3000/health)",
+      "Bash(npm ls:*)",
+      "Bash(node -e \"const d = require\\(''./packages/server/src/data/pointless.json''\\); console.log\\(''Rounds:'', d.length\\); d.forEach\\(\\(r,i\\) => console.log\\(i, r.category, Object.keys\\(r.answers\\).length, ''answers''\\)\\)\")",
+      "Bash(node tests/stress-test.mjs 50 http://localhost:3000 --auto-host --password=test123)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //F //PID 9532)",
+      "Bash(taskkill //F //IM node.exe)"
+    ]
+  }
+}

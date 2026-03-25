@@ -1,0 +1,79 @@
+[
+  {
+    "id": "round_1_elements",
+    "category": "Chemical Elements",
+    "question": "Name any element in the Periodic Table",
+    "answers": {
+      "oxygen": 92,
+      "iron": 85,
+      "gold": 70,
+      "scandium": 2,
+      "tennessine": 0,
+      "moscovium": 0,
+      "hydrogen": 100,
+      "helium": 100
+    }
+  },
+  {
+    "id": "round_2_countries",
+    "category": "Countries ending in A",
+    "question": "Name any country ending in the letter A",
+    "answers": {
+      "china": 80,
+      "india": 75,
+      "australia": 60,
+      "albania": 15,
+      "andorra": 5,
+      "antigua and barbuda": 0
+    }
+  },
+  {
+    "id": "round_3_oscars",
+    "category": "Oscar Best Picture Winners",
+    "question": "Name any film that has won Best Picture at the Oscars",
+    "answers": {
+      "titanic": 90,
+      "the godfather": 85,
+      "parasite": 40,
+      "moonlight": 10,
+      "spotlight": 5,
+      "coda": 0
+    }
+  },
+  {
+    "id": "round_4_capitals",
+    "category": "European Capital Cities",
+    "question": "Name any capital city in Europe",
+    "answers": {
+      "london": 95,
+      "paris": 93,
+      "berlin": 88,
+      "rome": 87,
+      "madrid": 85,
+      "athens": 70,
+      "dublin": 60,
+      "prague": 45,
+      "tallinn": 8,
+      "vaduz": 2,
+      "san marino": 0
+    }
+  },
+  {
+    "id": "round_5_shakespeare",
+    "category": "Shakespeare Plays",
+    "question": "Name any play written by William Shakespeare",
+    "answers": {
+      "romeo and juliet": 98,
+      "hamlet": 96,
+      "macbeth": 94,
+      "othello": 78,
+      "a midsummer night's dream": 72,
+      "the tempest": 55,
+      "king lear": 48,
+      "much ado about nothing": 42,
+      "titus andronicus": 12,
+      "timon of athens": 3,
+      "pericles": 0
+    }
+  }
+]

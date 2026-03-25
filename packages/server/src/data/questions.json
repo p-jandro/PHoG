@@ -1,0 +1,723 @@
+[
+  {
+    "id": "q001",
+    "category": "easy",
+    "question": "What is the capital of France?",
+    "answers": {
+      "A": "London",
+      "B": "Berlin",
+      "C": "Paris",
+      "D": "Madrid"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q002",
+    "category": "easy",
+    "question": "How many continents are there?",
+    "answers": {
+      "A": "5",
+      "B": "6",
+      "C": "7",
+      "D": "8"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q003",
+    "category": "easy",
+    "question": "What color is the sky on a clear day?",
+    "answers": {
+      "A": "Green",
+      "B": "Blue",
+      "C": "Red",
+      "D": "Yellow"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q004",
+    "category": "easy",
+    "question": "What is 2 + 2?",
+    "answers": {
+      "A": "3",
+      "B": "4",
+      "C": "5",
+      "D": "6"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q005",
+    "category": "easy",
+    "question": "Which planet is known as the Red Planet?",
+    "answers": {
+      "A": "Venus",
+      "B": "Jupiter",
+      "C": "Mars",
+      "D": "Saturn"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q006",
+    "category": "easy",
+    "question": "How many legs does a spider have?",
+    "answers": {
+      "A": "6",
+      "B": "8",
+      "C": "10",
+      "D": "12"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q007",
+    "category": "easy",
+    "question": "What is the largest ocean on Earth?",
+    "answers": {
+      "A": "Atlantic",
+      "B": "Indian",
+      "C": "Arctic",
+      "D": "Pacific"
+    },
+    "correct": "D"
+  },
+  {
+    "id": "q008",
+    "category": "easy",
+    "question": "Which animal is known as the King of the Jungle?",
+    "answers": {
+      "A": "Tiger",
+      "B": "Lion",
+      "C": "Elephant",
+      "D": "Bear"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q009",
+    "category": "easy",
+    "question": "How many days are in a week?",
+    "answers": {
+      "A": "5",
+      "B": "6",
+      "C": "7",
+      "D": "8"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q010",
+    "category": "easy",
+    "question": "What is the color of grass?",
+    "answers": {
+      "A": "Blue",
+      "B": "Green",
+      "C": "Yellow",
+      "D": "Red"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q011",
+    "category": "easy",
+    "question": "Which season comes after summer?",
+    "answers": {
+      "A": "Spring",
+      "B": "Winter",
+      "C": "Autumn",
+      "D": "Rainy"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q012",
+    "category": "easy",
+    "question": "What is the freezing point of water in Celsius?",
+    "answers": {
+      "A": "-10°C",
+      "B": "0°C",
+      "C": "10°C",
+      "D": "100°C"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q013",
+    "category": "easy",
+    "question": "How many wheels does a bicycle have?",
+    "answers": {
+      "A": "1",
+      "B": "2",
+      "C": "3",
+      "D": "4"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q014",
+    "category": "easy",
+    "question": "What shape is a football (soccer ball)?",
+    "answers": {
+      "A": "Square",
+      "B": "Triangle",
+      "C": "Round",
+      "D": "Rectangle"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q015",
+    "category": "easy",
+    "question": "Which fruit is yellow and curved?",
+    "answers": {
+      "A": "Apple",
+      "B": "Banana",
+      "C": "Orange",
+      "D": "Grape"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q016",
+    "category": "medium",
+    "question": "Who painted the Mona Lisa?",
+    "answers": {
+      "A": "Vincent van Gogh",
+      "B": "Pablo Picasso",
+      "C": "Leonardo da Vinci",
+      "D": "Michelangelo"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q017",
+    "category": "medium",
+    "question": "What is the smallest country in the world?",
+    "answers": {
+      "A": "Monaco",
+      "B": "Vatican City",
+      "C": "San Marino",
+      "D": "Liechtenstein"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q018",
+    "category": "medium",
+    "question": "In which year did World War II end?",
+    "answers": {
+      "A": "1943",
+      "B": "1944",
+      "C": "1945",
+      "D": "1946"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q019",
+    "category": "medium",
+    "question": "What is the chemical symbol for gold?",
+    "answers": {
+      "A": "Go",
+      "B": "Gd",
+      "C": "Au",
+      "D": "Ag"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q020",
+    "category": "medium",
+    "question": "Who wrote 'Romeo and Juliet'?",
+    "answers": {
+      "A": "Charles Dickens",
+      "B": "William Shakespeare",
+      "C": "Jane Austen",
+      "D": "Mark Twain"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q021",
+    "category": "medium",
+    "question": "What is the speed of light?",
+    "answers": {
+      "A": "300,000 km/s",
+      "B": "150,000 km/s",
+      "C": "450,000 km/s",
+      "D": "600,000 km/s"
+    },
+    "correct": "A"
+  },
+  {
+    "id": "q022",
+    "category": "medium",
+    "question": "Which element has the atomic number 1?",
+    "answers": {
+      "A": "Helium",
+      "B": "Oxygen",
+      "C": "Hydrogen",
+      "D": "Carbon"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q023",
+    "category": "medium",
+    "question": "What is the capital of Australia?",
+    "answers": {
+      "A": "Sydney",
+      "B": "Melbourne",
+      "C": "Canberra",
+      "D": "Perth"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q024",
+    "category": "medium",
+    "question": "How many bones are in the adult human body?",
+    "answers": {
+      "A": "186",
+      "B": "206",
+      "C": "226",
+      "D": "246"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q025",
+    "category": "medium",
+    "question": "What is the largest planet in our solar system?",
+    "answers": {
+      "A": "Saturn",
+      "B": "Neptune",
+      "C": "Jupiter",
+      "D": "Uranus"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q026",
+    "category": "medium",
+    "question": "Who invented the telephone?",
+    "answers": {
+      "A": "Thomas Edison",
+      "B": "Alexander Graham Bell",
+      "C": "Nikola Tesla",
+      "D": "Benjamin Franklin"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q027",
+    "category": "medium",
+    "question": "What is the currency of Japan?",
+    "answers": {
+      "A": "Yuan",
+      "B": "Won",
+      "C": "Yen",
+      "D": "Ringgit"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q028",
+    "category": "medium",
+    "question": "Which gas do plants absorb from the atmosphere?",
+    "answers": {
+      "A": "Oxygen",
+      "B": "Nitrogen",
+      "C": "Carbon Dioxide",
+      "D": "Hydrogen"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q029",
+    "category": "medium",
+    "question": "What is the tallest mountain in the world?",
+    "answers": {
+      "A": "K2",
+      "B": "Mount Everest",
+      "C": "Kangchenjunga",
+      "D": "Kilimanjaro"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q030",
+    "category": "medium",
+    "question": "How many strings does a standard guitar have?",
+    "answers": {
+      "A": "4",
+      "B": "5",
+      "C": "6",
+      "D": "7"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q031",
+    "category": "hard",
+    "question": "What is the longest river in the world?",
+    "answers": {
+      "A": "Amazon",
+      "B": "Nile",
+      "C": "Yangtze",
+      "D": "Mississippi"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q032",
+    "category": "hard",
+    "question": "Who was the first person to walk on the moon?",
+    "answers": {
+      "A": "Buzz Aldrin",
+      "B": "Neil Armstrong",
+      "C": "Yuri Gagarin",
+      "D": "Michael Collins"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q033",
+    "category": "hard",
+    "question": "What is the smallest prime number?",
+    "answers": {
+      "A": "0",
+      "B": "1",
+      "C": "2",
+      "D": "3"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q034",
+    "category": "hard",
+    "question": "Which programming language was created by Guido van Rossum?",
+    "answers": {
+      "A": "Java",
+      "B": "Python",
+      "C": "Ruby",
+      "D": "JavaScript"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q035",
+    "category": "hard",
+    "question": "What is the powerhouse of the cell?",
+    "answers": {
+      "A": "Nucleus",
+      "B": "Ribosome",
+      "C": "Mitochondria",
+      "D": "Golgi Apparatus"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q036",
+    "category": "hard",
+    "question": "In what year was the first iPhone released?",
+    "answers": {
+      "A": "2005",
+      "B": "2006",
+      "C": "2007",
+      "D": "2008"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q037",
+    "category": "hard",
+    "question": "What is the square root of 144?",
+    "answers": {
+      "A": "10",
+      "B": "11",
+      "C": "12",
+      "D": "13"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q038",
+    "category": "hard",
+    "question": "Which planet is closest to the sun?",
+    "answers": {
+      "A": "Venus",
+      "B": "Mercury",
+      "C": "Earth",
+      "D": "Mars"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q039",
+    "category": "hard",
+    "question": "What is the chemical formula for table salt?",
+    "answers": {
+      "A": "NaCl",
+      "B": "KCl",
+      "C": "CaCl2",
+      "D": "MgCl2"
+    },
+    "correct": "A"
+  },
+  {
+    "id": "q040",
+    "category": "hard",
+    "question": "How many time zones does Russia have?",
+    "answers": {
+      "A": "7",
+      "B": "9",
+      "C": "11",
+      "D": "13"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q041",
+    "category": "hard",
+    "question": "What is the most spoken language in the world by native speakers?",
+    "answers": {
+      "A": "English",
+      "B": "Spanish",
+      "C": "Mandarin Chinese",
+      "D": "Hindi"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q042",
+    "category": "hard",
+    "question": "Which country has the most UNESCO World Heritage Sites?",
+    "answers": {
+      "A": "China",
+      "B": "Italy",
+      "C": "Spain",
+      "D": "France"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q043",
+    "category": "hard",
+    "question": "What is the boiling point of water at sea level in Fahrenheit?",
+    "answers": {
+      "A": "200°F",
+      "B": "210°F",
+      "C": "212°F",
+      "D": "214°F"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q044",
+    "category": "hard",
+    "question": "Who developed the theory of general relativity?",
+    "answers": {
+      "A": "Isaac Newton",
+      "B": "Albert Einstein",
+      "C": "Stephen Hawking",
+      "D": "Niels Bohr"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q045",
+    "category": "hard",
+    "question": "What is the official language of Brazil?",
+    "answers": {
+      "A": "Spanish",
+      "B": "English",
+      "C": "Portuguese",
+      "D": "French"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q046",
+    "category": "impossible",
+    "question": "What is the 15th digit of Pi?",
+    "answers": {
+      "A": "2",
+      "B": "9",
+      "C": "6",
+      "D": "5"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q047",
+    "category": "impossible",
+    "question": "In which year was the Byzantine Empire founded?",
+    "answers": {
+      "A": "330 AD",
+      "B": "395 AD",
+      "C": "476 AD",
+      "D": "527 AD"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q048",
+    "category": "impossible",
+    "question": "What is the rarest blood type?",
+    "answers": {
+      "A": "AB-",
+      "B": "B-",
+      "C": "O-",
+      "D": "A-"
+    },
+    "correct": "A"
+  },
+  {
+    "id": "q049",
+    "category": "impossible",
+    "question": "How many symphonies did Beethoven compose?",
+    "answers": {
+      "A": "7",
+      "B": "8",
+      "C": "9",
+      "D": "10"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q050",
+    "category": "impossible",
+    "question": "What is the smallest country in Africa by land area?",
+    "answers": {
+      "A": "Seychelles",
+      "B": "Mauritius",
+      "C": "São Tomé and Príncipe",
+      "D": "Comoros"
+    },
+    "correct": "A"
+  },
+  {
+    "id": "q051",
+    "category": "impossible",
+    "question": "What is the molecular weight of glucose (C6H12O6)?",
+    "answers": {
+      "A": "160 g/mol",
+      "B": "170 g/mol",
+      "C": "180 g/mol",
+      "D": "190 g/mol"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q052",
+    "category": "impossible",
+    "question": "Which element has the highest melting point?",
+    "answers": {
+      "A": "Tungsten",
+      "B": "Carbon",
+      "C": "Osmium",
+      "D": "Rhenium"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q053",
+    "category": "impossible",
+    "question": "What is the air speed velocity of an unladen swallow?",
+    "answers": {
+      "A": "20 mph",
+      "B": "24 mph",
+      "C": "28 mph",
+      "D": "32 mph"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q054",
+    "category": "impossible",
+    "question": "How many teeth does an adult aardvark have?",
+    "answers": {
+      "A": "0",
+      "B": "12",
+      "C": "20",
+      "D": "32"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q055",
+    "category": "impossible",
+    "question": "What is the half-life of Carbon-14?",
+    "answers": {
+      "A": "4,730 years",
+      "B": "5,730 years",
+      "C": "6,730 years",
+      "D": "7,730 years"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q056",
+    "category": "impossible",
+    "question": "In what year did the Great Fire of London occur?",
+    "answers": {
+      "A": "1656",
+      "B": "1666",
+      "C": "1676",
+      "D": "1686"
+    },
+    "correct": "B"
+  },
+  {
+    "id": "q057",
+    "category": "impossible",
+    "question": "What is the orbital period of Neptune in Earth years?",
+    "answers": {
+      "A": "144 years",
+      "B": "154 years",
+      "C": "165 years",
+      "D": "175 years"
+    },
+    "correct": "C"
+  },
+  {
+    "id": "q058",
+    "category": "impossible",
+    "question": "How many bones does a shark have?",
+    "answers": {
+      "A": "0",
+      "B": "50",
+      "C": "100",
+      "D": "200"
+    },
+    "correct": "A"
+  },
+  {
+    "id": "q059",
+    "category": "impossible",
+    "question": "What is the freezing point of mercury in Celsius?",
+    "answers": {
+      "A": "-39°C",
+      "B": "-49°C",
+      "C": "-59°C",
+      "D": "-69°C"
+    },
+    "correct": "A"
+  },
+  {
+    "id": "q060",
+    "category": "impossible",
+    "question": "How many dots are on a pair of standard dice?",
+    "answers": {
+      "A": "36",
+      "B": "40",
+      "C": "42",
+      "D": "44"
+    },
+    "correct": "C"
+  }
+]
+

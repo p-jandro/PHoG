@@ -1,0 +1,19 @@
+{
+  "name": "peter-house-of-games",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "server": "cd packages/server && npm run dev",
+    "client": "cd packages/client && npm run dev",
+    "host": "cd packages/host && npm run dev"
+  },
+  "dependencies": {
+    "string-similarity": "^4.0.4"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.3"
+  }
+}
