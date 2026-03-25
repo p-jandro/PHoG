@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
+import { GamePromptHeader } from '../components/GamePromptHeader';
 
 interface TrueFalseProps {
   socket: Socket | null;
@@ -29,9 +30,28 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
   // Stats display
   const [currentScore, setCurrentScore] = useState(0);
   const [currentStreak, setCurrentStreak] = useState(0);
-  const [currentPlacement, setCurrentPlacement] = useState(0);
+  const [currentPlacement, setCurrentPlacement] = useState<number | null>(null);
 
   const { playerId } = useGameStore();
+  const players = useGameStore((state) => state.players);
+
+  useEffect(() => {
+    if (!playerId || players.length === 0) {
+      setCurrentScore(0);
+      setCurrentPlacement(null);
+      return;
+    }
+
+    const myPlayer = players.find((player) => player.id === playerId);
+    setCurrentScore(myPlayer?.score || 0);
+
+    const sortedPlayers = [...players]
+      .filter((player) => player.connected)
+      .sort((a, b) => b.score - a.score);
+
+    const placement = sortedPlayers.findIndex((player) => player.id === playerId) + 1;
+    setCurrentPlacement(placement > 0 ? placement : null);
+  }, [playerId, players]);
 
   useEffect(() => {
     if (!socket) return;
@@ -41,10 +61,13 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
       console.log('[TrueFalse] Game intro', data);
       setPhase('intro');
       setIntroData(data);
-      setTimeRemaining(data.duration);
+      const remaining = data.endsAt
+        ? Math.max(0, data.endsAt - Date.now())
+        : data.duration;
+      setTimeRemaining(remaining);
       setCurrentScore(0);
       setCurrentStreak(0);
-      setCurrentPlacement(0);
+      setCurrentPlacement(null);
     });
 
     // Statement events
@@ -73,7 +96,9 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
 
     socket.on('truefalse:answer:received', (data) => {
       console.log('[TrueFalse] Answer confirmed', data);
-      // Just confirmation — streak/score revealed after round ends
+      if (typeof data.streak === 'number') {
+        setCurrentStreak(data.streak);
+      }
     });
 
     socket.on('truefalse:answer', (data) => {
@@ -86,7 +111,6 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
         const myResult = data.playerResults[playerId];
         if (myResult) {
           setCurrentStreak(myResult.streak);
-          setCurrentScore(myResult.score);
         }
       }
 
@@ -116,6 +140,24 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
     };
   }, [socket, timer]);
 
+  useEffect(() => {
+    if (phase !== 'intro' || !introData) {
+      return;
+    }
+
+    const endsAt = introData.endsAt || Date.now() + (introData.duration || 0);
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, endsAt - Date.now());
+      setTimeRemaining(remaining);
+
+      if (remaining === 0) {
+        clearInterval(interval);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [phase, introData]);
+
   const handleAnswer = (answer: boolean) => {
     if (!socket || selectedAnswer !== null || !currentStatement) return;
     
@@ -132,7 +174,6 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
     }
   };
 
-  // Helper for ordinal suffix
   const getOrdinalSuffix = (num: number) => {
     const j = num % 10;
     const k = num % 100;
@@ -147,12 +188,13 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
     const progress = introData.duration ? ((introData.duration - timeRemaining) / introData.duration) * 100 : 0;
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-ui-background to-gray-900">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="max-w-3xl w-full text-center space-y-6"
+          className="screen-frame max-w-4xl text-center space-y-6"
         >
+          <p className="eyebrow">True or False</p>
           <motion.h1
             initial={{ y: -20 }}
             animate={{ y: 0 }}
@@ -161,52 +203,13 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
             {introData.title}
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-2xl sm:text-3xl text-ui-textMuted mb-8"
-          >
-            {introData.description}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-ui-card rounded-xl p-6 sm:p-8 text-left"
-          >
-            <h2 className="text-2xl font-bold text-game-accent mb-4">Streak Scoring</h2>
-            <div className="space-y-2 text-lg">
-              {introData.scoringRules?.map((rule: string, index: number) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  className="flex items-start"
-                >
-                  <span className="text-game-accent mr-2">•</span>
-                  <span className="text-ui-textMuted">{rule}</span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="text-xl text-game-warning"
-          >
-            {introData.placementInfo}
-          </motion.p>
+          <p className="text-xl text-ui-textMuted sm:text-2xl">Starting shortly</p>
 
           {/* Progress bar */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
+            transition={{ delay: 0.2 }}
             className="w-full max-w-md mx-auto"
           >
             <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -229,134 +232,100 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
   if (phase === 'playing' && currentStatement) {
     const timePercent = (timeRemaining / currentStatement.duration) * 100;
     const showingAnswer = correctAnswer !== null;
+    const timerToneClass =
+      timePercent > 50 ? 'bg-game-correct' :
+      timePercent > 25 ? 'bg-game-warning' :
+      'bg-game-incorrect';
+    const timerTextClass =
+      timePercent > 50 ? 'text-game-correct' :
+      timePercent > 25 ? 'text-game-warning' :
+      'text-game-incorrect';
 
     return (
-      <div className="min-h-screen flex flex-col p-4">
-        {/* Persistent Stats Bar */}
+      <div className="screen-shell py-8 text-white">
         <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="fixed top-0 left-0 right-0 z-10 bg-gray-900 border-b border-gray-800 px-4 py-3"
+          key={currentStatement.statementId}
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="screen-frame max-w-5xl"
         >
-          <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-1">
-              <div className="text-ui-textMuted text-xs sm:text-sm">
-                True/False • Round {currentStatement.statementNumber}/{currentStatement.totalStatements}
-              </div>
-              {currentPlacement > 0 && (
-                <div className="text-ui-textMuted text-xs sm:text-sm">
-                  <span className="font-bold text-white">{currentPlacement}{getOrdinalSuffix(currentPlacement)}</span> Place
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-game-accent font-bold text-xl sm:text-2xl">
-                {currentScore} pts
-              </div>
-              {currentStreak > 0 && (
-                <motion.div
-                  key={currentStreak}
-                  initial={{ scale: 1.5 }}
-                  animate={{ scale: 1 }}
-                  className="text-game-warning font-bold"
-                >
-                  {currentStreak}x Streak
-                </motion.div>
-              )}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Main content with top padding for stats bar */}
-        <div className="flex-1 flex items-center justify-center mt-16">
-          <motion.div
-            key={currentStatement.statementId}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="max-w-4xl w-full"
-          >
-            {/* Progress */}
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-ui-textMuted">
-                Statement {currentStatement.statementNumber} / {currentStatement.totalStatements}
-              </span>
-              {!showingAnswer && (
-                <div className="text-2xl font-bold text-primary-teal">
-                  {Math.ceil(timeRemaining / 1000)}s
-                </div>
-              )}
-            </div>
-
-            {/* Timer bar */}
-            {!showingAnswer && (
-              <div className="w-full h-2 bg-ui-border rounded-full overflow-hidden mb-8">
-                <motion.div
-                  className={`h-full ${
-                    timePercent > 50 ? 'bg-game-correct' :
-                    timePercent > 25 ? 'bg-game-warning' :
-                    'bg-game-incorrect'
-                  }`}
-                  style={{ width: `${timePercent}%` }}
-                  transition={{ duration: 0.1 }}
-                />
-              </div>
+          <GamePromptHeader
+            eyebrow="True or False"
+            meta={`Statement ${currentStatement.statementNumber} of ${currentStatement.totalStatements}`}
+            title={currentStatement.statement}
+            details={(
+              <>
+                <span className="status-pill">
+                  <span className="text-xl font-bold text-game-correct">{currentScore}</span>
+                  <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ui-textMuted">pts</span>
+                </span>
+                {currentPlacement ? (
+                  <span className="status-pill">
+                    {currentPlacement}
+                    {getOrdinalSuffix(currentPlacement)} in T/F
+                  </span>
+                ) : null}
+                {currentStreak > 0 ? (
+                  <span className="status-pill text-game-warning">
+                    {currentStreak}x streak
+                  </span>
+                ) : null}
+              </>
             )}
+            timerMs={!showingAnswer ? timeRemaining : undefined}
+            totalMs={!showingAnswer ? currentStatement.duration : undefined}
+            timerBarClassName={timerToneClass}
+            timerTextClassName={timerTextClass}
+          />
 
-            {/* Statement */}
-            <motion.div
-              className="card mb-8"
-              animate={showingAnswer ? {
-                backgroundColor: correctAnswer === selectedAnswer ? '#00D4AA20' : '#FF475720'
-              } : {}}
-            >
-              <h2 className="text-3xl font-bold text-center">
-                {currentStatement.statement}
-              </h2>
-
-              {/* Show answer */}
-              {showingAnswer && (
+          <div className="mx-auto max-w-4xl">
+            {showingAnswer && (
+              <motion.div
+                className="card mb-8"
+                animate={{
+                  backgroundColor: correctAnswer === selectedAnswer ? '#00D4AA20' : '#FF475720'
+                }}
+              >
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 text-center"
+                  className="text-center"
                 >
                   <p className={`text-2xl font-bold ${
                     correctAnswer === selectedAnswer ? 'text-game-correct' : 'text-game-incorrect'
                   }`}>
-                    {correctAnswer === selectedAnswer ? '✓ Correct!' : '✗ Wrong!'}
+                    {correctAnswer === selectedAnswer ? 'Correct' : 'Wrong'}
                   </p>
-                  <p className="text-ui-textMuted mt-2">
+                  <p className="mt-2 text-ui-textMuted">
                     Answer: {correctAnswer ? 'TRUE' : 'FALSE'}
                   </p>
 
-                  {/* Fun Fact Explanation */}
                   {explanation && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                      className="mt-6 p-4 bg-ui-background rounded-lg text-left"
+                      transition={{ delay: 0.25 }}
+                      className="mt-6 rounded-[1.5rem] bg-ui-background p-5 text-left"
                     >
                       <h3 className="text-lg font-bold text-primary-teal mb-2">Did you know?</h3>
                       <p className="text-ui-textMuted">{explanation}</p>
                     </motion.div>
                   )}
                 </motion.div>
-              )}
-            </motion.div>
+              </motion.div>
+            )}
 
-            {/* Answer buttons - optimized for mobile */}
             {!showingAnswer && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
                 <motion.button
                   onClick={() => handleAnswer(false)}
                   disabled={selectedAnswer !== null}
                   whileTap={{ scale: selectedAnswer !== null ? 1 : 0.95 }}
-                  className={`btn-answer min-h-[100px] text-3xl sm:text-2xl font-bold ${
+                  className={`btn-answer min-h-[100px] text-3xl font-bold sm:text-2xl ${
                     selectedAnswer === false ? 'ring-4 ring-white' : ''
                   } ${selectedAnswer !== null && selectedAnswer !== false ? 'opacity-50' : ''} 
                   active:scale-95 transition-all touch-manipulation`}
-                  style={{ backgroundColor: '#FF4757' }}
+                  style={{ backgroundColor: '#bf5c43' }}
                 >
                   FALSE
                 </motion.button>
@@ -365,18 +334,18 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
                   onClick={() => handleAnswer(true)}
                   disabled={selectedAnswer !== null}
                   whileTap={{ scale: selectedAnswer !== null ? 1 : 0.95 }}
-                  className={`btn-answer min-h-[100px] text-3xl sm:text-2xl font-bold ${
+                  className={`btn-answer min-h-[100px] text-3xl font-bold sm:text-2xl ${
                     selectedAnswer === true ? 'ring-4 ring-white' : ''
                   } ${selectedAnswer !== null && selectedAnswer !== true ? 'opacity-50' : ''} 
                   active:scale-95 transition-all touch-manipulation`}
-                  style={{ backgroundColor: '#00D4AA' }}
+                  style={{ backgroundColor: '#6f9a79' }}
                 >
                   TRUE
                 </motion.button>
               </div>
             )}
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -386,22 +355,22 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
     const myResult = results.results.find((r: any) => r.playerId === playerId);
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="card max-w-2xl w-full"
+          className="card w-full max-w-3xl p-6 sm:p-8"
         >
-          <h2 className="text-4xl font-bold text-center mb-6">
+          <h2 className="mb-6 text-center text-3xl font-bold sm:text-4xl">
             Game Over!
           </h2>
 
           {myResult && (
             <div className="text-center mb-8">
-              <p className="text-6xl font-bold mb-2" style={{ color: '#00D4AA' }}>
+              <p className="mb-2 text-5xl font-bold sm:text-6xl" style={{ color: '#00D4AA' }}>
                 {myResult.accuracy}%
               </p>
-              <p className="text-2xl text-ui-textMuted mb-4">
+              <p className="mb-4 text-xl text-ui-textMuted sm:text-2xl">
                 {myResult.correct} / {myResult.total} correct
               </p>
               <p className="text-xl">
@@ -412,32 +381,6 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
               </p>
             </div>
           )}
-
-          <div className="border-t border-ui-border pt-6">
-            <h3 className="font-bold mb-4 text-center">Top Performers</h3>
-            <div className="space-y-2">
-              {results.results.slice(0, 5).map((result: any, index: number) => (
-                <motion.div
-                  key={result.playerId}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`p-3 rounded-lg ${
-                    result.playerId === playerId ? 'bg-primary-blue bg-opacity-20 border-2 border-primary-blue' : 'bg-ui-background'
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">
-                      {index + 1}. {result.playerName}
-                    </span>
-                    <span className="text-game-correct font-bold">
-                      {result.accuracy}%
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
         </motion.div>
       </div>
     );
@@ -452,4 +395,3 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
     </div>
   );
 };
-

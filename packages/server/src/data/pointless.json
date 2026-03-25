@@ -1,79 +1,135 @@
 [
   {
-    "id": "round_1_elements",
-    "category": "Chemical Elements",
-    "question": "Name any element in the Periodic Table",
+    "id": "round_1_south_america",
+    "category": "South American Countries",
+    "question": "Name any country in South America",
     "answers": {
-      "oxygen": 92,
-      "iron": 85,
-      "gold": 70,
-      "scandium": 2,
-      "tennessine": 0,
-      "moscovium": 0,
-      "hydrogen": 100,
-      "helium": 100
+      "brazil": 100,
+      "argentina": 92,
+      "chile": 78,
+      "peru": 74,
+      "colombia": 72,
+      "ecuador": 52,
+      "bolivia": 48,
+      "venezuela": 46,
+      "uruguay": 34,
+      "paraguay": 28,
+      "guyana": 6,
+      "suriname": 0
     }
   },
   {
-    "id": "round_2_countries",
-    "category": "Countries ending in A",
-    "question": "Name any country ending in the letter A",
+    "id": "round_2_b_countries",
+    "category": "Countries Beginning with B",
+    "question": "Name any country whose English name begins with the letter B",
     "answers": {
-      "china": 80,
-      "india": 75,
-      "australia": 60,
-      "albania": 15,
-      "andorra": 5,
-      "antigua and barbuda": 0
+      "brazil": 100,
+      "belgium": 78,
+      "bangladesh": 72,
+      "bahamas": 50,
+      "bulgaria": 46,
+      "botswana": 38,
+      "belarus": 34,
+      "bahrain": 28,
+      "bolivia": 24,
+      "bhutan": 18,
+      "benin": 12,
+      "belize": 10,
+      "barbados": 8,
+      "brunei": 6,
+      "burkina faso": 4,
+      "burundi": 2,
+      "bosnia and herzegovina": 0
     }
   },
   {
-    "id": "round_3_oscars",
-    "category": "Oscar Best Picture Winners",
-    "question": "Name any film that has won Best Picture at the Oscars",
+    "id": "round_3_nintendo_home_consoles",
+    "category": "Nintendo Home Consoles",
+    "question": "Name any Nintendo home console",
     "answers": {
-      "titanic": 90,
-      "the godfather": 85,
-      "parasite": 40,
-      "moonlight": 10,
-      "spotlight": 5,
-      "coda": 0
+      "switch": {
+        "label": "Nintendo Switch",
+        "score": 100
+      },
+      "wii": {
+        "label": "Wii",
+        "score": 92
+      },
+      "nintendo 64": {
+        "label": "Nintendo 64",
+        "score": 78
+      },
+      "gamecube": {
+        "label": "GameCube",
+        "score": 54
+      },
+      "snes": {
+        "label": "SNES",
+        "score": 38
+      },
+      "nes": {
+        "label": "NES",
+        "score": 20
+      },
+      "wii u": {
+        "label": "Wii U",
+        "score": 0
+      }
     }
   },
   {
-    "id": "round_4_capitals",
-    "category": "European Capital Cities",
-    "question": "Name any capital city in Europe",
+    "id": "round_4_premier_league_winners",
+    "category": "Premier League Title-Winning Clubs",
+    "question": "Name any club that has won the Premier League title",
     "answers": {
-      "london": 95,
-      "paris": 93,
-      "berlin": 88,
-      "rome": 87,
-      "madrid": 85,
-      "athens": 70,
-      "dublin": 60,
-      "prague": 45,
-      "tallinn": 8,
-      "vaduz": 2,
-      "san marino": 0
+      "manchester united": {
+        "label": "Manchester United",
+        "score": 100
+      },
+      "liverpool": {
+        "label": "Liverpool",
+        "score": 92
+      },
+      "arsenal": {
+        "label": "Arsenal",
+        "score": 84
+      },
+      "chelsea": {
+        "label": "Chelsea",
+        "score": 80
+      },
+      "manchester city": {
+        "label": "Manchester City",
+        "score": 74
+      },
+      "leicester city": {
+        "label": "Leicester City",
+        "score": 18
+      },
+      "blackburn rovers": {
+        "label": "Blackburn Rovers",
+        "score": 0
+      }
     }
   },
   {
-    "id": "round_5_shakespeare",
-    "category": "Shakespeare Plays",
-    "question": "Name any play written by William Shakespeare",
+    "id": "round_5_planets_dwarf_planets",
+    "category": "Planets and Dwarf Planets",
+    "question": "Name any planet or official dwarf planet in our Solar System",
     "answers": {
-      "romeo and juliet": 98,
-      "hamlet": 96,
-      "macbeth": 94,
-      "othello": 78,
-      "a midsummer night's dream": 72,
-      "the tempest": 55,
-      "king lear": 48,
-      "much ado about nothing": 42,
-      "titus andronicus": 12,
-      "timon of athens": 3,
-      "pericles": 0
+      "earth": 100,
+      "mars": 98,
+      "jupiter": 96,
+      "saturn": 92,
+      "venus": 90,
+      "mercury": 84,
+      "neptune": 72,
+      "uranus": 68,
+      "pluto": 56,
+      "ceres": 12,
+      "eris": 8,
+      "makemake": 4,
+      "haumea": 0
     }
   }
 ]

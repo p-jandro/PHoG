@@ -8,7 +8,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { Timer } from '../utils/timer.js';
-import { calculateQuizScore, getLeader, updatePlayerPlacements } from '../utils/scoring.js';
+import { calculateQuizScore, getLeader } from '../utils/scoring.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,6 +16,8 @@ const __dirname = dirname(__filename);
 // Load quiz rounds
 const quizRoundsPath = join(__dirname, '../data/quizRounds.json');
 const quizRounds = JSON.parse(readFileSync(quizRoundsPath, 'utf-8'));
+const ROUND_LEADERBOARD_DURATION = 5000;
+const QUESTION_RESULTS_DURATION = 3000;
 
 export class QuizGame {
   constructor(gameState, io, gameEngine) {
@@ -31,9 +33,12 @@ export class QuizGame {
       votes: new Map(), // playerId -> optionId
       currentQuestion: null,
       questionStartTime: null,
+      introEndsAt: null,
+      votingEndsAt: null,
+      questionEndsAt: null,
       answers: new Map(), // playerId -> { answer, timeRemaining }
       questionNumber: 0,
-      totalQuestions: 15, // 15 rounds
+      totalQuestions: Math.min(10, quizRounds.length),
       currentRoundOptions: null
     };
   }
@@ -51,6 +56,7 @@ export class QuizGame {
    */
   showIntro() {
     this.gameState.quiz.phase = 'intro';
+    this.gameState.quiz.introEndsAt = Date.now() + 30000;
 
     console.log('[QUIZ] Showing intro and rules');
 
@@ -58,7 +64,7 @@ export class QuizGame {
     const duration = 30000;
     this.io.emit('quiz:intro', {
       title: 'Quiz Challenge',
-      description: '15 rounds of trivia questions',
+      description: `${this.gameState.quiz.totalQuestions} rounds of trivia questions`,
       scoringRules: [
         'Easy: 100 pts base',
         'Medium: 200 pts base',
@@ -69,7 +75,7 @@ export class QuizGame {
       ],
       placementInfo: 'Your rank in this game determines your placement score',
       duration,
-      endsAt: Date.now() + duration
+      endsAt: this.gameState.quiz.introEndsAt
     });
 
     // Auto-advance after 30 seconds
@@ -84,6 +90,7 @@ export class QuizGame {
    */
   startVoting() {
     this.gameState.quiz.phase = 'voting';
+    this.gameState.quiz.introEndsAt = null;
     this.gameState.quiz.votes.clear();
 
     // Get options for current round
@@ -111,6 +118,7 @@ export class QuizGame {
 
     // Emit voting start to all players
     const duration = 10000;
+    this.gameState.quiz.votingEndsAt = Date.now() + duration;
     this.io.emit('quiz:voting:start', {
       options: votingOptions,
       duration,
@@ -200,6 +208,7 @@ export class QuizGame {
 
     console.log(`[QUIZ] Voting ended. Winner: ${winningOption.category} (${winningOption.difficulty}) - ${maxVotes} votes`);
     console.log('[QUIZ] Vote counts:', voteCounts);
+    this.gameState.quiz.votingEndsAt = null;
 
     // Emit voting results with vote counts
     this.io.emit('quiz:voting:end', {
@@ -251,6 +260,7 @@ export class QuizGame {
 
     // Emit question to all players (without correct answer)
     const duration = 12000;
+    this.gameState.quiz.questionEndsAt = Date.now() + duration;
     this.io.emit('quiz:question:start', {
       questionId: questionOption.id,
       question: questionOption.question,
@@ -264,7 +274,7 @@ export class QuizGame {
       endsAt: Date.now() + duration
     });
 
-    // Auto-advance after 15 seconds
+    // Auto-advance after 12 seconds
     this.timer = new Timer(duration, null, () => {
       this.endQuestion();
     });
@@ -339,6 +349,7 @@ export class QuizGame {
     const correctAnswer = question.correct;
     const difficulty = question.difficulty;
     const totalTime = 12000;
+    this.gameState.quiz.questionEndsAt = null;
 
     console.log(`[QUIZ] ========== ENDING QUESTION ==========`);
     console.log(`[QUIZ] Correct answer: ${correctAnswer}`);
@@ -387,22 +398,35 @@ export class QuizGame {
 
     // Emit results to all players
     this.io.emit('quiz:question:end', {
+      questionId: question.id,
+      question: question.question,
+      answers: question.answers,
+      category: question.category,
+      difficulty: question.difficulty,
       correctAnswer,
+      correctAnswerText: question.answers[correctAnswer],
       results,
       leaderboard: this.gameEngine.getLeaderboard()
     });
 
     // Broadcast updated player list
     this.gameEngine.broadcastPlayerList();
-
-    // Continue to next question or end quiz
     this.trackTimeout(() => {
-      if (this.gameState.quiz.questionNumber >= this.gameState.quiz.totalQuestions) {
-        this.endQuiz();
-      } else {
-        this.startVoting();
-      }
-    }, 5000); // 5 second delay to show results
+      this.gameEngine.showRoundLeaderboard('quiz', ROUND_LEADERBOARD_DURATION, {
+        roundNumber: this.gameState.quiz.questionNumber,
+        totalRounds: this.gameState.quiz.totalQuestions,
+        unitLabel: 'Question'
+      });
+
+      // Continue to next question or end quiz
+      this.trackTimeout(() => {
+        if (this.gameState.quiz.questionNumber >= this.gameState.quiz.totalQuestions) {
+          this.endQuiz();
+        } else {
+          this.startVoting();
+        }
+      }, ROUND_LEADERBOARD_DURATION);
+    }, QUESTION_RESULTS_DURATION);
   }
 
   /**
@@ -410,9 +434,6 @@ export class QuizGame {
    */
   endQuiz() {
     console.log('[QUIZ] Quiz game ended');
-
-    // Calculate placements for quiz
-    updatePlayerPlacements(this.gameState.players, 'quiz');
 
     this.io.emit('quiz:end', {
       finalLeaderboard: this.gameEngine.getLeaderboard()
@@ -492,15 +513,20 @@ export class QuizGame {
       phase: this.gameState.quiz.phase,
       questionNumber: this.gameState.quiz.questionNumber,
       totalQuestions: this.gameState.quiz.totalQuestions,
+      introEndsAt: this.gameState.quiz.introEndsAt,
+      votingEndsAt: this.gameState.quiz.votingEndsAt,
+      questionEndsAt: this.gameState.quiz.questionEndsAt,
+      currentRoundOptions: this.gameState.quiz.currentRoundOptions,
       currentQuestion: this.gameState.quiz.currentQuestion ? {
+        id: this.gameState.quiz.currentQuestion.id,
         question: this.gameState.quiz.currentQuestion.question,
         answers: this.gameState.quiz.currentQuestion.answers,
-        category: this.gameState.quiz.currentQuestion.category
+        category: this.gameState.quiz.currentQuestion.category,
+        difficulty: this.gameState.quiz.currentQuestion.difficulty,
+        color: this.gameState.quiz.currentQuestion.color
       } : null,
       voteCount: this.gameState.quiz.votes.size,
       answerCount: this.gameState.quiz.answers.size
     };
   }
 }
-
-

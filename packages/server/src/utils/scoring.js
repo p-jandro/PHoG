@@ -107,26 +107,25 @@ export function getLeader(players) {
  * @param {Map} players - Map of player IDs to player objects
  * @returns {Array} - Array of player objects sorted by score
  */
-export function generateLeaderboard(players, gameType = null) {
+export function generateLeaderboard(players, gameType = null, usePlacement = false) {
   const playerArray = Array.from(players.values());
 
-  // If we have placement data, use placement-based sorting (lower is better)
-  // Otherwise fall back to score-based sorting
-  const hasPlacementData = playerArray.some(p => p.totalPlacement && p.totalPlacement > 0);
+  if (usePlacement) {
+    const placementPlayers = playerArray.filter(p => p.totalPlacement && p.totalPlacement > 0);
 
-  if (hasPlacementData) {
-    return playerArray
-      .filter(p => p.totalPlacement && p.totalPlacement > 0) // Only players who completed games
-      .sort((a, b) => a.totalPlacement - b.totalPlacement) // Lower placement = better
-      .map((player, index) => ({
-        rank: index + 1,
-        id: player.id,
-        name: player.name,
-        score: player.score,
-        placements: player.placements,
-        totalPlacement: player.totalPlacement,
-        connected: player.connected
-      }));
+    if (placementPlayers.length > 0) {
+      return placementPlayers
+        .sort((a, b) => a.totalPlacement - b.totalPlacement) // Lower placement = better
+        .map((player, index) => ({
+          rank: index + 1,
+          id: player.id,
+          name: player.name,
+          score: player.score,
+          placements: player.placements,
+          totalPlacement: player.totalPlacement,
+          connected: player.connected
+        }));
+    }
   }
 
   // Fallback to score-based leaderboard (during individual games)
@@ -323,4 +322,3 @@ export function generatePlacementLeaderboard(players) {
 
   return playerArray;
 }
-

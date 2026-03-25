@@ -14,6 +14,7 @@ export class GameEngine extends EventEmitter {
     this.currentGameModule = null;
     this.isGameRunning = false; // Flag to prevent concurrent games
     this.leaderboardTimeout = null; // Track leaderboard timeout
+    this.roundLeaderboardHistory = {};
 
     // Championship state
     this.championship = {
@@ -145,6 +146,10 @@ export class GameEngine extends EventEmitter {
     // Clear the module reference
     this.currentGameModule = null;
 
+    if (gameName) {
+      this.roundLeaderboardHistory[gameName] = null;
+    }
+
     // Clear game-specific state
     if (this.gameState[gameName]) {
       console.log(`[CLEANUP] Clearing ${gameName} state`);
@@ -228,6 +233,7 @@ export class GameEngine extends EventEmitter {
     this.gameState.currentGame = gameName;
     this.currentGameModule = gameModule;
     this.isGameRunning = true;
+    this.roundLeaderboardHistory[gameName] = null;
 
     console.log(`[GAME] Set isGameRunning = true`);
 
@@ -306,6 +312,45 @@ export class GameEngine extends EventEmitter {
   }
 
   /**
+   * Emit a game-specific round leaderboard without changing the main session phase
+   */
+  showRoundLeaderboard(game, duration = 5000, extra = {}) {
+    const { leaderboard, roundNumber, ...rest } = extra;
+    const nextLeaderboard = leaderboard || this.getLeaderboard();
+    const previousLeaderboard = this.roundLeaderboardHistory[game];
+    const canShowRankDelta =
+      typeof roundNumber === 'number' &&
+      roundNumber > 1 &&
+      Array.isArray(previousLeaderboard) &&
+      previousLeaderboard.length > 0;
+
+    const leaderboardWithDeltas = nextLeaderboard.map((entry) => {
+      const previousEntry = canShowRankDelta
+        ? previousLeaderboard.find((candidate) => candidate.id === entry.id)
+        : null;
+
+      return {
+        ...entry,
+        rankDelta: previousEntry ? previousEntry.rank - entry.rank : null
+      };
+    });
+
+    this.roundLeaderboardHistory[game] = leaderboardWithDeltas.map((entry) => ({
+      id: entry.id,
+      rank: entry.rank
+    }));
+
+    this.io.emit('round:leaderboard:show', {
+      game,
+      duration,
+      leaderboard: leaderboardWithDeltas,
+      timestamp: Date.now(),
+      roundNumber,
+      ...rest
+    });
+  }
+
+  /**
    * Return to lobby
    */
   returnToLobby() {
@@ -379,6 +424,7 @@ export class GameEngine extends EventEmitter {
     this.gameState.trueFalse = null;
     this.gameState.countdown = null;
     this.gameState.pointless = null;
+    this.roundLeaderboardHistory = {};
 
     this.transitionPhase('lobby');
 
@@ -398,7 +444,11 @@ export class GameEngine extends EventEmitter {
    * @returns {Array}
    */
   getLeaderboard() {
-    return generateLeaderboard(this.gameState.players, this.gameState.currentGame);
+    const usePlacement =
+      this.gameState.currentPhase === 'leaderboard' ||
+      this.gameState.currentPhase === 'finished';
+
+    return generateLeaderboard(this.gameState.players, this.gameState.currentGame, usePlacement);
   }
 
   /**
@@ -571,4 +621,3 @@ export class GameEngine extends EventEmitter {
     };
   }
 }
-

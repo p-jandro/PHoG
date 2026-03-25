@@ -1,182 +1,302 @@
 [
   {
     "id": "tf001",
-    "statement": "The Earth is flat.",
-    "answer": false,
-    "explanation": "The Earth is actually an oblate spheroid - slightly flattened at the poles and bulging at the equator due to its rotation. This has been proven by satellite imagery, circumnavigation, and countless scientific measurements!"
+    "statement": "Mercury is the closest planet to the Sun.",
+    "answer": true,
+    "explanation": "Mercury has the smallest average orbital distance from the Sun, at about 58 million kilometers. It completes one orbit in just 88 Earth days."
   },
   {
     "id": "tf002",
-    "statement": "Water boils at 100°C at sea level.",
-    "answer": true,
-    "explanation": "At standard atmospheric pressure (sea level), water boils at exactly 100°C (212°F). However, at higher altitudes where air pressure is lower, water boils at lower temperatures - which is why cooking takes longer in the mountains!"
+    "statement": "The Sahara is the largest desert on Earth.",
+    "answer": false,
+    "explanation": "Antarctica is the largest desert overall because deserts are defined by low precipitation, not heat. The Sahara is the largest hot desert."
   },
   {
     "id": "tf003",
-    "statement": "The Great Wall of China is visible from space.",
-    "answer": false,
-    "explanation": "This is a common myth! Astronauts have confirmed that the Great Wall is virtually invisible from low Earth orbit without magnification. It's only about 6 meters wide and blends in with the natural landscape. However, highways and airports are more visible!"
+    "statement": "Sound travels faster through water than through air.",
+    "answer": true,
+    "explanation": "Sound waves move much more quickly through water because its particles are packed more closely together. In seawater, sound travels at roughly 1,500 meters per second."
   },
   {
     "id": "tf004",
-    "statement": "Sharks are mammals.",
-    "answer": false,
-    "explanation": "Sharks are fish, not mammals! They're cartilaginous fish (their skeletons are made of cartilage, not bone), they breathe through gills, and they're cold-blooded. Mammals like whales and dolphins breathe air and are warm-blooded."
+    "statement": "An adult human body typically has 206 bones.",
+    "answer": true,
+    "explanation": "Most adults have 206 bones, though the exact number can vary slightly because some bones may fuse or remain separate."
   },
   {
     "id": "tf005",
-    "statement": "A tomato is technically a fruit.",
-    "answer": true,
-    "explanation": "Botanically speaking, tomatoes are fruits because they develop from the ovary of a flower and contain seeds. However, in 1893, the U.S. Supreme Court ruled them vegetables for trade purposes! Cucumbers, peppers, and pumpkins are also technically fruits."
+    "statement": "The Atlantic Ocean is the largest ocean on Earth.",
+    "answer": false,
+    "explanation": "The Pacific Ocean is the largest ocean by surface area and volume. The Atlantic is the second largest."
   },
   {
     "id": "tf006",
-    "statement": "Lightning never strikes the same place twice.",
-    "answer": false,
-    "explanation": "Lightning definitely strikes the same place multiple times! Tall structures like the Empire State Building get struck about 20-25 times per year. In fact, lightning tends to strike the highest point in an area repeatedly."
+    "statement": "Venus is the hottest planet in the Solar System.",
+    "answer": true,
+    "explanation": "Although Mercury is closer to the Sun, Venus has a thick carbon-dioxide atmosphere that traps heat extremely efficiently through a runaway greenhouse effect."
   },
   {
     "id": "tf007",
-    "statement": "Humans have more than 5 senses.",
-    "answer": true,
-    "explanation": "Beyond the traditional five (sight, hearing, smell, taste, touch), we have many more! These include proprioception (body position), equilibrioception (balance), thermoception (temperature), and nociception (pain). Scientists estimate we have between 9 and 21 different senses!"
+    "statement": "Bananas grow on trees.",
+    "answer": false,
+    "explanation": "Bananas grow on giant herbs, not trees. The 'trunk' is a pseudostem made from tightly packed leaf bases."
   },
   {
     "id": "tf008",
-    "statement": "Goldfish have a 3-second memory.",
+    "statement": "The capital of Canada is Toronto.",
     "answer": false,
-    "explanation": "Goldfish actually have impressive memories! Studies show they can remember things for at least three months and can be trained to recognize shapes, colors, and sounds. They can even tell time and anticipate feeding schedules!"
+    "explanation": "Ottawa is the capital of Canada. Toronto is the most populous city in the country."
   },
   {
     "id": "tf009",
-    "statement": "Mount Everest is the tallest mountain on Earth.",
+    "statement": "Glass is made primarily from sand.",
     "answer": true,
-    "explanation": "At 8,849 meters (29,032 feet) above sea level, Mount Everest is Earth's highest point. However, if measured from base to peak, Mauna Kea in Hawaii is taller (10,210m total, but most is underwater). And from Earth's center, Ecuador's Mount Chimborazo is furthest!"
+    "explanation": "Most ordinary glass is made mainly from silica, which is found in sand. Other ingredients are added to change its melting point and properties."
   },
   {
     "id": "tf010",
-    "statement": "Penguins can fly.",
-    "answer": false,
-    "explanation": "Penguins cannot fly in the air - they evolved to swim instead! However, they're excellent 'flyers' underwater, using their wings as flippers to 'fly' through the ocean at speeds up to 22 mph. Their dense bones help them dive deep."
+    "statement": "Water expands when it freezes.",
+    "answer": true,
+    "explanation": "Ice forms an open crystal structure that takes up more space than liquid water. That is why ice floats."
   },
   {
     "id": "tf011",
-    "statement": "The sun is a star.",
-    "answer": true,
-    "explanation": "The Sun is a medium-sized yellow dwarf star, about 4.6 billion years old! It's one of over 100 billion stars in our Milky Way galaxy. It provides Earth with light and heat through nuclear fusion, converting 600 million tons of hydrogen into helium every second."
+    "statement": "Australia lies entirely in the Northern Hemisphere.",
+    "answer": false,
+    "explanation": "Australia is entirely in the Southern Hemisphere. The Tropic of Capricorn passes through the country."
   },
   {
     "id": "tf012",
-    "statement": "Bats are blind.",
-    "answer": false,
-    "explanation": "Bats are not blind! All bats can see, and many species have excellent vision. While they do use echolocation (biological sonar) to navigate in darkness, fruit bats rely heavily on their eyesight and have vision comparable to humans."
+    "statement": "An octopus has three hearts.",
+    "answer": true,
+    "explanation": "Two hearts pump blood to the gills, while a third pumps blood to the rest of the body."
   },
   {
     "id": "tf013",
-    "statement": "Octopuses have three hearts.",
+    "statement": "Light travels faster than sound.",
     "answer": true,
-    "explanation": "Octopuses have three hearts: two pump blood to the gills, while the third pumps it to the rest of the body. Interestingly, the heart that delivers blood to the body stops beating when the octopus swims - which is why they prefer crawling!"
+    "explanation": "In a vacuum, light travels at about 300,000 kilometers per second. Sound is far slower because it needs a medium such as air or water."
   },
   {
     "id": "tf014",
-    "statement": "The human body has four lungs.",
-    "answer": false,
-    "explanation": "Humans have two lungs, not four! The right lung is larger and divided into three lobes, while the left lung has two lobes to make room for the heart. Together, they contain about 2,400 km of airways and 300-500 million alveoli."
+    "statement": "The chemical symbol for silver is Ag.",
+    "answer": true,
+    "explanation": "Ag comes from the Latin word argentum. Many chemical symbols are based on older Latin names."
   },
   {
     "id": "tf015",
-    "statement": "Honey never spoils.",
-    "answer": true,
-    "explanation": "Honey is virtually immortal! Archaeologists have found 3,000-year-old honey in Egyptian tombs that was still edible. Its low moisture content and acidic pH prevent bacterial growth. Bees add an enzyme that produces hydrogen peroxide, giving honey antibacterial properties."
+    "statement": "Koalas are a type of bear.",
+    "answer": false,
+    "explanation": "Koalas are marsupials, not bears. They carry their young in a pouch."
   },
   {
     "id": "tf016",
-    "statement": "A day on Venus is longer than a year on Venus.",
-    "answer": true,
-    "explanation": "Venus takes 243 Earth days to rotate once on its axis (one Venus day), but only 225 Earth days to orbit the Sun (one Venus year). This means a day on Venus is longer than its year! Venus also rotates backwards compared to most planets."
+    "statement": "A leap year occurs every four years without exception.",
+    "answer": false,
+    "explanation": "Century years are not leap years unless they are divisible by 400. For example, 1900 was not a leap year, but 2000 was."
   },
   {
     "id": "tf017",
-    "statement": "Chameleons change color to blend in with their environment.",
-    "answer": false,
-    "explanation": "Chameleons primarily change color to communicate mood, regulate temperature, and attract mates - not for camouflage! They use special cells called chromatophores containing different pigments. Mood and temperature changes trigger these cells to expand or contract, creating color shifts."
+    "statement": "Machu Picchu is in Peru.",
+    "answer": true,
+    "explanation": "Machu Picchu is a famous Inca site high in the Andes Mountains of Peru."
   },
   {
     "id": "tf018",
-    "statement": "The Pacific Ocean is the largest ocean.",
+    "statement": "Human skin is the body's largest organ.",
     "answer": true,
-    "explanation": "The Pacific Ocean covers about 165 million square kilometers - larger than all of Earth's land area combined! It contains more than half of the world's ocean water and is so vast you could fit all the continents inside it with room to spare."
+    "explanation": "Skin covers the entire body and plays a major role in protection, sensation, and temperature regulation."
   },
   {
     "id": "tf019",
-    "statement": "Bulls are enraged by the color red.",
+    "statement": "Penguins live only in the Arctic.",
     "answer": false,
-    "explanation": "Bulls are colorblind to red and green! They actually react to the movement of the matador's cape, not its color. In bullfighting, the red color is traditional and helps hide bloodstains, but the bull would charge at any color of moving fabric."
+    "explanation": "Penguins are native to the Southern Hemisphere. None are naturally found in the Arctic."
   },
   {
     "id": "tf020",
-    "statement": "Bananas are berries, but strawberries aren't.",
+    "statement": "The Suez Canal connects the Mediterranean Sea and the Red Sea.",
     "answer": true,
-    "explanation": "Botanically, berries must develop from one flower with one ovary and have seeds embedded in the flesh. Bananas qualify, but strawberries don't - they're 'accessory fruits' with seeds on the outside! Blueberries and grapes are true berries, while raspberries and blackberries aren't."
+    "explanation": "The canal cuts across Egypt and provides a direct shipping route between Europe and Asia without rounding Africa."
   },
   {
     "id": "tf021",
-    "statement": "The Eiffel Tower can be 15 cm taller during summer.",
+    "statement": "Bamboo is a type of grass.",
     "answer": true,
-    "explanation": "Due to thermal expansion, the iron in the Eiffel Tower expands when heated by the sun, making it grow up to 15 cm (6 inches) taller in summer! The side facing the sun also curves away from it by up to 18 cm as it expands more than the shaded side."
+    "explanation": "Despite its woody appearance, bamboo belongs to the grass family Poaceae."
   },
   {
     "id": "tf022",
-    "statement": "Humans can breathe and swallow at the same time.",
-    "answer": false,
-    "explanation": "Adults cannot breathe and swallow simultaneously - the epiglottis blocks the windpipe when swallowing to prevent choking! However, babies can do both at once until about 6-9 months old, which allows them to breathe while feeding. We lose this ability as our larynx descends."
+    "statement": "Jupiter has more than 70 known moons.",
+    "answer": true,
+    "explanation": "Jupiter has well over 70 known moons and the total continues to change as new moons are confirmed."
   },
   {
     "id": "tf023",
-    "statement": "Your fingernails grow faster than your toenails.",
-    "answer": true,
-    "explanation": "Fingernails grow about 3-4 mm per month, while toenails only grow 1-2 mm per month - roughly 3 times slower! The reason is likely related to better blood circulation in fingers and more frequent use. Interestingly, nails grow faster in summer and on your dominant hand!"
+    "statement": "The Roman numeral L means 100.",
+    "answer": false,
+    "explanation": "L represents 50. The Roman numeral for 100 is C."
   },
   {
     "id": "tf024",
-    "statement": "All planets in our solar system rotate counterclockwise.",
-    "answer": false,
-    "explanation": "Venus and Uranus are the rebels! Venus rotates clockwise (retrograde rotation), possibly due to a massive ancient collision. Uranus rotates on its side at a 98-degree angle, likely knocked over by an impact. All other planets rotate counterclockwise when viewed from above the North Pole."
+    "statement": "Caffeine occurs naturally in tea leaves.",
+    "answer": true,
+    "explanation": "Tea plants naturally produce caffeine, just like coffee plants do."
   },
   {
     "id": "tf025",
-    "statement": "The Amazon rainforest produces 20% of the world's oxygen.",
+    "statement": "The Pacific Ring of Fire is mainly associated with earthquakes and volcanoes.",
     "answer": true,
-    "explanation": "The Amazon rainforest produces about 20% of Earth's oxygen through photosynthesis, earning it the nickname 'the lungs of the Earth.' However, it also consumes most of that oxygen through decomposition and respiration. The ocean's phytoplankton actually produces more net oxygen!"
+    "explanation": "It follows the edges of several tectonic plates around the Pacific Ocean, which makes it one of the most geologically active regions on Earth."
   },
   {
     "id": "tf026",
-    "statement": "Diamonds are made from compressed coal.",
+    "statement": "Saturn is the only planet in the Solar System with rings.",
     "answer": false,
-    "explanation": "Diamonds are not formed from coal! They crystallize from carbon under extreme heat and pressure 140-190 km beneath Earth's surface, long before coal even formed. Most diamonds are 1-3 billion years old, while coal formed from plants only 300 million years ago. The carbon sources are completely different!"
+    "explanation": "Jupiter, Uranus, and Neptune also have ring systems. Saturn's are simply the most spectacular and easiest to see."
   },
   {
     "id": "tf027",
-    "statement": "An ostrich's eye is bigger than its brain.",
+    "statement": "The blue whale is the largest animal known to have lived.",
     "answer": true,
-    "explanation": "An ostrich's eye measures about 5 cm (2 inches) in diameter - the largest eye of any land animal - while its brain is only about the size of a walnut! Despite their small brains, ostriches are actually quite clever and can reach speeds of 70 km/h (43 mph)."
+    "explanation": "Blue whales exceed even the largest known dinosaurs in overall mass."
   },
   {
     "id": "tf028",
-    "statement": "Humans only use 10% of their brains.",
-    "answer": false,
-    "explanation": "This is a complete myth! Brain imaging studies show we use virtually all parts of our brain, just not all at once. Even during sleep, the brain is active. The myth may have originated from early neuroscience misunderstandings. We use 100% of our brain - just different areas for different tasks!"
+    "statement": "The currency used in Japan is the yen.",
+    "answer": true,
+    "explanation": "Japan's national currency is the yen, abbreviated as JPY in international finance."
   },
   {
     "id": "tf029",
-    "statement": "A group of flamingos is called a 'flamboyance'.",
-    "answer": true,
-    "explanation": "A group of flamingos is indeed called a 'flamboyance'! Other fun collective nouns include: a 'murder' of crows, a 'parliament' of owls, a 'conspiracy' of ravens, and a 'bloat' of hippos. Flamingos get their pink color from carotenoids in their diet of algae and shrimp!"
+    "statement": "Shakespeare wrote The Odyssey.",
+    "answer": false,
+    "explanation": "The Odyssey is an ancient Greek epic poem traditionally attributed to Homer."
   },
   {
     "id": "tf030",
-    "statement": "The Moon has its own light.",
+    "statement": "The Great Barrier Reef is off the coast of Queensland.",
+    "answer": true,
+    "explanation": "It stretches along the northeastern coast of Australia, mostly off the state of Queensland."
+  },
+  {
+    "id": "tf031",
+    "statement": "An ostrich's eye is larger than its brain.",
+    "answer": true,
+    "explanation": "Ostriches have exceptionally large eyes, each bigger than their relatively small brain."
+  },
+  {
+    "id": "tf032",
+    "statement": "Humans have exactly five senses and no more.",
     "answer": false,
-    "explanation": "The Moon doesn't produce its own light - it reflects sunlight! The bright 'moonlight' we see is actually the Sun's light bouncing off the Moon's rocky surface. This is why the Moon appears to go through phases: we're seeing different amounts of its sunlit side from Earth."
+    "explanation": "Beyond sight, hearing, smell, taste, and touch, humans also have senses such as balance, pain, temperature, and body position."
+  },
+  {
+    "id": "tf033",
+    "statement": "Mount Kilimanjaro is in Kenya.",
+    "answer": false,
+    "explanation": "Mount Kilimanjaro is in Tanzania, near the Kenyan border."
+  },
+  {
+    "id": "tf034",
+    "statement": "Pure honey can remain edible for years.",
+    "answer": true,
+    "explanation": "Honey's low moisture and acidic chemistry make it very resistant to spoilage when it is stored properly."
+  },
+  {
+    "id": "tf035",
+    "statement": "The Nile flows into the Mediterranean Sea.",
+    "answer": true,
+    "explanation": "The Nile runs north through northeastern Africa and empties into the Mediterranean in Egypt."
+  },
+  {
+    "id": "tf036",
+    "statement": "The human heart sits exactly in the center of the chest.",
+    "answer": false,
+    "explanation": "The heart sits slightly left of center, although much of it remains behind the breastbone."
+  },
+  {
+    "id": "tf037",
+    "statement": "A standard piano has 88 keys.",
+    "answer": true,
+    "explanation": "Most modern full-size pianos have 52 white keys and 36 black keys, for a total of 88."
+  },
+  {
+    "id": "tf038",
+    "statement": "Mandarin Chinese has more native speakers than English.",
+    "answer": true,
+    "explanation": "English is dominant globally as a second language, but Mandarin has more first-language speakers."
+  },
+  {
+    "id": "tf039",
+    "statement": "Gold is denser than silver.",
+    "answer": true,
+    "explanation": "Gold is significantly denser than silver, which is why equal-sized pieces of gold weigh more."
+  },
+  {
+    "id": "tf040",
+    "statement": "The Moon produces its own light.",
+    "answer": false,
+    "explanation": "Moonlight is reflected sunlight. The Moon does not generate visible light of its own."
+  },
+  {
+    "id": "tf041",
+    "statement": "Mario first appeared in the arcade game Donkey Kong.",
+    "answer": true,
+    "explanation": "Nintendo first introduced the character later known as Mario in the 1981 arcade game Donkey Kong."
+  },
+  {
+    "id": "tf042",
+    "statement": "The original Tetris was created in Japan.",
+    "answer": false,
+    "explanation": "Tetris was designed in 1984 by Alexey Pajitnov in the Soviet Union, not in Japan."
+  },
+  {
+    "id": "tf043",
+    "statement": "Valve developed the original Half-Life.",
+    "answer": true,
+    "explanation": "Half-Life was Valve's debut game and was released in 1998."
+  },
+  {
+    "id": "tf044",
+    "statement": "In most Legend of Zelda games, the main playable hero is named Zelda.",
+    "answer": false,
+    "explanation": "The playable hero is usually Link. Zelda is the princess after whom the series is named."
+  },
+  {
+    "id": "tf045",
+    "statement": "The Nintendo Wii launched before the Nintendo Switch.",
+    "answer": true,
+    "explanation": "The Wii launched in 2006, while the Nintendo Switch launched in 2017."
+  },
+  {
+    "id": "tf046",
+    "statement": "The Premier League was founded in 1992.",
+    "answer": true,
+    "explanation": "England's top division broke away from the Football League in 1992, with the first Premier League season beginning in 1992-93."
+  },
+  {
+    "id": "tf047",
+    "statement": "Anfield is the home stadium of Manchester United.",
+    "answer": false,
+    "explanation": "Anfield is Liverpool's home ground. Manchester United play at Old Trafford."
+  },
+  {
+    "id": "tf048",
+    "statement": "Arsenal are nicknamed the Gunners.",
+    "answer": true,
+    "explanation": "Arsenal's long-standing nickname is the Gunners, a reference to the club's roots in Woolwich's armaments industry."
+  },
+  {
+    "id": "tf049",
+    "statement": "A win in the Premier League is worth two points.",
+    "answer": false,
+    "explanation": "A win is worth three points, a draw is worth one, and a loss is worth none."
+  },
+  {
+    "id": "tf050",
+    "statement": "Chelsea play their home league matches at Stamford Bridge.",
+    "answer": true,
+    "explanation": "Chelsea's home stadium is Stamford Bridge in west London."
   }
 ]

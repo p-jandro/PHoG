@@ -2,14 +2,39 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:3000';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:3000`
+    : 'http://localhost:3000'
+);
+const PLAYER_URL = import.meta.env.VITE_PLAYER_URL || (
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:5173`
+    : 'http://localhost:5173'
+);
 
 interface Player {
   id: string;
   name: string;
   score: number;
+  currentGameScore: number;
+  totalPlacementScore: number;
+  gamePlacements?: {
+    quiz: number | null;
+    trueFalse: number | null;
+    countdown: number | null;
+    pointless: number | null;
+  };
   connected: boolean;
 }
+
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+const GAME_LABELS: Record<GameKey, string> = {
+  quiz: 'Quiz',
+  trueFalse: 'True/False',
+  countdown: 'Countdown',
+  pointless: 'Pointless'
+};
 
 export const Dashboard = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -26,31 +51,61 @@ export const Dashboard = () => {
   const [answeredPlayers, setAnsweredPlayers] = useState<Map<string, 'correct' | 'incorrect' | 'answered'>>(new Map());
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
+  const [timerEndsAt, setTimerEndsAt] = useState<number | null>(null);
+  const [pointlessReadyToReveal, setPointlessReadyToReveal] = useState(false);
+  const [championshipActive, setChampionshipActive] = useState(false);
   
   // Championship state
   const [championshipMode, setChampionshipMode] = useState(false);
-  const [selectedGames, setSelectedGames] = useState<Set<string>>(new Set(['quiz', 'trueFalse', 'countdown', 'pointless']));
+  const [selectedGames, setSelectedGames] = useState<Set<string>>(new Set(['quiz', 'trueFalse', 'pointless']));
   const availableGames = [
     { id: 'quiz', name: 'Quiz' },
     { id: 'trueFalse', name: 'True or False' },
-    { id: 'countdown', name: 'Countdown' },
     { id: 'pointless', name: 'Pointless' }
   ];
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (timeRemaining > 0) {
-      const startTime = Date.now();
-      const initialTime = timeRemaining;
-      timer = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const remaining = Math.max(0, initialTime - elapsed);
-        setTimeRemaining(remaining);
-        if (remaining === 0) clearInterval(timer);
-      }, 100);
+  const activeGame = (gameState?.currentGame || null) as GameKey | null;
+  const playerJoinLabel = PLAYER_URL.replace(/^https?:\/\//, '');
+  const championshipPlayers = [...players].sort((a, b) => {
+    const aPlacement = a.totalPlacementScore || 0;
+    const bPlacement = b.totalPlacementScore || 0;
+
+    if (aPlacement === 0 && bPlacement === 0) {
+      return activeGame === 'pointless'
+        ? (a.currentGameScore || a.score || 0) - (b.currentGameScore || b.score || 0)
+        : (b.currentGameScore || b.score || 0) - (a.currentGameScore || a.score || 0);
     }
-    return () => { if (timer) clearInterval(timer); };
-  }, [timeRemaining > 0]); // Trigger when time is set
+
+    if (aPlacement === 0) return 1;
+    if (bPlacement === 0) return -1;
+    if (aPlacement !== bPlacement) return aPlacement - bPlacement;
+
+    return a.name.localeCompare(b.name);
+  });
+
+  useEffect(() => {
+    if (!timerEndsAt) {
+      return;
+    }
+
+    const updateRemaining = () => {
+      const remaining = Math.max(0, timerEndsAt - Date.now());
+      setTimeRemaining(remaining);
+      return remaining;
+    };
+
+    updateRemaining();
+
+    const timer = setInterval(() => {
+      if (updateRemaining() === 0) {
+        clearInterval(timer);
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [timerEndsAt]);
 
   useEffect(() => {
     const newSocket = io(SERVER_URL, {
@@ -74,6 +129,7 @@ export const Dashboard = () => {
       console.log('[Host] Disconnected');
       setConnected(false);
       setAuthenticated(false);
+      setPointlessReadyToReveal(false);
     });
 
     // Heartbeat - respond to server pings
@@ -86,6 +142,13 @@ export const Dashboard = () => {
       setAuthenticated(true);
       setGameState(data.gameState);
       setPlayers(data.gameState?.players || []);
+      setChampionshipActive(Boolean(data.gameState?.championship?.active));
+      setPointlessReadyToReveal(
+        Boolean(
+          data.gameState?.currentGame === 'pointless' &&
+          data.gameState?.pointless?.phase === 'reveal'
+        )
+      );
       setError('');
     });
 
@@ -112,6 +175,22 @@ export const Dashboard = () => {
       setGameState((prev: any) => ({ ...prev, currentGame: game, phase: 'playing' }));
       setLiveData(null);
       setAnsweredPlayers(new Map());
+      setPointlessReadyToReveal(false);
+    });
+
+    newSocket.on('host:control:success', ({ action }) => {
+      if (action === 'startChampionship') {
+        setChampionshipActive(true);
+      }
+
+      if (action === 'reset' || action === 'lobby' || action === 'end') {
+        setChampionshipActive(false);
+        setPointlessReadyToReveal(false);
+      }
+
+      if (action === 'reveal') {
+        setPointlessReadyToReveal(false);
+      }
     });
 
     // Listen for championship updates (need to handle player list update for championship state)
@@ -131,6 +210,7 @@ export const Dashboard = () => {
       setAnsweredPlayers(new Map());
       setTotalTime(data.duration);
       setTimeRemaining(data.duration);
+      setTimerEndsAt(Date.now() + data.duration);
     });
 
     newSocket.on('truefalse:statement', (data) => {
@@ -138,6 +218,7 @@ export const Dashboard = () => {
       setAnsweredPlayers(new Map());
       setTotalTime(data.duration);
       setTimeRemaining(data.duration);
+      setTimerEndsAt(Date.now() + data.duration);
     });
 
     newSocket.on('countdown:round:start', (data) => {
@@ -145,6 +226,7 @@ export const Dashboard = () => {
       setAnsweredPlayers(new Map());
       setTotalTime(data.duration);
       setTimeRemaining(data.duration);
+      setTimerEndsAt(Date.now() + data.duration);
     });
 
     newSocket.on('pointless:round:start', (data) => {
@@ -152,6 +234,8 @@ export const Dashboard = () => {
       setAnsweredPlayers(new Map());
       setTotalTime(data.duration);
       setTimeRemaining(data.duration);
+      setTimerEndsAt(Date.now() + data.duration);
+      setPointlessReadyToReveal(false);
     });
 
     newSocket.on('host:player_answered', ({ playerId, isCorrect }: { playerId: string; isCorrect?: boolean }) => {
@@ -166,12 +250,20 @@ export const Dashboard = () => {
     // Clear live data on round ends
     const clearLive = () => {
       setTimeRemaining(0);
+      setTimerEndsAt(null);
       // Keep the text but maybe indicate "Ended"
     };
     newSocket.on('quiz:question:end', clearLive);
     newSocket.on('truefalse:answer', clearLive);
     newSocket.on('countdown:round:end', clearLive);
     newSocket.on('pointless:round:end', clearLive);
+    newSocket.on('pointless:round:end', () => {
+      setPointlessReadyToReveal(true);
+    });
+    newSocket.on('session:end', () => {
+      setChampionshipActive(false);
+      setPointlessReadyToReveal(false);
+    });
 
     setSocket(newSocket);
     newSocket.connect();
@@ -192,8 +284,6 @@ export const Dashboard = () => {
 
   const startChampionship = () => {
     if (socket && selectedGames.size > 0) {
-      const sequence = Array.from(selectedGames);
-      // Sort sequence based on availableGames order to maintain logical flow
       const sortedSequence = availableGames
         .filter(g => selectedGames.has(g.id))
         .map(g => g.id);
@@ -229,18 +319,23 @@ export const Dashboard = () => {
   const revealResults = () => {
     if (socket) {
       socket.emit('host:control', { action: 'reveal' });
+      setPointlessReadyToReveal(false);
     }
   };
 
   const resetGame = () => {
     if (socket && confirm('Are you sure you want to reset the game?')) {
       socket.emit('host:control', { action: 'reset' });
+      setChampionshipActive(false);
+      setPointlessReadyToReveal(false);
     }
   };
 
   const returnToLobby = () => {
     if (socket) {
       socket.emit('host:control', { action: 'lobby' });
+      setChampionshipActive(false);
+      setPointlessReadyToReveal(false);
     }
   };
 
@@ -253,6 +348,8 @@ export const Dashboard = () => {
   const handleLogout = () => {
     sessionStorage.removeItem('hostPassword');
     setAuthenticated(false);
+    setChampionshipActive(false);
+    setPointlessReadyToReveal(false);
     if (socket) {
       socket.disconnect();
     }
@@ -260,85 +357,122 @@ export const Dashboard = () => {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="screen-shell flex items-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="card max-w-md w-full"
+          className="screen-frame grid max-w-5xl gap-6 lg:grid-cols-[1fr_0.92fr]"
         >
-          <h1 className="text-4xl font-bold text-center mb-2 text-white">
-            Host Control
-          </h1>
-          <p className="text-ui-textMuted text-center mb-8">
-            Peter's House of Games
-          </p>
+          <div className="card flex flex-col justify-between gap-8 p-8 sm:p-10">
+            <div className="space-y-5">
+              <p className="eyebrow">Host Station</p>
+              <div className="space-y-3">
+                <h1 className="text-5xl font-bold sm:text-6xl">Run the Room</h1>
+                <p className="max-w-2xl text-lg leading-relaxed text-ui-textMuted">
+                  Start rounds, monitor responses, and keep the room moving without hunting through controls.
+                </p>
+              </div>
+            </div>
 
-          <div className="mb-6 p-3 rounded-lg bg-ui-background border border-ui-border">
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${connected ? 'bg-game-correct' : 'bg-game-incorrect'}`} />
-              <span className="text-sm">
-                {connected ? 'Connected to server' : 'Connecting...'}
-              </span>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-5">
+                <p className="section-label mb-2">Connection</p>
+                <p className="text-2xl font-semibold">{connected ? 'Live' : 'Waiting'}</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-5">
+                <p className="section-label mb-2">Views</p>
+                <p className="text-2xl font-semibold">Dashboard and Display</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-5">
+                <p className="section-label mb-2">Format</p>
+                <p className="text-2xl font-semibold">Single Rounds or Championship</p>
+              </div>
             </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2">
-                Host Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter host password"
-                className="w-full px-4 py-3 bg-ui-card border border-ui-border rounded-lg text-ui-text focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                required
-                disabled={!connected}
-              />
+          <div className="card p-8 sm:p-9">
+            <p className="eyebrow mb-3">Secure Entry</p>
+            <h2 className="text-3xl font-bold">Host Login</h2>
+            <p className="mt-2 text-ui-textMuted">
+              Use the host password to unlock controls for the current session.
+            </p>
+
+            <div className="my-6 rounded-[1.35rem] border border-ui-border/80 bg-black/20 p-4">
+              <div className="flex items-center gap-3">
+                <div className={`h-2.5 w-2.5 rounded-full ${connected ? 'bg-game-correct' : 'bg-game-incorrect'}`} />
+                <span className="font-medium">
+                  {connected ? 'Connected to server' : 'Connecting to server'}
+                </span>
+              </div>
             </div>
 
-            {error && (
-              <p className="text-game-incorrect text-sm">{error}</p>
-            )}
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label htmlFor="password" className="section-label mb-2 block">
+                  Host Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter host password"
+                  className="input-field"
+                  required
+                  disabled={!connected}
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={!connected || !password}
-              className="btn w-full bg-primary-blue"
-            >
-              Login as Host
-            </button>
-          </form>
+              {error && (
+                <p className="text-sm text-game-incorrect">{error}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={!connected || !password}
+                className="btn w-full bg-primary-blue"
+              >
+                Unlock Host Controls
+              </button>
+            </form>
+
+            <div className="mt-5 rounded-[1.35rem] border border-ui-border/80 bg-white/[0.03] p-4 text-sm text-ui-textMuted">
+              The display view stays in this same app, so you can switch between control mode and the public screen without opening another tool.
+            </div>
+          </div>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8 flex justify-between items-start">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">Host Dashboard</h1>
-            <p className="text-ui-textMuted">
-              Phase: <span className="font-bold text-primary-teal">{gameState?.phase || 'lobby'}</span>
-              {gameState?.currentGame && (
-                <> | Game: <span className="font-bold text-primary-blue">{gameState.currentGame}</span></>
-              )}
-            </p>
+    <div className="screen-shell">
+      <div className="screen-frame">
+        <div className="card mb-6 p-7 sm:p-8">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="eyebrow mb-3">Control Room</p>
+              <h1 className="text-4xl font-bold sm:text-5xl">Host Dashboard</h1>
+              <p className="mt-2 text-ui-textMuted">
+                Session phase <span className="font-semibold text-primary-teal">{gameState?.phase || 'lobby'}</span>
+                {gameState?.currentGame && (
+                  <> • current game <span className="font-semibold text-primary-blue">{gameState.currentGame}</span></>
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <span className="status-pill">{players.filter(p => p.connected).length} players connected</span>
+              <button
+                onClick={handleLogout}
+                className="btn bg-white/10 text-ui-text"
+              >
+                Logout
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 rounded-lg bg-ui-background hover:bg-ui-border text-ui-textMuted hover:text-ui-text transition-colors"
-          >
-            Logout
-          </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
           {/* Live Game View */}
           {gameState?.phase === 'playing' && (
@@ -376,7 +510,6 @@ export const Dashboard = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
                   {players.filter(p => p.connected).map(player => {
                     const answerStatus = answeredPlayers.get(player.id);
-                    const hasAnswered = !!answerStatus;
                     let bgClass = 'bg-ui-card border border-ui-border text-ui-textMuted'; // not answered
                     if (answerStatus === 'correct') {
                       bgClass = 'bg-emerald-800 text-white border border-emerald-600'; // darker green for correct
@@ -404,6 +537,7 @@ export const Dashboard = () => {
 
           {/* Game Controls */}
           <div className="card lg:col-span-2">
+            <p className="eyebrow mb-3">Session Controls</p>
             <h2 className="text-2xl font-bold mb-4">Game Controls</h2>
 
             {/* Championship Mode Toggle */}
@@ -423,8 +557,8 @@ export const Dashboard = () => {
 
               {championshipMode && (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-2">
-                    {availableGames.map(game => (
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {availableGames.map(game => (
                       <label key={game.id} className="flex items-center space-x-2 p-2 rounded hover:bg-ui-card cursor-pointer">
                         <input
                           type="checkbox"
@@ -450,7 +584,7 @@ export const Dashboard = () => {
             </div>
 
             {!championshipMode && (
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <button
                   onClick={() => startGame('quiz')}
                   disabled={gameState?.phase !== 'lobby'}
@@ -466,13 +600,6 @@ export const Dashboard = () => {
                   Start True/False
                 </button>
                 <button
-                  onClick={() => startGame('countdown')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-primary-purple"
-                >
-                  Start Countdown
-                </button>
-                <button
                   onClick={() => startGame('pointless')}
                   disabled={gameState?.phase !== 'lobby'}
                   className="btn bg-game-incorrect"
@@ -483,7 +610,7 @@ export const Dashboard = () => {
             )}
 
             {/* Championship Continue Button */}
-            {gameState?.phase === 'leaderboard' && gameState?.championship?.active && (
+            {gameState?.phase === 'leaderboard' && championshipActive && (
                <div className="mb-6 p-4 border-2 border-game-leader rounded-lg bg-game-leader/10 animate-pulse">
                  <h3 className="font-bold text-center mb-2 text-game-leader">Championship in Progress</h3>
                  <button
@@ -496,7 +623,7 @@ export const Dashboard = () => {
             )}
 
             {/* Pointless Controls */}
-            {gameState?.currentGame === 'pointless' && (
+            {gameState?.currentGame === 'pointless' && pointlessReadyToReveal && (
               <div className="mb-6 p-4 border border-ui-border rounded-lg bg-ui-background/50">
                 <h3 className="font-bold mb-2 text-sm text-ui-textMuted uppercase">Pointless Controls</h3>
                 <button
@@ -508,7 +635,7 @@ export const Dashboard = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4 border-t border-ui-border pt-4">
+            <div className="grid grid-cols-1 gap-4 border-t border-ui-border pt-4 sm:grid-cols-2">
               <button
                 onClick={returnToLobby}
                 disabled={gameState?.phase === 'lobby'}
@@ -525,7 +652,7 @@ export const Dashboard = () => {
               </button>
               <button
                 onClick={resetGame}
-                className="btn bg-game-incorrect col-span-2"
+                className="btn bg-game-incorrect sm:col-span-2"
               >
                 Reset Game
               </button>
@@ -534,10 +661,13 @@ export const Dashboard = () => {
 
           {/* Player Stats */}
           <div className="card">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">
+            <div className="mb-4 flex justify-between items-center">
+              <div>
+                <p className="eyebrow mb-2">Room Overview</p>
+                <h2 className="text-2xl font-bold">
                 Players ({players.filter(p => p.connected).length}/{players.length})
-              </h2>
+                </h2>
+              </div>
               {gameState?.phase === 'lobby' && players.length > 0 && (
                 <span className="text-sm text-game-correct animate-pulse">
                   ● Waiting Room
@@ -551,7 +681,7 @@ export const Dashboard = () => {
                     No players yet
                   </p>
                   <p className="text-ui-textMuted text-sm">
-                    Share http://localhost:5173 with players
+                    Share {playerJoinLabel} with players
                   </p>
                 </div>
               ) : (
@@ -598,6 +728,64 @@ export const Dashboard = () => {
             </div>
           </div>
 
+          <div className="card lg:col-span-3">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="eyebrow mb-2">Championship Table</p>
+                <h2 className="text-2xl font-bold">Current Standings</h2>
+              </div>
+              <span className="status-pill">
+                {activeGame ? `${GAME_LABELS[activeGame]} just ended` : 'Live placements'}
+              </span>
+            </div>
+
+            {championshipPlayers.length === 0 ? (
+              <div className="rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-6 text-ui-textMuted">
+                Championship standings will appear once players join the room.
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {championshipPlayers.slice(0, 9).map((player, index) => (
+                  <div
+                    key={player.id}
+                    className={`rounded-[1.6rem] border px-5 py-5 ${
+                      index < 3 ? 'border-white/10 bg-white/[0.07]' : 'border-ui-border/80 bg-black/20'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="truncate text-xl font-semibold">
+                          {index + 1}. {player.name}
+                        </p>
+                        <p className="mt-2 text-sm text-ui-textMuted">
+                          Championship total: {player.totalPlacementScore || '-'}
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {(['quiz', 'trueFalse', 'pointless'] as GameKey[]).map((game) => (
+                            <span
+                              key={game}
+                              className="rounded-full border border-ui-border/70 bg-black/20 px-3 py-1 text-xs font-semibold text-ui-textMuted"
+                            >
+                              {GAME_LABELS[game]}: {player.gamePlacements?.[game] ?? '-'}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-3xl font-bold ${index === 0 ? 'text-game-leader' : 'text-primary-teal'}`}>
+                          {player.totalPlacementScore || '-'}
+                        </p>
+                        <p className="mt-2 text-xs uppercase tracking-[0.18em] text-ui-textMuted">
+                          Total place
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Instructions */}
           <div className="card lg:col-span-3">
             <h2 className="text-2xl font-bold mb-4">Quick Guide</h2>
@@ -627,4 +815,3 @@ export const Dashboard = () => {
     </div>
   );
 };
-

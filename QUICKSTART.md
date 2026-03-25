@@ -70,7 +70,7 @@ npm run dev
 
 1. **On Host Panel:**
    - Wait for players to join
-   - Click "Start Quiz", "Start True/False", or "Start Countdown"
+   - Start a single game or launch a championship sequence
 
 2. **On Player App:**
    - Follow the on-screen instructions
@@ -109,22 +109,24 @@ npm run dev
 
 - **Start Quiz**: Begin the quiz game
 - **Start True/False**: Begin true/false game
-- **Start Countdown**: Begin word game
+- **Start Pointless**: Begin the low-score answer round
+- **Championship Mode**: Run the full multi-game sequence
 - **Return to Lobby**: Go back to waiting room
 - **Reset Game**: Reset all scores and return to lobby
 
 ## Default Settings
 
 - **Max Players**: 30
-- **Quiz Questions**: 5 per game
-- **True/False Statements**: 10 per game
-- **Countdown Rounds**: 3 per game
+- **Quiz Questions**: 15 per game
+- **True/False Statements**: 30 per game
+- **Pointless Rounds**: 5 per game
 - **Host Password**: admin123 (change in `.env.local`)
 
 ## Next Steps
 
-- Add more questions to `packages/server/src/data/questions.json`
+- Add or edit quiz rounds in `packages/server/src/data/quizRounds.json`
 - Add more statements to `packages/server/src/data/statements.json`
+- Add or edit Pointless categories in `packages/server/src/data/pointless.json`
 - Customize colors in `tailwind.config.js`
 - Deploy to production (see README.md)
 
@@ -137,4 +139,3 @@ Check the full README.md for:
 - Advanced configuration
 
 Enjoy your game! 🎮
-

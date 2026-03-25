@@ -3,7 +3,6 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import stringSimilarity from 'string-similarity';
 import { Timer } from '../utils/timer.js';
-import { updatePlayerPlacements } from '../utils/scoring.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -11,6 +10,75 @@ const __dirname = dirname(__filename);
 // Load pointless data
 const pointlessDataPath = join(__dirname, '../data/pointless.json');
 const pointlessData = JSON.parse(readFileSync(pointlessDataPath, 'utf-8'));
+
+export const POINTLESS_ROUND_DURATION = 30000;
+const POINTLESS_INTRO_DURATION = 30000;
+const POINTLESS_REVEAL_DURATION = 8000;
+const ROUND_LEADERBOARD_DURATION = 5000;
+const ANSWER_LABEL_OVERRIDES = {
+  coda: 'CODA'
+};
+
+const MINOR_TITLE_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'as',
+  'at',
+  'by',
+  'for',
+  'in',
+  'of',
+  'on',
+  'or',
+  'the',
+  'to'
+]);
+
+const formatAnswerLabel = (value) => {
+  if (!value) {
+    return value;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (ANSWER_LABEL_OVERRIDES[normalized]) {
+    return ANSWER_LABEL_OVERRIDES[normalized];
+  }
+
+  return normalized
+    .split(' ')
+    .map((word, index) => {
+      if (!word) {
+        return word;
+      }
+
+      if (index > 0 && MINOR_TITLE_WORDS.has(word)) {
+        return word;
+      }
+
+      return word
+        .split('-')
+        .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1) : part))
+        .join('-');
+    })
+    .join(' ');
+};
+
+const normalizeAnswerEntry = ([answer, rawValue]) => {
+  if (typeof rawValue === 'number') {
+    return {
+      answer,
+      displayText: formatAnswerLabel(answer),
+      score: rawValue
+    };
+  }
+
+  return {
+    answer,
+    displayText: rawValue.label || formatAnswerLabel(answer),
+    score: rawValue.score
+  };
+};
 
 export class PointlessGame {
   constructor(gameState, io, gameEngine) {
@@ -25,9 +93,13 @@ export class PointlessGame {
       phase: 'intro', // intro | playing | reveal | finished
       roundIndex: 0,
       currentRound: null,
-      answers: new Map(), // playerId -> { text, score, isCorrect, originalInput }
+      answers: new Map(), // playerId -> { text, displayText, score, isCorrect, originalInput }
+      introEndsAt: null,
       startTime: null,
-      revealIndex: 0
+      revealIndex: 0,
+      hasRevealed: false,
+      obscureAnswers: [],
+      frequentAnswers: []
     };
   }
 
@@ -36,7 +108,32 @@ export class PointlessGame {
    */
   start() {
     console.log('[POINTLESS] Starting Pointless game');
-    this.startRound(0);
+    this.showIntro();
+  }
+
+  showIntro() {
+    this.gameState.pointless.phase = 'intro';
+    this.gameState.pointless.introEndsAt = Date.now() + POINTLESS_INTRO_DURATION;
+
+    this.io.emit('pointless:intro', {
+      title: 'Pointless',
+      description: 'We asked 100 people. Find an official answer that as few of them gave as possible.',
+      scoringRules: [
+        'Each official answer is scored by how many people said it',
+        'Lower scores are better',
+        'A pointless answer scores 0',
+        'Invalid or missing answers score 100'
+      ],
+      placementInfo: 'Lowest total score wins this game',
+      totalRounds: pointlessData.length,
+      duration: POINTLESS_INTRO_DURATION,
+      endsAt: this.gameState.pointless.introEndsAt
+    });
+
+    this.timer = new Timer(POINTLESS_INTRO_DURATION, null, () => {
+      this.startRound(0);
+    });
+    this.timer.start();
   }
 
   /**
@@ -66,8 +163,12 @@ export class PointlessGame {
       // Don't send answers to client!
     };
     this.gameState.pointless.answers.clear();
+    this.gameState.pointless.introEndsAt = null;
     this.gameState.pointless.startTime = Date.now();
     this.gameState.pointless.revealIndex = 0;
+    this.gameState.pointless.hasRevealed = false;
+    this.gameState.pointless.obscureAnswers = [];
+    this.gameState.pointless.frequentAnswers = [];
 
     console.log(`[POINTLESS] Starting Round ${index + 1}: ${roundData.category}`);
 
@@ -77,11 +178,11 @@ export class PointlessGame {
       totalRounds: pointlessData.length,
       category: roundData.category,
       question: roundData.question,
-      duration: 20000 // 20 seconds to answer
+      duration: POINTLESS_ROUND_DURATION
     });
 
-    // Auto-reveal after 20 seconds
-    this.timer = new Timer(20000, null, () => {
+    // Auto-reveal after the answer window closes
+    this.timer = new Timer(POINTLESS_ROUND_DURATION, null, () => {
       this.endRound();
     });
     this.timer.start();
@@ -116,27 +217,31 @@ export class PointlessGame {
     }
 
     const roundData = pointlessData[this.gameState.pointless.roundIndex];
-    const answers = roundData.answers; // Object: { "answer": score }
+    const answerEntries = Object.entries(roundData.answers).map(normalizeAnswerEntry);
+    const answers = new Map(answerEntries.map((entry) => [entry.answer, entry]));
 
     let score = 100;
     let isCorrect = false;
     let matchedAnswer = null;
+    let matchedDisplayText = null;
 
     const strippedInput = stripArticles(input);
 
     // 1. Exact match check (try both original and stripped)
-    if (answers.hasOwnProperty(input)) {
-      score = answers[input];
+    if (answers.has(input)) {
+      score = answers.get(input).score;
       isCorrect = true;
       matchedAnswer = input;
-    } else if (answers.hasOwnProperty(strippedInput)) {
-      score = answers[strippedInput];
+      matchedDisplayText = answers.get(input).displayText;
+    } else if (answers.has(strippedInput)) {
+      score = answers.get(strippedInput).score;
       isCorrect = true;
       matchedAnswer = strippedInput;
+      matchedDisplayText = answers.get(strippedInput).displayText;
       console.log(`[POINTLESS] Article-stripped match: "${input}" -> "${strippedInput}"`);
     } else {
       // 2. Fuzzy match check with stripped candidates
-      const candidates = Object.keys(answers);
+      const candidates = Array.from(answers.keys());
       const strippedCandidates = candidates.map(stripArticles);
       const matches = stringSimilarity.findBestMatch(strippedInput, strippedCandidates);
       const bestMatch = matches.bestMatch;
@@ -145,7 +250,8 @@ export class PointlessGame {
         // Find original answer key
         const matchIndex = strippedCandidates.indexOf(bestMatch.target);
         matchedAnswer = candidates[matchIndex];
-        score = answers[matchedAnswer];
+        score = answers.get(matchedAnswer).score;
+        matchedDisplayText = answers.get(matchedAnswer).displayText;
         isCorrect = true;
         console.log(`[POINTLESS] Fuzzy match: "${input}" -> "${matchedAnswer}" (Rating: ${bestMatch.rating.toFixed(2)})`);
       } else {
@@ -159,6 +265,7 @@ export class PointlessGame {
     // Store result (do NOT reveal yet)
     this.gameState.pointless.answers.set(playerId, {
       text: matchedAnswer || input, // Use corrected text if matched
+      displayText: matchedDisplayText || text.trim(),
       originalInput: text,
       score,
       isCorrect
@@ -189,7 +296,7 @@ export class PointlessGame {
     if (this.timer) this.timer.stop();
     
     // Safety check
-    if (!this.gameState.pointless) {
+    if (!this.gameState.pointless || this.gameState.pointless.phase !== 'playing') {
       return;
     }
 
@@ -201,6 +308,7 @@ export class PointlessGame {
       if (!this.gameState.pointless.answers.has(playerId)) {
         this.gameState.pointless.answers.set(playerId, {
           text: "No Answer",
+          displayText: "No Answer",
           originalInput: "",
           score: 100,
           isCorrect: false
@@ -214,20 +322,31 @@ export class PointlessGame {
 
     // Notify host it's ready to reveal
     this.updateHost();
-
-    // Auto-reveal after brief delay
-    this.trackTimeout(() => {
-      this.revealResults();
-    }, 1000);
   }
 
   /**
    * Reveal results for all players simultaneously
    */
   revealResults() {
-    const triggerTime = Date.now() + 2000; // 2 seconds in future
+    if (!this.gameState.pointless || this.gameState.pointless.phase !== 'reveal') {
+      console.warn('[POINTLESS] Reveal requested outside reveal phase');
+      return;
+    }
+
+    if (this.gameState.pointless.hasRevealed) {
+      console.warn('[POINTLESS] Reveal already completed for this round');
+      return;
+    }
+
+    this.gameState.pointless.hasRevealed = true;
+    const triggerTime = Date.now() + 250;
+    const highlights = this.getRoundHighlights();
+    this.gameState.pointless.obscureAnswers = highlights.obscureAnswers;
+    this.gameState.pointless.frequentAnswers = highlights.frequentAnswers;
 
     console.log(`[POINTLESS] Revealing results at ${triggerTime}`);
+
+    this.io.emit('pointless:reveal:display', this.getDisplayRevealPayload(triggerTime));
 
     // Send individual results to each player
     for (const [playerId, answerData] of this.gameState.pointless.answers) {
@@ -238,47 +357,118 @@ export class PointlessGame {
 
         const socket = this.io.sockets.sockets.get(player.socketId);
         if (socket) {
-          socket.emit('game:pointless:reveal', {
-            score: answerData.score,
-            triggerTime,
-            isCorrect: answerData.isCorrect,
-            correctAnswer: answerData.text,
-            originalInput: answerData.originalInput
-          });
+          socket.emit('game:pointless:reveal', this.getRevealPayload(playerId, triggerTime));
         }
       }
     }
 
-    // Also update host with full results
-    // Wait for animation to finish (3s + 2s buffer) before moving on
+    this.gameEngine.broadcastPlayerList();
+
     this.trackTimeout(() => {
-      this.finishRound();
-    }, 6000);
+      this.gameEngine.showRoundLeaderboard('pointless', ROUND_LEADERBOARD_DURATION, {
+        roundNumber: this.gameState.pointless.roundIndex + 1,
+        totalRounds: pointlessData.length,
+        unitLabel: 'Round'
+      });
+
+      this.trackTimeout(() => {
+        this.finishRound();
+      }, ROUND_LEADERBOARD_DURATION);
+    }, POINTLESS_REVEAL_DURATION);
   }
 
   finishRound() {
-    // Show round summary / leaderboard
-    this.gameEngine.broadcastPlayerList();
-
-    // Wait then next round
-    this.trackTimeout(() => {
-      const nextRound = this.gameState.pointless.roundIndex + 1;
-      if (nextRound < pointlessData.length) {
-        this.startRound(nextRound);
-      } else {
-        this.endGame();
-      }
-    }, 5000);
+    const nextRound = this.gameState.pointless.roundIndex + 1;
+    if (nextRound < pointlessData.length) {
+      this.startRound(nextRound);
+    } else {
+      this.endGame();
+    }
   }
 
   updateHost() {
     // Optional: push specific state to host if needed outside standard polling
   }
 
+  getRoundHighlights() {
+    const roundData = pointlessData[this.gameState.pointless.roundIndex];
+    if (!roundData?.answers) {
+      return {
+        obscureAnswers: [],
+        frequentAnswers: []
+      };
+    }
+
+    const normalizedAnswers = Object.entries(roundData.answers)
+      .map(normalizeAnswerEntry)
+      .map(({ answer, displayText, score }) => ({
+        answer: displayText,
+        score,
+        isPointless: score === 0,
+        normalizedAnswer: answer
+      }));
+
+    const obscureAnswers = [...normalizedAnswers]
+      .sort((a, b) => {
+        if (a.score !== b.score) {
+          return a.score - b.score;
+        }
+
+        return a.answer.localeCompare(b.answer);
+      })
+      .slice(0, 3);
+
+    const frequentAnswers = [...normalizedAnswers]
+      .sort((a, b) => {
+        if (a.score !== b.score) {
+          return b.score - a.score;
+        }
+
+        return a.answer.localeCompare(b.answer);
+      })
+      .slice(0, 3);
+
+    return {
+      obscureAnswers,
+      frequentAnswers
+    };
+  }
+
+  getRevealPayload(playerId, triggerTime = Date.now() + 400) {
+    const answerData = this.gameState.pointless.answers.get(playerId);
+    if (!answerData) {
+      return null;
+    }
+
+    return {
+      score: answerData.score,
+      triggerTime,
+      isCorrect: answerData.isCorrect,
+      correctAnswer: answerData.displayText,
+      originalInput: answerData.originalInput
+    };
+  }
+
+  getDisplayRevealPayload(triggerTime = Date.now() + 250) {
+    const roundData = pointlessData[this.gameState.pointless.roundIndex];
+    if (!roundData) {
+      return null;
+    }
+
+    return {
+      triggerTime,
+      roundIndex: this.gameState.pointless.roundIndex,
+      totalRounds: pointlessData.length,
+      category: roundData.category,
+      question: roundData.question,
+      obscureAnswers: this.gameState.pointless.obscureAnswers || [],
+      frequentAnswers: this.gameState.pointless.frequentAnswers || []
+    };
+  }
+
   endGame() {
     console.log('[POINTLESS] Game finished');
     this.gameState.pointless.phase = 'finished';
-    updatePlayerPlacements(this.gameState.players, 'pointless'); // Add 'pointless' to valid games if needed or reuse a slot
 
     this.io.emit('pointless:end', {
       leaderboard: this.gameEngine.getLeaderboard()
@@ -343,10 +533,9 @@ export class PointlessGame {
       phase: this.gameState.pointless.phase,
       roundIndex: this.gameState.pointless.roundIndex,
       totalRounds: pointlessData.length,
+      introEndsAt: this.gameState.pointless.introEndsAt,
       currentRound: this.gameState.pointless.currentRound,
       answerCount: this.gameState.pointless.answers.size
     };
   }
 }
-
-

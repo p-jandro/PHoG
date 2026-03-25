@@ -2,31 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark;
+  --font-body: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  min-height: 100vh;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  @apply bg-ui-background text-ui-text;
+  background:
+    radial-gradient(circle at top left, rgba(208, 109, 69, 0.16), transparent 24rem),
+    radial-gradient(circle at top right, rgba(111, 154, 121, 0.16), transparent 20rem),
+    linear-gradient(180deg, #16110f 0%, #100c0a 56%, #0a0807 100%);
+  @apply text-ui-text;
 }
 
 #root {
   min-height: 100vh;
 }
 
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(225, 195, 114, 0.28);
+}
+
 @layer components {
+  .screen-shell {
+    @apply min-h-screen px-4 py-6 sm:px-6 sm:py-8;
+  }
+
+  .screen-frame {
+    @apply mx-auto w-full max-w-7xl;
+  }
+
+  .eyebrow {
+    @apply text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ui-textMuted;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold uppercase tracking-[0.24em] text-ui-textMuted;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-ui-border/80 bg-black/20 px-4 py-2 text-sm text-ui-textMuted shadow-[0_10px_24px_rgba(0,0,0,0.18)];
+  }
+
   .btn {
-    @apply px-6 py-3 rounded-xl font-semibold text-white
-           transition-all duration-300 shadow-md hover:shadow-lg
-           active:scale-[0.98]
-           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-md;
+    @apply inline-flex items-center justify-center rounded-full border border-white/10 px-6 py-3 font-semibold text-white
+           transition-all duration-300 shadow-[0_16px_30px_rgba(0,0,0,0.28)]
+           hover:-translate-y-0.5 hover:shadow-[0_22px_40px_rgba(0,0,0,0.35)]
+           active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
   .card {
-    @apply bg-ui-card border border-ui-border/50 rounded-2xl p-6
-           shadow-[0_4px_20px_rgb(0,0,0,0.15)];
+    @apply relative overflow-hidden rounded-[2rem] border border-ui-border/70 p-6
+           shadow-[0_18px_55px_rgba(0,0,0,0.32)];
+    background: linear-gradient(180deg, rgba(255, 244, 227, 0.08), rgba(255, 255, 255, 0.02));
+  }
+
+  .input-field {
+    @apply w-full rounded-[1.35rem] border border-ui-border/80 bg-black/20 px-4 py-3 text-ui-text placeholder-ui-textMuted
+           focus:outline-none focus:border-primary-blue/60 focus:ring-4 focus:ring-primary-blue/15
+           transition-all duration-300;
   }
 }
 
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+}

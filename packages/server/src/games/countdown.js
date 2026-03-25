@@ -7,7 +7,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { Timer } from '../utils/timer.js';
-import { calculateCountdownScore, updatePlayerPlacements } from '../utils/scoring.js';
+import { calculateCountdownScore } from '../utils/scoring.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -294,9 +294,6 @@ export class CountdownGame {
 
     this.gameState.countdown.phase = 'results';
 
-    // Calculate placements for Countdown
-    updatePlayerPlacements(this.gameState.players, 'countdown');
-
     this.io.emit('countdown:end', {
       finalLeaderboard: this.gameEngine.getLeaderboard()
     });
@@ -370,4 +367,3 @@ export class CountdownGame {
     };
   }
 }
-

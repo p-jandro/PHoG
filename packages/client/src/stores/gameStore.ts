@@ -1,5 +1,25 @@
 import { create } from 'zustand';
 
+export interface RoundLeaderboardEntry {
+  rank: number;
+  id: string;
+  name: string;
+  score: number;
+  connected: boolean;
+  streak?: number;
+  rankDelta?: number | null;
+}
+
+export interface RoundLeaderboardState {
+  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+  duration: number;
+  leaderboard: RoundLeaderboardEntry[];
+  roundNumber?: number | null;
+  totalRounds?: number | null;
+  unitLabel?: string;
+  timestamp: number;
+}
+
 export interface Player {
   id: string;
   name: string;
@@ -37,6 +57,7 @@ export interface GameState {
   currentGame: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | null;
   players: Player[];
   paused: boolean;
+  roundLeaderboard: RoundLeaderboardState | null;
 
   // Actions
   setConnected: (connected: boolean) => void;
@@ -47,6 +68,7 @@ export interface GameState {
   setPlayers: (players: Player[]) => void;
   updatePlayer: (player: Player) => void;
   setPaused: (paused: boolean) => void;
+  setRoundLeaderboard: (roundLeaderboard: RoundLeaderboardState | null) => void;
   reset: () => void;
 }
 
@@ -60,6 +82,7 @@ const initialState = {
   currentGame: null,
   players: [],
   paused: false,
+  roundLeaderboard: null,
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -87,6 +110,7 @@ export const useGameStore = create<GameState>((set) => ({
 
   setPaused: (paused) => set({ paused }),
 
+  setRoundLeaderboard: (roundLeaderboard) => set({ roundLeaderboard }),
+
   reset: () => set(initialState),
 }));
-

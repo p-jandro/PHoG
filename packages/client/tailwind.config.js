@@ -7,42 +7,41 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Plandek-inspired color scheme
         primary: {
-          navy: '#1a2332',
-          blue: '#0066FF',
-          teal: '#00D4AA',
-          purple: '#7B61FF',
+          navy: '#16110f',
+          blue: '#d06d45',
+          teal: '#6f9a79',
+          purple: '#8b5f6b',
         },
         game: {
-          correct: '#00D4AA',
-          incorrect: '#FF4757',
-          warning: '#FFA502',
-          leader: '#FFD700',
+          correct: '#6f9a79',
+          incorrect: '#bf5c43',
+          warning: '#d7a348',
+          leader: '#e1c372',
         },
         difficulty: {
-          easy: '#00D4AA',
-          medium: '#0066FF',
-          hard: '#FFA502',
-          impossible: '#FF4757',
+          easy: '#6f9a79',
+          medium: '#7186be',
+          hard: '#d7a348',
+          impossible: '#bf5c43',
         },
         answer: {
-          A: '#0066FF',
-          B: '#00D4AA',
-          C: '#FFA502',
-          D: '#7B61FF',
+          A: '#7186be',
+          B: '#6f9a79',
+          C: '#d7a348',
+          D: '#8b5f6b',
         },
         medal: {
-          gold: '#E8B931',
-          silver: '#A8B0BC',
-          bronze: '#CD7F32',
+          gold: '#d8b25a',
+          silver: '#b6aea2',
+          bronze: '#ad744c',
         },
         ui: {
-          background: '#131518',
-          card: '#1c1f26',
-          border: '#2d3039',
-          text: '#FFFFFF',
-          textMuted: '#8B92A1',
+          background: '#0f0b09',
+          card: '#1d1613',
+          border: '#4a392f',
+          text: '#f5ecdd',
+          textMuted: '#c7b59d',
         }
       },
       animation: {
@@ -53,4 +52,3 @@ export default {
   },
   plugins: [],
 }
-

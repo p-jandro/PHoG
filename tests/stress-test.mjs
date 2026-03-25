@@ -3,7 +3,7 @@
  * Usage: node tests/stress-test.js [numPlayers] [serverUrl]
  *
  * Simulates players joining, then playing through a championship:
- *   Quiz (15 rounds) → True/False (30 statements) → Pointless (5 rounds)
+ *   Quiz (10 rounds) → True/False (20 statements) → Pointless (5 rounds)
  *
  * The host must start the championship manually from the host panel,
  * OR pass --auto-host to have this script act as host too.
@@ -37,11 +37,11 @@ const LAST_NAMES = [
 
 // Known pointless answers for realistic submissions
 const POINTLESS_ANSWERS = {
-  'Chemical Elements': ['oxygen', 'iron', 'gold', 'scandium', 'tennessine', 'moscovium', 'hydrogen', 'helium', 'carbon', 'nitrogen', 'lithium', 'neon'],
-  'Countries ending in A': ['china', 'india', 'australia', 'albania', 'andorra', 'antigua and barbuda', 'argentina', 'canada', 'russia'],
-  'Oscar Best Picture Winners': ['titanic', 'the godfather', 'parasite', 'moonlight', 'spotlight', 'coda', 'rocky', 'gladiator', 'braveheart'],
-  'European Capital Cities': ['paris', 'london', 'berlin', 'madrid', 'rome', 'vienna', 'lisbon', 'oslo', 'prague', 'warsaw', 'bucharest'],
-  'Shakespeare Plays': ['hamlet', 'macbeth', 'othello', 'romeo and juliet', 'the tempest', 'a midsummer nights dream', 'king lear']
+  'South American Countries': ['brazil', 'argentina', 'chile', 'peru', 'colombia', 'ecuador', 'bolivia', 'venezuela', 'uruguay', 'paraguay', 'guyana', 'suriname'],
+  'Countries Beginning with B': ['brazil', 'belgium', 'bangladesh', 'bahamas', 'bulgaria', 'botswana', 'belarus', 'bahrain', 'bolivia', 'bhutan', 'benin', 'belize', 'barbados', 'brunei', 'burkina faso', 'burundi', 'bosnia and herzegovina'],
+  'Nintendo Home Consoles': ['switch', 'wii', 'nintendo 64', 'gamecube', 'snes', 'nes', 'wii u'],
+  'Premier League Title-Winning Clubs': ['manchester united', 'liverpool', 'arsenal', 'chelsea', 'manchester city', 'leicester city', 'blackburn rovers'],
+  'Planets and Dwarf Planets': ['earth', 'mars', 'jupiter', 'saturn', 'venus', 'mercury', 'neptune', 'uranus', 'pluto', 'ceres', 'eris', 'makemake', 'haumea']
 };
 
 // Stats tracking
@@ -142,8 +142,7 @@ function createPlayer(index) {
       const thinkTime = 1000 + Math.random() * (data.duration - 2000); // Answer within time limit
       await randomDelay(1000, Math.min(thinkTime, data.duration - 1000));
       const answers = ['A', 'B', 'C', 'D'];
-      // 40% chance of picking A (often correct for placeholders), rest random
-      const answer = Math.random() < 0.4 ? 'A' : randomChoice(answers);
+      const answer = randomChoice(answers);
       const timeRemaining = Math.max(0, data.duration - thinkTime);
 
       socket.emit('quiz:answer', {

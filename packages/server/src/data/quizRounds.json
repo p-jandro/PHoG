@@ -7,7 +7,7 @@
         "category": "History",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "When did World War II end?",
+        "question": "In what year did World War II end?",
         "answers": {
           "A": "1943",
           "B": "1945",
@@ -21,42 +21,42 @@
         "category": "Geography",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "What is the capital of Australia?",
+        "question": "What is the capital city of Australia?",
         "answers": {
           "A": "Sydney",
           "B": "Melbourne",
           "C": "Canberra",
-          "D": "Brisbane"
+          "D": "Perth"
         },
         "correct": "C"
       },
       {
         "id": "r1_option3",
-        "category": "Gaming",
+        "category": "Science",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "In what year was the original Super Mario Bros released?",
+        "question": "Which metal is liquid at standard room temperature?",
         "answers": {
-          "A": "1983",
-          "B": "1985",
-          "C": "1987",
-          "D": "1990"
+          "A": "Mercury",
+          "B": "Bromine",
+          "C": "Gallium",
+          "D": "Cesium"
         },
-        "correct": "B"
+        "correct": "A"
       },
       {
         "id": "r1_option4",
-        "category": "Flags",
+        "category": "Literature",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Which country's flag features a two-headed eagle?",
+        "question": "Which Bronte sister wrote Jane Eyre?",
         "answers": {
-          "A": "Albania",
-          "B": "Serbia",
-          "C": "Montenegro",
-          "D": "All of these"
+          "A": "Charlotte Bronte",
+          "B": "Emily Bronte",
+          "C": "Anne Bronte",
+          "D": "None of them"
         },
-        "correct": "D"
+        "correct": "A"
       }
     ]
   },
@@ -65,38 +65,58 @@
     "options": [
       {
         "id": "r2_option1",
-        "category": "Science",
+        "category": "Movies",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "Which film won the first Academy Award for Best Animated Feature?",
+        "answers": {
+          "A": "Shrek",
+          "B": "Monsters, Inc.",
+          "C": "Finding Nemo",
+          "D": "Toy Story 2"
+        },
         "correct": "A"
       },
       {
         "id": "r2_option2",
-        "category": "Sports",
+        "category": "Premier League",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which club is nicknamed the Gunners?",
+        "answers": {
+          "A": "Chelsea",
+          "B": "Arsenal",
+          "C": "Tottenham Hotspur",
+          "D": "West Ham United"
+        },
+        "correct": "B"
       },
       {
         "id": "r2_option3",
         "category": "Music",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which Beatles album includes both 'Come Together' and 'Something'?",
+        "answers": {
+          "A": "Let It Be",
+          "B": "Revolver",
+          "C": "Abbey Road",
+          "D": "Rubber Soul"
+        },
+        "correct": "C"
       },
       {
         "id": "r2_option4",
-        "category": "Movies",
+        "category": "Art",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "Who painted The Garden of Earthly Delights?",
+        "answers": {
+          "A": "Hieronymus Bosch",
+          "B": "Pieter Bruegel the Elder",
+          "C": "Albrecht Durer",
+          "D": "El Greco"
+        },
         "correct": "A"
       }
     ]
@@ -106,39 +126,59 @@
     "options": [
       {
         "id": "r3_option1",
-        "category": "History",
+        "category": "Food",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "Guacamole is primarily made from which fruit?",
+        "answers": {
+          "A": "Avocado",
+          "B": "Tomato",
+          "C": "Lime",
+          "D": "Mango"
+        },
         "correct": "A"
       },
       {
         "id": "r3_option2",
-        "category": "Geography",
+        "category": "Gaming",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "Which company developed the original Portal?",
+        "answers": {
+          "A": "Valve",
+          "B": "Ubisoft",
+          "C": "Blizzard Entertainment",
+          "D": "Bungie"
+        },
         "correct": "A"
       },
       {
         "id": "r3_option3",
-        "category": "Gaming",
+        "category": "Nature",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "What is the largest living reptile?",
+        "answers": {
+          "A": "Komodo dragon",
+          "B": "Saltwater crocodile",
+          "C": "Green anaconda",
+          "D": "Leatherback sea turtle"
+        },
+        "correct": "B"
       },
       {
         "id": "r3_option4",
-        "category": "Flags",
+        "category": "Language",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Basque is best described as which of the following?",
+        "answers": {
+          "A": "A Romance language",
+          "B": "A Germanic language",
+          "C": "A Celtic language",
+          "D": "A language isolate"
+        },
+        "correct": "D"
       }
     ]
   },
@@ -147,38 +187,58 @@
     "options": [
       {
         "id": "r4_option1",
-        "category": "Science",
+        "category": "Space",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which planet is known as the Red Planet?",
+        "answers": {
+          "A": "Venus",
+          "B": "Jupiter",
+          "C": "Mars",
+          "D": "Mercury"
+        },
+        "correct": "C"
       },
       {
         "id": "r4_option2",
-        "category": "Sports",
+        "category": "Architecture",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "In which city would you find the Sagrada Familia?",
+        "answers": {
+          "A": "Madrid",
+          "B": "Barcelona",
+          "C": "Valencia",
+          "D": "Seville"
+        },
+        "correct": "B"
       },
       {
         "id": "r4_option3",
-        "category": "Music",
+        "category": "Mythology",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "In Greek mythology, who solved the riddle of the Sphinx?",
+        "answers": {
+          "A": "Perseus",
+          "B": "Theseus",
+          "C": "Oedipus",
+          "D": "Orpheus"
+        },
+        "correct": "C"
       },
       {
         "id": "r4_option4",
-        "category": "Movies",
+        "category": "History",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "Which English king sealed the Magna Carta in 1215?",
+        "answers": {
+          "A": "King John",
+          "B": "Henry II",
+          "C": "Richard I",
+          "D": "Edward I"
+        },
         "correct": "A"
       }
     ]
@@ -188,39 +248,59 @@
     "options": [
       {
         "id": "r5_option1",
-        "category": "History",
+        "category": "Science",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which gas do plants absorb during photosynthesis?",
+        "answers": {
+          "A": "Oxygen",
+          "B": "Helium",
+          "C": "Hydrogen",
+          "D": "Carbon dioxide"
+        },
+        "correct": "D"
       },
       {
         "id": "r5_option2",
         "category": "Geography",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "Which mountain range is commonly used as part of the boundary between Europe and Asia?",
+        "answers": {
+          "A": "The Ural Mountains",
+          "B": "The Alps",
+          "C": "The Caucasus Mountains",
+          "D": "The Carpathians"
+        },
         "correct": "A"
       },
       {
         "id": "r5_option3",
-        "category": "Gaming",
+        "category": "Literature",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which novel opens with the line 'Call me Ishmael'?",
+        "answers": {
+          "A": "Treasure Island",
+          "B": "Moby-Dick",
+          "C": "The Old Man and the Sea",
+          "D": "Twenty Thousand Leagues Under the Sea"
+        },
+        "correct": "B"
       },
       {
         "id": "r5_option4",
-        "category": "Flags",
+        "category": "Art",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Who created the sculpture The Thinker?",
+        "answers": {
+          "A": "Michelangelo",
+          "B": "Donatello",
+          "C": "Auguste Rodin",
+          "D": "Gian Lorenzo Bernini"
+        },
+        "correct": "C"
       }
     ]
   },
@@ -229,38 +309,58 @@
     "options": [
       {
         "id": "r6_option1",
-        "category": "Science",
+        "category": "Gaming",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which character is Nintendo's famous plumber mascot?",
+        "answers": {
+          "A": "Luigi",
+          "B": "Wario",
+          "C": "Mario",
+          "D": "Yoshi"
+        },
+        "correct": "C"
       },
       {
         "id": "r6_option2",
-        "category": "Sports",
+        "category": "Medicine",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which blood type is known as the universal donor for red blood cells?",
+        "answers": {
+          "A": "AB positive",
+          "B": "A negative",
+          "C": "B negative",
+          "D": "O negative"
+        },
+        "correct": "D"
       },
       {
         "id": "r6_option3",
         "category": "Music",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Who composed The Planets suite?",
+        "answers": {
+          "A": "Edward Elgar",
+          "B": "Gustav Holst",
+          "C": "Ralph Vaughan Williams",
+          "D": "Claude Debussy"
+        },
+        "correct": "B"
       },
       {
         "id": "r6_option4",
-        "category": "Movies",
+        "category": "Science",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "Which physicist is most closely associated with the uncertainty principle?",
+        "answers": {
+          "A": "Werner Heisenberg",
+          "B": "Erwin Schrodinger",
+          "C": "Niels Bohr",
+          "D": "Paul Dirac"
+        },
         "correct": "A"
       }
     ]
@@ -270,39 +370,59 @@
     "options": [
       {
         "id": "r7_option1",
-        "category": "History",
+        "category": "Animals",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "What is the largest animal known to have lived on Earth?",
+        "answers": {
+          "A": "African elephant",
+          "B": "Giraffe",
+          "C": "Tyrannosaurus rex",
+          "D": "Blue whale"
+        },
+        "correct": "D"
       },
       {
         "id": "r7_option2",
-        "category": "Geography",
+        "category": "Premier League",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which stadium is the home ground of Liverpool FC?",
+        "answers": {
+          "A": "Etihad Stadium",
+          "B": "Stamford Bridge",
+          "C": "Anfield",
+          "D": "Villa Park"
+        },
+        "correct": "C"
       },
       {
         "id": "r7_option3",
-        "category": "Gaming",
+        "category": "Exploration",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "What was the name of the ship on which Charles Darwin sailed?",
+        "answers": {
+          "A": "HMS Endeavour",
+          "B": "HMS Resolution",
+          "C": "HMS Beagle",
+          "D": "HMS Victory"
+        },
+        "correct": "C"
       },
       {
         "id": "r7_option4",
-        "category": "Flags",
+        "category": "Geography",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "What is the official capital of Benin?",
+        "answers": {
+          "A": "Cotonou",
+          "B": "Parakou",
+          "C": "Ouidah",
+          "D": "Porto-Novo"
+        },
+        "correct": "D"
       }
     ]
   },
@@ -311,39 +431,59 @@
     "options": [
       {
         "id": "r8_option1",
-        "category": "Science",
+        "category": "Language",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which language is primarily spoken in Brazil?",
+        "answers": {
+          "A": "Spanish",
+          "B": "Portuguese",
+          "C": "French",
+          "D": "Italian"
+        },
+        "correct": "B"
       },
       {
         "id": "r8_option2",
-        "category": "Sports",
+        "category": "History",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Who was the first woman to fly solo across the Atlantic Ocean?",
+        "answers": {
+          "A": "Bessie Coleman",
+          "B": "Valentina Tereshkova",
+          "C": "Amelia Earhart",
+          "D": "Harriet Quimby"
+        },
+        "correct": "C"
       },
       {
         "id": "r8_option3",
-        "category": "Music",
+        "category": "Gaming",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which studio created the Dark Souls series?",
+        "answers": {
+          "A": "Capcom",
+          "B": "FromSoftware",
+          "C": "Square Enix",
+          "D": "CD Projekt Red"
+        },
+        "correct": "B"
       },
       {
         "id": "r8_option4",
-        "category": "Movies",
+        "category": "Math",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "The English word 'algorithm' ultimately comes from the Latinized name of which scholar?",
+        "answers": {
+          "A": "Euclid",
+          "B": "Fibonacci",
+          "C": "Al-Khwarizmi",
+          "D": "Gauss"
+        },
+        "correct": "C"
       }
     ]
   },
@@ -352,38 +492,58 @@
     "options": [
       {
         "id": "r9_option1",
-        "category": "History",
+        "category": "Nature",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "What is the tallest land animal?",
+        "answers": {
+          "A": "Giraffe",
+          "B": "Elephant",
+          "C": "Camel",
+          "D": "Moose"
+        },
         "correct": "A"
       },
       {
         "id": "r9_option2",
-        "category": "Geography",
+        "category": "Food",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which cheese is traditionally used in a Greek salad?",
+        "answers": {
+          "A": "Halloumi",
+          "B": "Mozzarella",
+          "C": "Feta",
+          "D": "Ricotta"
+        },
+        "correct": "C"
       },
       {
         "id": "r9_option3",
-        "category": "Gaming",
+        "category": "Space",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "What is the largest moon of Saturn?",
+        "answers": {
+          "A": "Europa",
+          "B": "Titan",
+          "C": "Ganymede",
+          "D": "Enceladus"
+        },
+        "correct": "B"
       },
       {
         "id": "r9_option4",
-        "category": "Flags",
+        "category": "Literature",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
+        "question": "Which author created the detective C. Auguste Dupin?",
+        "answers": {
+          "A": "Edgar Allan Poe",
+          "B": "Arthur Conan Doyle",
+          "C": "Wilkie Collins",
+          "D": "Agatha Christie"
+        },
         "correct": "A"
       }
     ]
@@ -393,252 +553,60 @@
     "options": [
       {
         "id": "r10_option1",
-        "category": "Science",
+        "category": "Geography",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which ocean lies along the west coast of the United States?",
+        "answers": {
+          "A": "Atlantic Ocean",
+          "B": "Pacific Ocean",
+          "C": "Indian Ocean",
+          "D": "Arctic Ocean"
+        },
+        "correct": "B"
       },
       {
         "id": "r10_option2",
-        "category": "Sports",
+        "category": "Science",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which element has the chemical symbol Ag?",
+        "answers": {
+          "A": "Gold",
+          "B": "Argon",
+          "C": "Silver",
+          "D": "Tin"
+        },
+        "correct": "C"
       },
       {
         "id": "r10_option3",
-        "category": "Music",
+        "category": "History",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which empire was ruled by Mansa Musa?",
+        "answers": {
+          "A": "Songhai Empire",
+          "B": "Mali Empire",
+          "C": "Ottoman Empire",
+          "D": "Aksumite Empire"
+        },
+        "correct": "B"
       },
       {
         "id": "r10_option4",
-        "category": "Movies",
+        "category": "Premier League",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      }
-    ]
-  },
-  {
-    "roundNumber": 11,
-    "options": [
-      {
-        "id": "r11_option1",
-        "category": "History",
-        "difficulty": "easy",
-        "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r11_option2",
-        "category": "Geography",
-        "difficulty": "medium",
-        "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r11_option3",
-        "category": "Gaming",
-        "difficulty": "hard",
-        "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r11_option4",
-        "category": "Flags",
-        "difficulty": "impossible",
-        "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      }
-    ]
-  },
-  {
-    "roundNumber": 12,
-    "options": [
-      {
-        "id": "r12_option1",
-        "category": "Science",
-        "difficulty": "easy",
-        "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r12_option2",
-        "category": "Sports",
-        "difficulty": "medium",
-        "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r12_option3",
-        "category": "Music",
-        "difficulty": "hard",
-        "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r12_option4",
-        "category": "Movies",
-        "difficulty": "impossible",
-        "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      }
-    ]
-  },
-  {
-    "roundNumber": 13,
-    "options": [
-      {
-        "id": "r13_option1",
-        "category": "History",
-        "difficulty": "easy",
-        "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r13_option2",
-        "category": "Geography",
-        "difficulty": "medium",
-        "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r13_option3",
-        "category": "Gaming",
-        "difficulty": "hard",
-        "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r13_option4",
-        "category": "Flags",
-        "difficulty": "impossible",
-        "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      }
-    ]
-  },
-  {
-    "roundNumber": 14,
-    "options": [
-      {
-        "id": "r14_option1",
-        "category": "Science",
-        "difficulty": "easy",
-        "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r14_option2",
-        "category": "Sports",
-        "difficulty": "medium",
-        "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r14_option3",
-        "category": "Music",
-        "difficulty": "hard",
-        "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r14_option4",
-        "category": "Movies",
-        "difficulty": "impossible",
-        "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      }
-    ]
-  },
-  {
-    "roundNumber": 15,
-    "options": [
-      {
-        "id": "r15_option1",
-        "category": "History",
-        "difficulty": "easy",
-        "color": "#00D4AA",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r15_option2",
-        "category": "Geography",
-        "difficulty": "medium",
-        "color": "#0066FF",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r15_option3",
-        "category": "Gaming",
-        "difficulty": "hard",
-        "color": "#FFA502",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
-      },
-      {
-        "id": "r15_option4",
-        "category": "Flags",
-        "difficulty": "impossible",
-        "color": "#FF4757",
-        "question": "[PLACEHOLDER - Add your question]",
-        "answers": { "A": "Answer A", "B": "Answer B", "C": "Answer C", "D": "Answer D" },
-        "correct": "A"
+        "question": "Which club won the inaugural Premier League title in 1992-93?",
+        "answers": {
+          "A": "Blackburn Rovers",
+          "B": "Arsenal",
+          "C": "Liverpool",
+          "D": "Manchester United"
+        },
+        "correct": "D"
       }
     ]
   }
 ]
-
-
-
-
-
-
-

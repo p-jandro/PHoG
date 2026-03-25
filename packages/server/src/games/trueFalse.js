@@ -7,7 +7,6 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { Timer } from '../utils/timer.js';
-import { calculateTrueFalseScore, updatePlayerPlacements } from '../utils/scoring.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,6 +14,9 @@ const __dirname = dirname(__filename);
 // Load statements
 const statementsPath = join(__dirname, '../data/statements.json');
 const allStatements = JSON.parse(readFileSync(statementsPath, 'utf-8'));
+const INTRO_DURATION = 30000;
+const ANSWER_REVEAL_DURATION = 5000;
+const ROUND_LEADERBOARD_DURATION = 5000;
 
 export class TrueFalseGame {
   constructor(gameState, io, gameEngine) {
@@ -30,10 +32,11 @@ export class TrueFalseGame {
       phase: 'intro', // intro | playing | results
       currentStatement: null,
       statementNumber: 0,
-      totalStatements: 30, // Updated to 30 questions
+      totalStatements: 20,
       playerAnswers: new Map(), // playerId -> { correct, total, streak }
       usedStatements: new Set(),
-      answeredPlayers: new Set() // Track who answered current statement
+      answeredPlayers: new Set(), // Track who answered current statement
+      introEndsAt: null
     };
 
     // Track player streaks separately
@@ -66,10 +69,11 @@ export class TrueFalseGame {
     this.gameState.trueFalse.phase = 'intro';
 
     console.log('[TRUE/FALSE] Showing intro and rules');
+    this.gameState.trueFalse.introEndsAt = Date.now() + INTRO_DURATION;
 
     this.io.emit('truefalse:intro', {
       title: 'True or False Rapid Fire',
-      description: '30 statements, answer as fast as you can!',
+      description: '20 statements, answer as fast as you can!',
       scoringRules: [
         'Base: 10 points per correct answer',
         '2 in a row: 12 pts',
@@ -82,11 +86,12 @@ export class TrueFalseGame {
       placementInfo: 'Your rank in this game determines your placement score',
       totalStatements: this.gameState.trueFalse.totalStatements,
       timePerStatement: 5000,
-      duration: 30000 // 30 seconds
+      duration: INTRO_DURATION,
+      endsAt: this.gameState.trueFalse.introEndsAt
     });
 
     // Start game after 30 seconds
-    this.timer = new Timer(30000, null, () => {
+    this.timer = new Timer(INTRO_DURATION, null, () => {
       this.nextStatement();
     });
     this.timer.start();
@@ -105,6 +110,7 @@ export class TrueFalseGame {
     }
 
     this.gameState.trueFalse.phase = 'playing';
+    this.gameState.trueFalse.introEndsAt = null;
 
     // Select random unused statement
     const availableStatements = allStatements.filter(
@@ -167,7 +173,8 @@ export class TrueFalseGame {
     this.gameState.trueFalse.answeredPlayers.add(playerId);
 
     const statement = this.gameState.trueFalse.currentStatement;
-    const isCorrect = answer === statement.answer;
+    const isValidAnswer = typeof answer === 'boolean';
+    const isCorrect = isValidAnswer && answer === statement.answer;
 
     // Get current streak
     let currentStreak = this.playerStreaks.get(playerId) || 0;
@@ -194,12 +201,6 @@ export class TrueFalseGame {
 
     playerAnswers.total++;
 
-    // Calculate current placement (sort by score, descending)
-    const sortedPlayers = Array.from(this.gameState.players.values())
-      .filter(p => p.connected)
-      .sort((a, b) => b.score - a.score);
-    const currentPlacement = sortedPlayers.findIndex(p => p.id === playerId) + 1;
-
     console.log(`[TRUE/FALSE] ${player.name} answered: ${answer} - ${isCorrect ? 'Correct' : 'Wrong'} - Streak: ${currentStreak} - Points: ${pointsEarned} (Total: ${player.score})`);
 
     // Emit answer confirmation to player (streak hidden until round end)
@@ -207,7 +208,10 @@ export class TrueFalseGame {
     if (socket) {
       socket.emit('truefalse:answer:received', {
         answer,
-        confirmed: true
+        confirmed: true,
+        isCorrect,
+        streak: currentStreak,
+        pointsEarned
       });
     }
 
@@ -227,6 +231,23 @@ export class TrueFalseGame {
   showAnswer() {
     const statement = this.gameState.trueFalse.currentStatement;
 
+    for (const [playerId] of this.gameState.players) {
+      if (!this.gameState.trueFalse.answeredPlayers.has(playerId)) {
+        const playerAnswers = this.gameState.trueFalse.playerAnswers.get(playerId);
+        if (playerAnswers) {
+          playerAnswers.total++;
+        }
+        this.playerStreaks.set(playerId, 0);
+      }
+    }
+
+    const placements = new Map(
+      Array.from(this.gameState.players.values())
+        .filter(player => player.connected)
+        .sort((a, b) => b.score - a.score)
+        .map((player, index) => [player.id, index + 1])
+    );
+
     console.log(`[TRUE/FALSE] Showing answer: ${statement.answer}`);
 
     // Build per-player results for this statement
@@ -238,22 +259,42 @@ export class TrueFalseGame {
       playerResults[playerId] = {
         answered,
         streak,
-        score: this.gameState.players.get(playerId)?.score || 0
+        score: this.gameState.players.get(playerId)?.score || 0,
+        placement: placements.get(playerId) || null
       };
     }
+
+    const leaderboard = this.gameEngine.getLeaderboard().map((entry) => ({
+      ...entry,
+      streak: this.playerStreaks.get(entry.id) || 0
+    }));
 
     // Emit answer to all players (with streaks revealed after round)
     this.io.emit('truefalse:answer', {
       statementId: statement.id,
+      statement: statement.statement,
+      statementNumber: this.gameState.trueFalse.statementNumber,
+      totalStatements: this.gameState.trueFalse.totalStatements,
       correctAnswer: statement.answer,
       explanation: statement.explanation || '',
-      playerResults
+      playerResults,
+      leaderboard
     });
 
-    // Move to next statement after 5 seconds (time to read fun fact)
+    this.gameEngine.broadcastPlayerList();
+
     this.trackTimeout(() => {
-      this.nextStatement();
-    }, 5000);
+      this.gameEngine.showRoundLeaderboard('trueFalse', ROUND_LEADERBOARD_DURATION, {
+        roundNumber: this.gameState.trueFalse.statementNumber,
+        totalRounds: this.gameState.trueFalse.totalStatements,
+        unitLabel: 'Statement',
+        leaderboard
+      });
+
+      this.trackTimeout(() => {
+        this.nextStatement();
+      }, ROUND_LEADERBOARD_DURATION);
+    }, ANSWER_REVEAL_DURATION);
   }
 
   /**
@@ -288,9 +329,6 @@ export class TrueFalseGame {
 
     // Sort by score (highest first)
     results.sort((a, b) => b.newScore - a.newScore);
-
-    // Calculate placements for True/False
-    updatePlayerPlacements(this.gameState.players, 'trueFalse');
 
     // Emit results
     this.io.emit('truefalse:end', {
@@ -393,10 +431,11 @@ export class TrueFalseGame {
       phase: this.gameState.trueFalse.phase,
       statementNumber: this.gameState.trueFalse.statementNumber,
       totalStatements: this.gameState.trueFalse.totalStatements,
+      introEndsAt: this.gameState.trueFalse.introEndsAt,
       currentStatement: this.gameState.trueFalse.currentStatement ? {
+        id: this.gameState.trueFalse.currentStatement.id,
         statement: this.gameState.trueFalse.currentStatement.statement
       } : null
     };
   }
 }
-

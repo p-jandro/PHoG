@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { useAudio } from '../hooks/useAudio';
@@ -174,12 +174,13 @@ export const Countdown = ({ socket }: CountdownProps) => {
     const progress = introData.duration ? ((introData.duration - timeRemaining) / introData.duration) * 100 : 0;
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-ui-background to-gray-900">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="max-w-3xl w-full text-center space-y-6"
+          className="screen-frame max-w-4xl text-center space-y-6"
         >
+          <p className="eyebrow">Countdown Briefing</p>
           <motion.h1
             initial={{ y: -20 }}
             animate={{ y: 0 }}
@@ -263,11 +264,11 @@ export const Countdown = ({ socket }: CountdownProps) => {
     const timeSeconds = Math.ceil(timeRemaining / 1000);
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl w-full"
+          className="screen-frame max-w-5xl"
         >
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
@@ -278,7 +279,7 @@ export const Countdown = ({ socket }: CountdownProps) => {
               {/* Volume control */}
               <button
                 onClick={() => audio.isPlaying ? audio.pause() : audio.play()}
-                className="text-sm font-medium px-3 py-1 rounded-lg bg-ui-card border border-ui-border opacity-75 hover:opacity-100 transition-opacity"
+                className="btn-secondary text-sm"
                 aria-label={audio.isPlaying ? "Mute music" : "Play music"}
               >
                 {audio.isPlaying ? 'Sound On' : 'Sound Off'}
@@ -371,11 +372,11 @@ export const Countdown = ({ socket }: CountdownProps) => {
     const mySubmission = roundResults.submissions.find((s: any) => s.playerId === playerId);
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="card max-w-3xl w-full"
+          className="card max-w-4xl w-full"
         >
           <h2 className="text-3xl font-bold text-center mb-6">Round Complete!</h2>
 
@@ -447,11 +448,11 @@ export const Countdown = ({ socket }: CountdownProps) => {
   // Game End Phase
   if (phase === 'gameEnd' && gameResults) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="card max-w-2xl w-full text-center"
+          className="card max-w-3xl w-full text-center"
         >
           <h2 className="text-4xl font-bold mb-8">Countdown Complete!</h2>
           <p className="text-ui-textMuted text-lg">
@@ -471,4 +472,3 @@ export const Countdown = ({ socket }: CountdownProps) => {
     </div>
   );
 };
-

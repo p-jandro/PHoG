@@ -24,19 +24,42 @@ import { GameEngine } from './gameEngine.js';
 import { QuizGame } from './games/quiz.js';
 import { TrueFalseGame } from './games/trueFalse.js';
 import { CountdownGame } from './games/countdown.js';
-import { PointlessGame } from './games/pointless.js';
+import { PointlessGame, POINTLESS_ROUND_DURATION } from './games/pointless.js';
 
 const app = express();
 const server = createServer(app);
 
-// CORS configuration for client and host apps
-app.use(cors({
-  origin: [
+const allowedOrigins = new Set(
+  [
     'http://localhost:5173',
     'http://localhost:5174',
     process.env.CLIENT_URL,
     process.env.HOST_URL
-  ].filter(Boolean),
+  ].filter(Boolean)
+);
+
+const LAN_ORIGIN_PATTERN = /^https?:\/\/(?:(?:localhost|127(?:\.\d{1,3}){3})|(?:10(?:\.\d{1,3}){3})|(?:192\.168(?:\.\d{1,3}){2})|(?:172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})|(?:[a-z0-9-]+\.local))(?::\d+)?$/i;
+
+const allowOrigin = (origin) => {
+  if (!origin) {
+    return true;
+  }
+
+  return allowedOrigins.has(origin) || LAN_ORIGIN_PATTERN.test(origin);
+};
+
+const corsOrigin = (origin, callback) => {
+  if (allowOrigin(origin)) {
+    callback(null, true);
+    return;
+  }
+
+  callback(new Error(`Origin not allowed: ${origin}`));
+};
+
+// CORS configuration for client and host apps
+app.use(cors({
+  origin: corsOrigin,
   credentials: true
 }));
 
@@ -45,12 +68,7 @@ app.use(express.json());
 // Socket.io server setup
 const io = new Server(server, {
   cors: {
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:5174',
-      process.env.CLIENT_URL,
-      process.env.HOST_URL
-    ].filter(Boolean),
+    origin: corsOrigin,
     methods: ['GET', 'POST'],
     credentials: true
   },
@@ -59,9 +77,6 @@ const io = new Server(server, {
 
 // Optimize connection ID generation
 io.engine.generateId = (req) => randomUUID();
-
-// Global rate limiter for connections
-const connectionRateLimiter = new Map();
 
 // Rate limiting removed by user request
 io.use((socket, next) => {
@@ -82,7 +97,7 @@ const gameState = {
     hostSocketId: null,
     config: {
       maxPlayers: 30,
-      gameSequence: ['quiz', 'trueFalse', 'pointless', 'countdown']
+      gameSequence: ['quiz', 'trueFalse', 'pointless']
     }
   },
 
@@ -299,11 +314,14 @@ io.on('connection', (socket) => {
           gameEngine.returnToLobby();
           break;
         case 'reveal':
-          if (gameState.currentGame === 'pointless') {
+          if (gameState.currentGame === 'pointless' && gameState.pointless?.phase === 'reveal') {
             const pointlessGame = gameEngine.currentGameModule;
             if (pointlessGame && typeof pointlessGame.revealResults === 'function') {
               pointlessGame.revealResults();
             }
+          } else {
+            socket.emit('error', { message: 'Pointless results are not ready to reveal yet' });
+            return;
           }
           break;
         case 'end':
@@ -444,22 +462,129 @@ io.on('connection', (socket) => {
 
   // State synchronization for late joiners/refresh
   socket.on('request:state', () => {
-    if (gameState.currentGame === 'pointless' && gameEngine.currentGameModule) {
-        const state = gameEngine.currentGameModule.getState();
-        const pointlessState = gameState.pointless;
-        
-        if (pointlessState.phase === 'playing') {
-            const elapsed = Date.now() - pointlessState.startTime;
-            const remaining = Math.max(0, 60000 - elapsed);
-            
-            socket.emit('pointless:round:start', {
-                roundIndex: state.roundIndex,
-                totalRounds: state.totalRounds,
-                category: state.currentRound.category,
-                question: state.currentRound.question,
-                duration: remaining
-            });
+    const players = Array.from(gameState.players.values()).map(p => ({
+      id: p.id,
+      name: p.name,
+      score: p.score,
+      currentGameScore: p.currentGameScore,
+      totalPlacementScore: p.totalPlacement,
+      gamePlacements: p.placements,
+      connected: p.connected
+    }));
+
+    socket.emit('players:update', players);
+
+    socket.emit('phase:change', {
+      phase: gameState.currentPhase,
+      previousPhase: gameState.currentPhase,
+      timestamp: Date.now()
+    });
+
+    if (gameState.currentGame) {
+      socket.emit('game:start', {
+        game: gameState.currentGame,
+        timestamp: Date.now()
+      });
+    }
+
+    if (gameEngine.currentGameModule && typeof gameEngine.currentGameModule.getState === 'function') {
+      const state = gameEngine.currentGameModule.getState();
+
+      if (gameState.currentGame === 'quiz' && gameState.quiz) {
+        if (gameState.quiz.phase === 'intro') {
+          const remaining = Math.max(0, (state.introEndsAt || Date.now()) - Date.now());
+
+          socket.emit('quiz:intro', {
+            title: 'Quiz Challenge',
+            description: `${state.totalQuestions} rounds of trivia questions`,
+            scoringRules: [
+              'Easy: 100 pts base',
+              'Medium: 200 pts base',
+              'Hard: 300 pts base',
+              'Impossible: 500 pts base',
+              'Speed bonus: up to 10% for fast answers',
+              'Leader gets 2x voting power'
+            ],
+            placementInfo: 'Your rank in this game determines your placement score',
+            duration: remaining,
+            endsAt: Date.now() + remaining
+          });
         }
+      }
+
+      if (gameState.currentGame === 'trueFalse' && gameState.trueFalse) {
+        if (gameState.trueFalse.phase === 'intro') {
+          const remaining = Math.max(0, (state.introEndsAt || Date.now()) - Date.now());
+
+          socket.emit('truefalse:intro', {
+            title: 'True or False Rapid Fire',
+            description: '20 statements, answer as fast as you can!',
+            scoringRules: [
+              'Base: 10 points per correct answer',
+              '2 in a row: 12 pts',
+              '3 in a row: 14 pts',
+              '4 in a row: 16 pts',
+              '5+ in a row: 18+ pts',
+              'Formula: 10 + (2 × (streak - 1)) points',
+              'Wrong answer resets streak'
+            ],
+            placementInfo: 'Your rank in this game determines your placement score',
+            totalStatements: state.totalStatements,
+            timePerStatement: 5000,
+            duration: remaining,
+            endsAt: Date.now() + remaining
+          });
+        }
+      }
+
+      if (gameState.currentGame === 'pointless' && gameState.pointless) {
+        const pointlessState = gameState.pointless;
+
+        if (pointlessState.phase === 'intro') {
+          const remaining = Math.max(0, (state.introEndsAt || Date.now()) - Date.now());
+
+          socket.emit('pointless:intro', {
+            title: 'Pointless',
+            description: 'We asked 100 people. Find an official answer that as few of them gave as possible.',
+            scoringRules: [
+              'Each official answer is scored by how many people said it',
+              'Lower scores are better',
+              'A pointless answer scores 0',
+              'Invalid or missing answers score 100'
+            ],
+            placementInfo: 'Lowest total score wins this game',
+            totalRounds: state.totalRounds,
+            duration: remaining,
+            endsAt: Date.now() + remaining
+          });
+        } else if (pointlessState.phase === 'playing') {
+          const elapsed = Date.now() - pointlessState.startTime;
+          const remaining = Math.max(0, POINTLESS_ROUND_DURATION - elapsed);
+
+          socket.emit('pointless:round:start', {
+            roundIndex: state.roundIndex,
+            totalRounds: state.totalRounds,
+            category: state.currentRound.category,
+            question: state.currentRound.question,
+            duration: remaining
+          });
+        } else if (pointlessState.phase === 'reveal') {
+          if (typeof gameEngine.currentGameModule.getDisplayRevealPayload === 'function') {
+            const displayRevealPayload = gameEngine.currentGameModule.getDisplayRevealPayload();
+            if (displayRevealPayload) {
+              socket.emit('pointless:reveal:display', displayRevealPayload);
+            }
+          }
+
+          const playerId = connectionManager.getPlayerId(socket.id);
+          if (playerId && typeof gameEngine.currentGameModule.getRevealPayload === 'function') {
+            const revealPayload = gameEngine.currentGameModule.getRevealPayload(playerId);
+            if (revealPayload) {
+              socket.emit('game:pointless:reveal', revealPayload);
+            }
+          }
+        }
+      }
     }
   });
 
@@ -508,19 +633,6 @@ function broadcastPlayerList() {
   io.emit('players:update', players);
 }
 
-/**
- * Get public game state (safe to send to clients)
- */
-function getPublicGameState() {
-  return {
-    gameId: gameState.meta.gameId,
-    phase: gameState.currentPhase,
-    currentGame: gameState.currentGame,
-    playerCount: gameState.players.size,
-    maxPlayers: gameState.meta.config.maxPlayers
-  };
-}
-
 // Start server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
@@ -545,4 +657,3 @@ process.on('SIGTERM', () => {
 });
 
 export { io, gameState, connectionManager, gameEngine };
-

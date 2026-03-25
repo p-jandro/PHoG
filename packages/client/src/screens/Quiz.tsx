@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
+import { GamePromptHeader } from '../components/GamePromptHeader';
 
 interface QuizProps {
   socket: Socket | null;
@@ -9,7 +10,8 @@ interface QuizProps {
 
 interface Category {
   id: string;
-  name: string;
+  name?: string;
+  label?: string;
   color: string;
 }
 
@@ -18,10 +20,19 @@ interface QuizQuestion {
   question: string;
   answers: Record<string, string>;
   category: string;
+  difficulty: string;
+  color: string;
   questionNumber: number;
   totalQuestions: number;
   duration: number;
 }
+
+const QUIZ_ANSWER_COLORS: Record<string, string> = {
+  A: '#7186be',
+  B: '#6f9a79',
+  C: '#d7a348',
+  D: '#8b5f6b'
+};
 
 export const Quiz = ({ socket }: QuizProps) => {
   const [phase, setPhase] = useState<'intro' | 'voting' | 'votingResults' | 'question' | 'results'>('intro');
@@ -34,8 +45,30 @@ export const Quiz = ({ socket }: QuizProps) => {
   const [questionTimer, setQuestionTimer] = useState<NodeJS.Timeout | null>(null);
   const [results, setResults] = useState<any>(null);
   const [votingResults, setVotingResults] = useState<any>(null);
+  const [currentScore, setCurrentScore] = useState(0);
+  const [currentPlacement, setCurrentPlacement] = useState<number | null>(null);
+  const [submittedTimeSeconds, setSubmittedTimeSeconds] = useState<number | null>(null);
 
   const { playerId } = useGameStore();
+  const players = useGameStore((state) => state.players);
+
+  useEffect(() => {
+    if (!playerId || players.length === 0) {
+      setCurrentScore(0);
+      setCurrentPlacement(null);
+      return;
+    }
+
+    const myPlayer = players.find((player) => player.id === playerId);
+    setCurrentScore(myPlayer?.score || 0);
+
+    const sortedPlayers = [...players]
+      .filter((player) => player.connected)
+      .sort((a, b) => b.score - a.score);
+
+    const placement = sortedPlayers.findIndex((player) => player.id === playerId) + 1;
+    setCurrentPlacement(placement > 0 ? placement : null);
+  }, [playerId, players]);
 
   useEffect(() => {
     if (!socket) return;
@@ -81,6 +114,7 @@ export const Quiz = ({ socket }: QuizProps) => {
       setPhase('question');
       setCurrentQuestion(data);
       setSelectedAnswer(null);
+      setSubmittedTimeSeconds(null);
       
       const initialRemaining = data.endsAt 
         ? Math.max(0, data.endsAt - Date.now())
@@ -147,6 +181,24 @@ export const Quiz = ({ socket }: QuizProps) => {
     };
   }, [socket, questionTimer]);
 
+  useEffect(() => {
+    if (phase !== 'intro' || !introData) {
+      return;
+    }
+
+    const endsAt = introData.endsAt || Date.now() + (introData.duration || 0);
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, endsAt - Date.now());
+      setTimeRemaining(remaining);
+
+      if (remaining === 0) {
+        clearInterval(interval);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [phase, introData]);
+
   const handleVote = (optionId: string) => {
     if (!socket || selectedCategory) return;
     
@@ -171,6 +223,7 @@ export const Quiz = ({ socket }: QuizProps) => {
     }
     
     setSelectedAnswer(answer);
+    setSubmittedTimeSeconds(Math.ceil(timeRemaining / 1000));
     
     const payload = {
       questionId: currentQuestion.questionId,
@@ -200,66 +253,28 @@ export const Quiz = ({ socket }: QuizProps) => {
     const progress = ((introData.duration - timeRemaining) / introData.duration) * 100;
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-ui-background to-gray-900">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="max-w-3xl w-full text-center space-y-6"
+          className="screen-frame max-w-4xl text-center space-y-6"
         >
+          <p className="eyebrow">Quiz Briefing</p>
           <motion.h1
             initial={{ y: -20 }}
             animate={{ y: 0 }}
-            className="text-5xl sm:text-6xl font-bold text-game-correct mb-4"
+            className="text-5xl sm:text-6xl font-bold text-game-leader mb-4"
           >
             {introData.title}
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-2xl sm:text-3xl text-ui-textMuted mb-8"
-          >
-            {introData.description}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-ui-card rounded-xl p-6 sm:p-8 text-left"
-          >
-            <h2 className="text-2xl font-bold text-game-accent mb-4">Scoring Rules</h2>
-            <ul className="space-y-2 text-lg">
-              {introData.scoringRules.map((rule: string, index: number) => (
-                <motion.li
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  className="flex items-start"
-                >
-                  <span className="text-game-accent mr-2">•</span>
-                  <span className="text-ui-textMuted">{rule}</span>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="text-xl text-game-warning"
-          >
-            {introData.placementInfo}
-          </motion.p>
+          <p className="text-xl text-ui-textMuted sm:text-2xl">Starting shortly</p>
 
           {/* Progress bar */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
+            transition={{ delay: 0.2 }}
             className="w-full max-w-md mx-auto"
           >
             <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -281,18 +296,19 @@ export const Quiz = ({ socket }: QuizProps) => {
   // Voting Phase
   if (phase === 'voting') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl w-full"
+          className="screen-frame max-w-4xl"
         >
+          <p className="eyebrow mb-3 text-center">Round Vote</p>
           <h1 className="text-4xl font-bold text-center mb-2">Vote for Category</h1>
           <p className="text-ui-textMuted text-center mb-8">
             The leader's vote counts 2x!
           </p>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {categories.map((category) => (
               <motion.button
                 key={category.id}
@@ -300,7 +316,7 @@ export const Quiz = ({ socket }: QuizProps) => {
                 disabled={!!selectedCategory}
                 whileHover={{ scale: selectedCategory ? 1 : 1.05 }}
                 whileTap={{ scale: selectedCategory ? 1 : 0.95 }}
-                className={`p-8 rounded-xl font-bold text-2xl transition-all ${
+                className={`rounded-[1.8rem] border border-white/10 p-6 text-xl font-bold transition-all shadow-[0_18px_30px_rgba(0,0,0,0.22)] sm:p-8 sm:text-2xl ${
                   selectedCategory === category.id
                     ? 'ring-4 ring-white'
                     : selectedCategory
@@ -334,28 +350,29 @@ export const Quiz = ({ socket }: QuizProps) => {
   // Voting Results Phase
   if (phase === 'votingResults' && votingResults) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="max-w-2xl w-full"
+          className="screen-frame max-w-4xl"
         >
+          <p className="eyebrow mb-3 text-center">Vote Locked</p>
           <h1 className="text-4xl font-bold text-center mb-2">Voting Results</h1>
           <p className="text-ui-textMuted text-center mb-8">
             The votes are in!
           </p>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {categories.map((category) => {
               const voteCount = votingResults.voteCounts[category.id] || 0;
-              const isWinner = votingResults.winningCategory === category.id;
+              const isWinner = votingResults.winningOptionId === category.id;
               
               return (
                 <motion.div
                   key={category.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`p-6 rounded-xl transition-all ${
+                  className={`rounded-xl p-5 transition-all sm:p-6 ${
                     isWinner ? 'ring-4 ring-game-leader scale-105' : ''
                   }`}
                   style={{
@@ -364,8 +381,8 @@ export const Quiz = ({ socket }: QuizProps) => {
                   }}
                 >
                   <div className="text-center">
-                    <div className="text-2xl font-bold mb-2">{category.name}</div>
-                    <div className="text-4xl font-bold">{voteCount}</div>
+                      <div className="mb-2 text-xl font-bold sm:text-2xl">{category.label || category.name}</div>
+                    <div className="text-3xl font-bold sm:text-4xl">{voteCount}</div>
                     <div className="text-sm opacity-75">vote{voteCount !== 1 ? 's' : ''}</div>
                     {isWinner && (
                       <div className="mt-2 text-xl font-bold uppercase tracking-wide">Winner!</div>
@@ -392,92 +409,76 @@ export const Quiz = ({ socket }: QuizProps) => {
   if (phase === 'question' && currentQuestion) {
     const timeSeconds = Math.ceil(timeRemaining / 1000);
     const timePercent = (timeRemaining / currentQuestion.duration) * 100;
+    const timerToneClass =
+      timePercent > 50 ? 'bg-game-correct' :
+      timePercent > 25 ? 'bg-game-warning' :
+      'bg-game-incorrect';
+    const timerTextClass =
+      timePercent > 50 ? 'text-game-correct' :
+      timePercent > 25 ? 'text-game-warning' :
+      'text-game-incorrect';
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="screen-shell py-8 text-white">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl w-full"
+          className="screen-frame max-w-5xl"
         >
-          {/* Question header */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-ui-textMuted">
-                Question {currentQuestion.questionNumber} / {currentQuestion.totalQuestions}
-              </span>
-              <span
-                className={`font-bold px-3 py-1 rounded-full text-sm`}
-                style={{
-                  backgroundColor: categories.find(c => c.id === currentQuestion.category)?.color || '#0066FF',
-                  color: 'white'
-                }}
-              >
-                {currentQuestion.category.toUpperCase()}
-              </span>
-            </div>
+          <GamePromptHeader
+            eyebrow="Quiz"
+            meta={`${currentQuestion.category} • ${currentQuestion.difficulty}`}
+            title={currentQuestion.question}
+            details={(
+              <>
+                <span className="status-pill">
+                  <span className="text-xl font-bold text-primary-blue">{currentScore}</span>
+                  <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ui-textMuted">pts</span>
+                </span>
+                {currentPlacement ? (
+                  <span className="status-pill">
+                    {currentPlacement}
+                    {getOrdinalSuffix(currentPlacement)} in Quiz
+                  </span>
+                ) : null}
+              </>
+            )}
+            timerMs={timeRemaining}
+            totalMs={currentQuestion.duration}
+            timerBarClassName={timerToneClass}
+            timerTextClassName={timerTextClass}
+          />
 
-            {/* Timer bar */}
-            <div className="w-full h-2 bg-ui-border rounded-full overflow-hidden mb-4">
-              <motion.div
-                className={`h-full ${
-                  timePercent > 50 ? 'bg-game-correct' :
-                  timePercent > 25 ? 'bg-game-warning' :
-                  'bg-game-incorrect'
-                }`}
-                style={{ width: `${timePercent}%` }}
-                transition={{ duration: 0.1 }}
-              />
-            </div>
-
-            {/* Question text - centered with padding */}
-            <div className="card p-6 sm:p-8">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center leading-tight">
-                {currentQuestion.question}
-              </h2>
-            </div>
-          </div>
-
-          {/* Answer buttons - optimized for mobile */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {Object.entries(currentQuestion.answers).map(([key, value]) => (
+          <div className="mx-auto max-w-4xl">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              {Object.entries(currentQuestion.answers).map(([key, value]) => (
               <motion.button
                 key={key}
                 onClick={() => handleAnswer(key)}
                 disabled={!!selectedAnswer}
-                whileTap={{ scale: selectedAnswer ? 1 : 0.95 }}
-                className={`btn-answer min-h-[100px] sm:min-h-[88px] ${
-                  selectedAnswer === key ? 'ring-4 ring-white' : ''
-                } ${selectedAnswer && selectedAnswer !== key ? 'opacity-50' : ''} 
-                active:scale-95 transition-all touch-manipulation`}
-                style={{
-                  backgroundColor: {
-                    A: '#0066FF',
-                    B: '#00D4AA',
-                    C: '#FFA502',
-                    D: '#7B61FF'
-                  }[key]
-                }}
+                  whileTap={{ scale: selectedAnswer ? 1 : 0.95 }}
+                  className={`btn-answer min-h-[100px] sm:min-h-[88px] ${
+                    selectedAnswer === key ? 'ring-4 ring-white' : ''
+                  } ${selectedAnswer && selectedAnswer !== key ? 'opacity-50' : ''} 
+                  active:scale-95 transition-all touch-manipulation`}
+                  style={{ backgroundColor: QUIZ_ANSWER_COLORS[key] }}
+                >
+                  <div className="text-center w-full text-2xl font-medium leading-tight px-4 sm:text-xl">
+                    {value}
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+
+            {selectedAnswer && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center mt-6 text-game-correct font-medium"
               >
-                <div className="text-center w-full text-2xl sm:text-xl font-medium leading-tight px-4">
-                  {value}
-                </div>
-              </motion.button>
-            ))}
-          </div>
-
-          {selectedAnswer && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center mt-6 text-game-correct font-medium"
-            >
-              ✓ Answer submitted!
-            </motion.p>
-          )}
-
-          <div className="text-center mt-6 text-2xl font-bold">
-            {timeSeconds}s
+                Answer submitted. Locked in with {submittedTimeSeconds ?? timeSeconds}s remaining.
+              </motion.p>
+            )}
           </div>
         </motion.div>
       </div>
@@ -485,79 +486,84 @@ export const Quiz = ({ socket }: QuizProps) => {
   }
 
   // Results Phase
-  if (phase === 'results' && results) {
+  if (phase === 'results' && results && currentQuestion) {
     const myResult = results.results.find((r: any) => r.playerId === playerId);
-    
-    // Calculate current placement in quiz
     const myRank = results.leaderboard?.findIndex((p: any) => p.id === playerId) + 1 || 0;
-    const totalPlayers = results.leaderboard?.length || 0;
+    const correctAnswerKey = results.correctAnswer;
+    const correctAnswerText = currentQuestion.answers[correctAnswerKey];
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="screen-shell py-8 text-white">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="card max-w-2xl w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="screen-frame max-w-5xl"
         >
-          <h2 className="text-3xl font-bold text-center mb-6">
-            {myResult?.isCorrect ? (
-              <span className="text-game-correct">Correct!</span>
-            ) : (
-              <span className="text-game-incorrect">Wrong!</span>
+          <GamePromptHeader
+            eyebrow="Quiz"
+            meta={`${currentQuestion.category} • ${currentQuestion.difficulty}`}
+            title={currentQuestion.question}
+            details={(
+              <>
+                <span className="status-pill">
+                  <span className="text-xl font-bold text-primary-blue">{myResult?.newScore ?? currentScore}</span>
+                  <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ui-textMuted">pts</span>
+                </span>
+                {myRank > 0 ? (
+                  <span className="status-pill">
+                    {myRank}
+                    {getOrdinalSuffix(myRank)} in Quiz
+                  </span>
+                ) : null}
+              </>
             )}
-          </h2>
+          />
 
-          {myResult && (
-            <div className="text-center mb-6">
-              {/* Points earned this question */}
-              <div className="mb-4">
-                <p className="text-lg text-ui-textMuted mb-1">Points This Question</p>
-                <p className="text-4xl font-bold text-game-leader">
-                  +{myResult.points}
-                </p>
-              </div>
-
-              {/* Total score for current game */}
-              <div className="mb-4 p-4 bg-ui-background rounded-lg">
-                <p className="text-sm text-ui-textMuted mb-1">Current Quiz Score</p>
-                <p className="text-3xl font-bold text-primary-blue">
-                  {myResult.newScore} pts
-                </p>
-              </div>
-
-              {/* Current placement */}
-              {myRank > 0 && (
-                <div className="mb-4">
-                  <p className="text-sm text-ui-textMuted mb-2">Current Placement</p>
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', delay: 0.2 }}
-                    className={`inline-block px-6 py-3 rounded-full ${
-                      myRank === 1 ? 'bg-game-leader' :
-                      myRank === 2 ? 'bg-primary-blue' :
-                      myRank === 3 ? 'bg-primary-teal' :
-                      'bg-primary-purple'
-                    }`}
-                  >
-                    <span className="text-3xl font-bold text-white">
-                      {myRank}{getOrdinalSuffix(myRank)} of {totalPlayers}
-                    </span>
-                  </motion.div>
-                </div>
-              )}
-
-              {myResult.isLeader && (
-                <p className="text-game-leader mt-2 text-sm font-bold">Leader Bonus (2x) Applied!</p>
-              )}
+          <div className="mx-auto max-w-4xl">
+            <div className="mb-6 rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-5 text-center">
+              <p className={`text-2xl font-bold ${myResult?.isCorrect ? 'text-game-correct' : 'text-game-incorrect'}`}>
+                {myResult?.isCorrect ? 'Correct' : selectedAnswer ? 'Wrong' : 'No answer'}
+              </p>
+              <p className="mt-2 text-lg text-ui-textMuted">
+                {myResult ? `+${myResult.points} points this question` : '0 points this question'}
+              </p>
+              <p className="mt-3 text-base font-semibold text-white">
+                Correct answer: {correctAnswerKey} • {correctAnswerText}
+              </p>
             </div>
-          )}
 
-          <div className="border-t border-ui-border pt-4">
-            <h3 className="font-bold mb-2 text-lg">Correct Answer: {results.correctAnswer}</h3>
-            <p className="text-ui-textMuted text-sm">
-              {results.results.filter((r: any) => r.isCorrect).length} / {results.results.length} players got it right
-            </p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              {Object.entries(currentQuestion.answers).map(([key, value]) => {
+                const isCorrectAnswer = key === correctAnswerKey;
+                const isSelectedAnswer = selectedAnswer === key;
+                const resultClass = isCorrectAnswer
+                  ? 'border-white ring-4 ring-game-correct/70 brightness-110'
+                  : isSelectedAnswer
+                    ? 'border-white ring-4 ring-white/80 opacity-80'
+                    : 'border-white/10 opacity-35 brightness-50';
+
+                return (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.08 * ['A', 'B', 'C', 'D'].indexOf(key) }}
+                    className={`rounded-[1.8rem] border p-6 text-left shadow-[0_18px_30px_rgba(0,0,0,0.22)] transition-all sm:p-8 ${resultClass}`}
+                    style={{ backgroundColor: QUIZ_ANSWER_COLORS[key] }}
+                  >
+                    <div className="mb-2 flex items-center justify-between gap-4">
+                      <div className="text-2xl font-bold text-white/80 sm:text-3xl">{key}</div>
+                      {isSelectedAnswer ? (
+                        <div className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+                          Your pick
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="text-2xl text-white sm:text-3xl">{value}</div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </motion.div>
       </div>
@@ -573,4 +579,3 @@ export const Quiz = ({ socket }: QuizProps) => {
     </div>
   );
 };
-
