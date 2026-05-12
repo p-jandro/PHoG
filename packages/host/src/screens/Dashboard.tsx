@@ -65,7 +65,9 @@ export const Dashboard = () => {
   const availableGames = [
     { id: 'quiz', name: 'Quiz' },
     { id: 'trueFalse', name: 'True or False' },
-    { id: 'pointless', name: 'Pointless' }
+    { id: 'pointless', name: 'Pointless' },
+    { id: 'pokedle', name: 'Pokédle' },
+    { id: 'hpdle', name: 'HP-dle' }
   ];
 
   const activeGame = (gameState?.currentGame || null) as GameKey | null;
@@ -610,6 +612,20 @@ export const Dashboard = () => {
                 >
                   Start Pointless
                 </button>
+                <button
+                  onClick={() => startGame('pokedle')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-yellow-500 text-black"
+                >
+                  Start Pokédle
+                </button>
+                <button
+                  onClick={() => startGame('hpdle')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-purple-600"
+                >
+                  Start HP-dle
+                </button>
               </div>
             )}
 
@@ -765,7 +781,7 @@ export const Dashboard = () => {
                           Championship total: {player.totalPlacementScore || '-'}
                         </p>
                         <div className="mt-3 flex flex-wrap gap-2">
-                          {(['quiz', 'trueFalse', 'pointless'] as GameKey[]).map((game) => (
+                          {(['quiz', 'trueFalse', 'pointless', 'pokedle', 'hpdle'] as GameKey[]).map((game) => (
                             <span
                               key={game}
                               className="rounded-full border border-ui-border/70 bg-black/20 px-3 py-1 text-xs font-semibold text-ui-textMuted"
