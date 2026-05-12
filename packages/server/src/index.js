@@ -25,6 +25,7 @@ import { QuizGame } from './games/quiz.js';
 import { TrueFalseGame } from './games/trueFalse.js';
 import { CountdownGame } from './games/countdown.js';
 import { PointlessGame, POINTLESS_ROUND_DURATION } from './games/pointless.js';
+import { ThemedDleGame } from './games/themedDle.js';
 
 const app = express();
 const server = createServer(app);
@@ -154,6 +155,14 @@ function startSpecificGame(gameName) {
       const pointlessGame = new PointlessGame(gameState, io, gameEngine);
       gameEngine.startGame('pointless', pointlessGame);
       pointlessGame.start();
+  } else if (gameName === 'pokedle' || gameName === 'hpdle') {
+      // Each themed-dle game plays all 4 modes sequentially:
+      //   pokedle: Classic → Emoji → Silhouette → Grid
+      //   hpdle:   Classic → Emoji → Spell → Grid
+      const theme = gameName === 'pokedle' ? 'pokemon' : 'hp';
+      const game = new ThemedDleGame(gameState, io, gameEngine, { theme });
+      gameEngine.startGame(gameName, game);
+      game.start();
   }
 }
 
@@ -215,7 +224,9 @@ io.on('connection', (socket) => {
             quiz: null,
             trueFalse: null,
             countdown: null,
-            pointless: null
+            pointless: null,
+            pokedle: null,
+            hpdle: null
           }, // Rank for each game
           totalPlacement: 0, // Sum of all placements (lower is better)
           joinedAt: Date.now(),
@@ -458,6 +469,46 @@ io.on('connection', (socket) => {
     if (currentGame && typeof currentGame.submitAnswer === 'function') {
       currentGame.submitAnswer(playerId, text);
     }
+  });
+
+  // Themed-dle (Pokédle / HP-dle) — guess submission
+  // Payload shape varies by mode:
+  //   classic/emoji/silhouette: { name: 'Pikachu' }
+  //   spell:                    { name: 'Expecto Patronum' }
+  //   grid:                     { row: 0, col: 1, name: 'Snape' }
+  socket.on('themedDle:guess', (payload) => {
+    const playerId = connectionManager.getPlayerId(socket.id);
+    if (!playerId) {
+      socket.emit('error', { message: 'Not registered' });
+      return;
+    }
+    const game = gameState.currentGame;
+    if (game !== 'pokedle' && game !== 'hpdle') {
+      socket.emit('error', { message: 'No themed-dle game running' });
+      return;
+    }
+    if (gameState[game]?.phase !== 'playing') {
+      socket.emit('error', { message: 'Not in playing phase' });
+      return;
+    }
+    const currentGame = gameEngine.currentGameModule;
+    if (currentGame && typeof currentGame.handleGuess === 'function') {
+      currentGame.handleGuess(playerId, payload);
+    }
+  });
+
+  // Themed-dle — host configures mode/difficulty before starting
+  socket.on('host:themedDle:configure', ({ mode, difficulty }) => {
+    if (socket.id !== gameState.meta?.hostSocketId) {
+      socket.emit('error', { message: 'Only host can configure' });
+      return;
+    }
+    gameState.themedDleConfig = {
+      mode: mode || 'classic',
+      difficulty: difficulty || 'difficult'
+    };
+    console.log('[THEMEDDLE] Config set:', gameState.themedDleConfig);
+    socket.emit('host:themedDle:configured', gameState.themedDleConfig);
   });
 
   // State synchronization for late joiners/refresh

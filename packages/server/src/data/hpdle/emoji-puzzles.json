@@ -1,0 +1,258 @@
+[
+  {
+    "name": "Harry Potter",
+    "emojis": ["🧙", "🦉", "🏆", "🤓", "⚡"]
+  },
+  {
+    "name": "Hermione Granger",
+    "emojis": ["👧", "🦁", "📚", "🐈", "🦦"]
+  },
+  {
+    "name": "Ron Weasley",
+    "emojis": ["🦁", "🐶", "🍗", "♟️", "🐀"]
+  },
+  {
+    "name": "Albus Dumbledore",
+    "emojis": ["🧙", "👴", "🔥", "🍋", "📯"]
+  },
+  {
+    "name": "Lord Voldemort",
+    "emojis": ["🐍", "🪄", "💍", "💀", "👃"]
+  },
+  {
+    "name": "Severus Snape",
+    "emojis": ["🖤", "💚", "🧪", "🦇", "🦌"]
+  },
+  {
+    "name": "Sirius Black",
+    "emojis": ["🖤", "⭐", "🪞", "🏍️", "🐕"]
+  },
+  {
+    "name": "Remus Lupin",
+    "emojis": ["📜", "🍫", "🐾", "🌕", "🐺"]
+  },
+  {
+    "name": "Rubeus Hagrid",
+    "emojis": ["🦁", "🌂", "🐻", "🐉", "🧔"]
+  },
+  {
+    "name": "Minerva McGonagall",
+    "emojis": ["🦁", "🎩", "📐", "👵", "🐈‍⬛"]
+  },
+  {
+    "name": "Draco Malfoy",
+    "emojis": ["🐍", "🦅", "💇", "🏎️", "❄️"]
+  },
+  {
+    "name": "Ginny Weasley",
+    "emojis": ["🦁", "👧", "🔥", "🦇", "🧹"]
+  },
+  {
+    "name": "Neville Longbottom",
+    "emojis": ["🦁", "⚔️", "😳", "🌱", "🐸"]
+  },
+  {
+    "name": "Luna Lovegood",
+    "emojis": ["🦅", "👓", "🌙", "🐎", "🥕"]
+  },
+  {
+    "name": "Bellatrix Lestrange",
+    "emojis": ["🐍", "🖤", "🏛️", "🗡️", "🃏"]
+  },
+  {
+    "name": "Fred Weasley",
+    "emojis": ["🦁", "🤡", "🎆", "💀", "👯"]
+  },
+  {
+    "name": "George Weasley",
+    "emojis": ["🦁", "🤡", "🎆", "👯", "👂"]
+  },
+  {
+    "name": "Molly Weasley",
+    "emojis": ["🦁", "👩", "🕰️", "🔪", "🧶"]
+  },
+  {
+    "name": "Arthur Weasley",
+    "emojis": ["🦁", "👨", "🏛️", "🚗", "🔌"]
+  },
+  {
+    "name": "Lucius Malfoy",
+    "emojis": ["🐍", "🪄", "💼", "💰", "🦚"]
+  },
+  {
+    "name": "Narcissa Malfoy",
+    "emojis": ["🐍", "🤍", "👱‍♀️", "💅", "🤱"]
+  },
+  {
+    "name": "Nymphadora Tonks",
+    "emojis": ["🦡", "🐺", "👩‍✈️", "💜", "🦄"]
+  },
+  {
+    "name": "Kingsley Shacklebolt",
+    "emojis": ["🦁", "🏛️", "🛡️", "👨🏿", "🧿"]
+  },
+  {
+    "name": "Mad-Eye Moody",
+    "emojis": ["🛡️", "🎓", "🍶", "🦯", "👁️"]
+  },
+  {
+    "name": "Dolores Umbridge",
+    "emojis": ["🐍", "🍵", "🐱", "🌸", "✒️"]
+  },
+  {
+    "name": "Cornelius Fudge",
+    "emojis": ["🏛️", "🎩", "🧑‍⚖️", "📰", "🍬"]
+  },
+  {
+    "name": "Peter Pettigrew",
+    "emojis": ["🦁", "🥈", "😰", "🤚", "🐀"]
+  },
+  {
+    "name": "James Potter",
+    "emojis": ["🦁", "👓", "🧥", "💨", "🦌"]
+  },
+  {
+    "name": "Lily Potter",
+    "emojis": ["🦁", "💚", "🛡️", "🌷", "🤰"]
+  },
+  {
+    "name": "Fleur Delacour",
+    "emojis": ["💍", "👰", "💎", "🪶", "🇫🇷"]
+  },
+  {
+    "name": "Viktor Krum",
+    "emojis": ["🏆", "🧹", "💪", "🦈", "🇧🇬"]
+  },
+  {
+    "name": "Cedric Diggory",
+    "emojis": ["🦡", "🧹", "🏆", "💛", "✨"]
+  },
+  {
+    "name": "Cho Chang",
+    "emojis": ["🦅", "🧹", "💋", "🥺", "💧"]
+  },
+  {
+    "name": "Filius Flitwick",
+    "emojis": ["🦅", "🪄", "🪶", "🎶", "📏"]
+  },
+  {
+    "name": "Pomona Sprout",
+    "emojis": ["🦡", "🧤", "🪴", "🌿", "🍄"]
+  },
+  {
+    "name": "Sybill Trelawney",
+    "emojis": ["🦅", "👓", "👁️", "🍷", "🔮"]
+  },
+  {
+    "name": "Horace Slughorn",
+    "emojis": ["🐍", "🍬", "🏺", "🥂", "🍍"]
+  },
+  {
+    "name": "Gilderoy Lockhart",
+    "emojis": ["🦅", "📖", "🧠", "💅", "💁"]
+  },
+  {
+    "name": "Quirinus Quirrell",
+    "emojis": ["🦅", "🧠", "🪞", "😬", "🌀"]
+  },
+  {
+    "name": "Argus Filch",
+    "emojis": ["🧹", "📂", "🔦", "⛓️", "🐈"]
+  },
+  {
+    "name": "Madame Pomfrey",
+    "emojis": ["💊", "🍫", "🩺", "🛏️", "🏥"]
+  },
+  {
+    "name": "Bill Weasley",
+    "emojis": ["🦁", "👨‍🦰", "💇‍♂️", "🏦", "🐺"]
+  },
+  {
+    "name": "Charlie Weasley",
+    "emojis": ["🦁", "👨‍🦰", "🔥", "🇷🇴", "🐉"]
+  },
+  {
+    "name": "Percy Weasley",
+    "emojis": ["🦁", "🦉", "🤓", "🏛️", "📋"]
+  },
+  {
+    "name": "Dobby",
+    "emojis": ["🧝", "👁️", "🗡️", "👂", "🧦"]
+  },
+  {
+    "name": "Kreacher",
+    "emojis": ["🧝", "🪙", "🤬", "🏚️", "📿"]
+  },
+  {
+    "name": "Firenze",
+    "emojis": ["🌲", "🏹", "🌌", "🔭", "🐎"]
+  },
+  {
+    "name": "Nearly Headless Nick",
+    "emojis": ["🦁", "👻", "🤺", "🎂", "🔪"]
+  },
+  {
+    "name": "Moaning Myrtle",
+    "emojis": ["🦅", "👻", "😭", "💧", "🚽"]
+  },
+  {
+    "name": "Peeves",
+    "emojis": ["🎈", "🔔", "🎨", "💥", "🤪"]
+  },
+  {
+    "name": "Rita Skeeter",
+    "emojis": ["👓", "✒️", "📰", "💋", "🪲"]
+  },
+  {
+    "name": "Ollivander",
+    "emojis": ["👴", "🏪", "📦", "🌳", "🪄"]
+  },
+  {
+    "name": "Vernon Dursley",
+    "emojis": ["🏡", "📺", "😡", "🔩", "🥸"]
+  },
+  {
+    "name": "Petunia Dursley",
+    "emojis": ["🏡", "🌸", "🙄", "🤐", "🐎"]
+  },
+  {
+    "name": "Dudley Dursley",
+    "emojis": ["🎮", "🍰", "🥊", "🐷", "🐽"]
+  },
+  {
+    "name": "Oliver Wood",
+    "emojis": ["🦁", "🧹", "📣", "🥅", "🪵"]
+  },
+  {
+    "name": "Seamus Finnigan",
+    "emojis": ["🦁", "🔥", "🍀", "💥", "🇮🇪"]
+  },
+  {
+    "name": "Dean Thomas",
+    "emojis": ["🦁", "📜", "🖌️", "⚽", "🎨"]
+  },
+  {
+    "name": "Gellert Grindelwald",
+    "emojis": ["💀", "🪄", "👁️", "🗼", "🔺"]
+  },
+  {
+    "name": "Hedwig",
+    "emojis": ["🛡️", "🪶", "✉️", "❄️", "🦉"]
+  },
+  {
+    "name": "Fawkes",
+    "emojis": ["🐦", "🪶", "🎵", "👁️", "🔥"]
+  },
+  {
+    "name": "Nagini",
+    "emojis": ["🐍", "🧿", "🗡️", "🦷", "🩸"]
+  },
+  {
+    "name": "Buckbeak",
+    "emojis": ["🪶", "⚔️", "🦅", "🙇", "🐴"]
+  },
+  {
+    "name": "Tom Riddle",
+    "emojis": ["🐍", "👦", "💍", "✒️", "📓"]
+  }
+]
