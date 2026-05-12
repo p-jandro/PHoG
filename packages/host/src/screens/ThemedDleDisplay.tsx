@@ -3,6 +3,11 @@ import { Socket } from 'socket.io-client';
 import { ModeIntroSplash } from '../components/themed-dle/ModeIntroSplash';
 import { ModeResultsReveal } from '../components/themed-dle/ModeResultsReveal';
 import { PlayerProgressPanel } from '../components/themed-dle/PlayerProgressPanel';
+import { HostClassicView } from '../components/themed-dle/HostClassicView';
+import { HostEmojiView } from '../components/themed-dle/HostEmojiView';
+import { HostSilhouetteView } from '../components/themed-dle/HostSilhouetteView';
+import { HostSpellView } from '../components/themed-dle/HostSpellView';
+import { HostGridView } from '../components/themed-dle/HostGridView';
 
 interface Player { id: string; name: string; connected: boolean; }
 
@@ -61,23 +66,28 @@ export const ThemedDleDisplay = ({ socket, currentGame, players }: ThemedDleDisp
     return <div className="flex h-screen w-screen items-center justify-center text-2xl">Loading…</div>;
   }
 
+  const maxGuess = Math.max(0, ...Object.values(progress).map((p: any) => p.guessCount ?? 0));
+  const minGuess = Object.keys(progress).length > 0
+    ? Math.min(...Object.values(progress).map((p: any) => p.guessCount ?? 0))
+    : 0;
+  const emojiRevealCount = Math.min(5, 1 + maxGuess);
+  const hintsUnlocked = Math.min(3, maxGuess);
+
   return (
     <div className="flex h-screen w-screen gap-8 px-12 py-10">
       <main className="flex flex-1 flex-col">
         <header className="mb-6">
           <p className="eyebrow">{theme === 'pokemon' ? 'Pokédle' : 'HP-dle'} · {mode}</p>
-          <h1 className="text-4xl font-bold">{playData.title || mode}</h1>
         </header>
         <div className="flex-1 rounded-3xl border border-white/10 bg-black/30 p-8">
-          <p className="text-center text-2xl text-ui-textMuted">Mode {mode} display coming…</p>
+          {mode === 'classic' && <HostClassicView attributes={(introData?.attributes) || []} />}
+          {mode === 'emoji'   && <HostEmojiView initialEmojis={playData.emojis || []} maxRevealed={emojiRevealCount} />}
+          {mode === 'silhouette' && <HostSilhouetteView spriteUrl={playData.spriteUrl} stage={minGuess} />}
+          {mode === 'spell'   && <HostSpellView effect={playData.effect} category={playData.category} incantationLength={playData.incantationLength} hintsUnlocked={hintsUnlocked} />}
+          {mode === 'grid'    && <HostGridView rows={playData.rows || []} cols={playData.cols || []} />}
         </div>
       </main>
-      <PlayerProgressPanel
-        mode={mode}
-        players={players}
-        progress={progress}
-        maxGuesses={playData.maxGuesses || undefined}
-      />
+      <PlayerProgressPanel mode={mode} players={players} progress={progress} maxGuesses={playData.maxGuesses || undefined} />
     </div>
   );
 };
