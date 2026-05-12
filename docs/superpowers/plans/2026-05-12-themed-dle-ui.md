@@ -2058,7 +2058,21 @@ Find the `!championshipMode &&` block (around line 586). Inside the `<div classN
 
 Optional — adjust `useState<Set<string>>(new Set(['quiz', 'trueFalse', 'pointless']))` to include `'pokedle', 'hpdle'` if desired. Leave alone for now.
 
-- [ ] **Step 4: Verify build**
+- [ ] **Step 4: Extend the championship-standings render array**
+
+Around line 768 of `Dashboard.tsx`:
+```tsx
+{(['quiz', 'trueFalse', 'pointless'] as GameKey[]).map((game) => (
+```
+
+Replace with:
+```tsx
+{(['quiz', 'trueFalse', 'pointless', 'pokedle', 'hpdle'] as GameKey[]).map((game) => (
+```
+
+(`countdown` is intentionally absent — it's not championship-eligible in this build.)
+
+- [ ] **Step 5: Verify build**
 
 ```bash
 cd packages/host && npm run build
