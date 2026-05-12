@@ -4,6 +4,7 @@ import { useGameStore } from '../stores/gameStore';
 import { ModeIntro } from '../components/themed-dle/ModeIntro';
 import { ModeResults } from '../components/themed-dle/ModeResults';
 import { CumulativeScoreBar } from '../components/themed-dle/CumulativeScoreBar';
+import { ClassicMatrix } from '../components/themed-dle/ClassicMatrix';
 
 type Phase = 'intro' | 'playing' | 'results';
 type Mode = 'classic' | 'emoji' | 'silhouette' | 'spell' | 'grid';
@@ -114,6 +115,8 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
     };
   }, [socket, gamePrefix, playerId]);
 
+  const submit = (payload: any) => socket?.emit('themedDle:guess', payload);
+
   if (phase === 'intro' && introData) return <ModeIntro data={introData} />;
   if (phase === 'results' && resultsData) return <ModeResults data={resultsData} />;
   if (phase !== 'playing' || !playData) {
@@ -145,8 +148,13 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
           </div>
         )}
 
-        {/* Mode bodies (filled in Phases 3–7) */}
-        <ModeBodyPlaceholder mode={mode} guessEvents={guessEvents} cellEvents={cellEvents} />
+        {/* Mode bodies */}
+        {mode === 'classic' && (
+          <ClassicMatrix data={playData} guesses={guessEvents} onGuess={submit} />
+        )}
+        {mode !== 'classic' && (
+          <ModeBodyPlaceholder mode={mode} guessEvents={guessEvents} cellEvents={cellEvents} />
+        )}
       </div>
     </div>
   );
