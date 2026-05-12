@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
+import { ThemedDleDisplay } from './ThemedDleDisplay';
 import { QRCodeSVG } from 'qrcode.react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
@@ -121,6 +122,7 @@ export const Display = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [leaderboardStage, setLeaderboardStage] = useState<'game' | 'championship'>('game');
   const [now, setNow] = useState(Date.now());
+  const [socket, setSocket] = useState<Socket | null>(null);
   const playerJoinLabel = PLAYER_URL.replace(/^https?:\/\//, '');
 
   // Quiz state
@@ -347,7 +349,10 @@ export const Display = () => {
       setPointlessReadyToReveal(false);
     });
 
+    setSocket(newSocket);
+
     return () => {
+      setSocket(null);
       if (roundLeaderboardTimeout) {
         clearTimeout(roundLeaderboardTimeout);
       }
@@ -560,6 +565,19 @@ export const Display = () => {
             </div>
           </motion.div>
         </div>
+        {displayControl}
+      </>
+    );
+  }
+
+  if (currentGame === 'pokedle' || currentGame === 'hpdle') {
+    return (
+      <>
+        <ThemedDleDisplay
+          socket={socket}
+          currentGame={currentGame as 'pokedle' | 'hpdle'}
+          players={players}
+        />
         {displayControl}
       </>
     );
