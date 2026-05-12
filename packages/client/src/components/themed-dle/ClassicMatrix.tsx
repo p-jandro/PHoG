@@ -79,7 +79,9 @@ export const ClassicMatrix = ({ data, guesses, onGuess }: ClassicMatrixProps) =>
       {!solved && used >= data.maxGuesses && (
         <p className="text-center text-game-incorrect text-lg font-bold">Out of guesses</p>
       )}
-      <p className="text-center text-xs text-ui-textMuted">{data.maxGuesses - used} guesses left</p>
+      {!solved && used < data.maxGuesses && (
+        <p className="text-center text-xs text-ui-textMuted">{data.maxGuesses - used} guesses left</p>
+      )}
     </div>
   );
 };

@@ -349,9 +349,11 @@ export class ThemedDleGame {
 
     const startPayload = {
       mode: this.mode,
+      modeIndex: this.currentModeIndex,
+      totalModes: this.modes.length,
       duration: phaseDuration,
       endsAt: this.phaseEndsAt,
-      maxGuesses: this.mode === 'grid' ? null : MAX_GUESSES,
+      maxGuesses: this.mode === 'grid' ? null : (this.mode === 'spell' ? 5 : MAX_GUESSES),
       ...this._modePublicPrompt()
     };
 
@@ -619,7 +621,8 @@ export class ThemedDleGame {
 
     if (ps.solved) return; // already won
 
-    if (ps.guesses.length >= MAX_GUESSES) return; // out of guesses
+    const maxAttempts = this.mode === 'spell' ? 5 : MAX_GUESSES;
+    if (ps.guesses.length >= maxAttempts) return; // out of guesses
 
     const guessName = String(guess?.name || '').trim();
     if (!guessName) return;

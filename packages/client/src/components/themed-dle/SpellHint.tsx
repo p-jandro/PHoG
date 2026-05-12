@@ -74,7 +74,9 @@ export const SpellHint = ({ data, guesses, onGuess }: SpellHintProps) => {
       {!solved && used >= data.maxGuesses && (
         <p className="text-center text-game-incorrect text-lg font-bold">Out of attempts</p>
       )}
-      <p className="text-center text-xs text-ui-textMuted">{data.maxGuesses - used} attempts left</p>
+      {!solved && used < data.maxGuesses && (
+        <p className="text-center text-xs text-ui-textMuted">{data.maxGuesses - used} attempts left</p>
+      )}
     </div>
   );
 };
