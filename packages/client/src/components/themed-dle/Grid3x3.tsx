@@ -24,19 +24,18 @@ export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
   const [activeCell, setActiveCell] = useState<{ row: number; col: number } | null>(null);
 
   const cellState = useMemo(() => {
-    const latest: Record<string, { name: string; valid: boolean }> = {};
-    for (const ev of cellEvents) {
-      for (const [k, name] of Object.entries(ev.cellAnswers)) {
-        if (!name) continue;
-        latest[k] = { name, valid: latest[k]?.valid ?? true };
-      }
-      const key = `${ev.row},${ev.col}`;
-      if (ev.valid) latest[key] = { name: ev.name, valid: true };
-      else if (!ev.cellAnswers[key]) {
-        latest[key] = { name: ev.name, valid: false };
-      }
+    if (cellEvents.length === 0) return {} as Record<string, { name: string; valid: boolean }>;
+    const lastEv = cellEvents[cellEvents.length - 1];
+    const state: Record<string, { name: string; valid: boolean }> = {};
+    for (const [k, name] of Object.entries(lastEv.cellAnswers)) {
+      if (name) state[k] = { name, valid: true };
     }
-    return latest;
+    // Surface the most-recent invalid pick so the player sees their red attempt
+    if (!lastEv.valid) {
+      const key = `${lastEv.row},${lastEv.col}`;
+      if (!state[key]) state[key] = { name: lastEv.name, valid: false };
+    }
+    return state;
   }, [cellEvents]);
 
   const filledCount = Object.values(cellState).filter((c) => c.valid).length;
