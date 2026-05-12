@@ -570,7 +570,7 @@ export const Display = () => {
     );
   }
 
-  if (currentGame === 'pokedle' || currentGame === 'hpdle') {
+  if ((currentGame === 'pokedle' || currentGame === 'hpdle') && phase === 'playing') {
     return (
       <>
         <ThemedDleDisplay
