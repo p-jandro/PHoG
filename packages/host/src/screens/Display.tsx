@@ -14,7 +14,7 @@ const PLAYER_URL = import.meta.env.VITE_PLAYER_URL || (
     : 'http://localhost:5173'
 );
 const CHAMPIONSHIP_PREVIEW_DELAY = 5000;
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle';
 
 interface Player {
   id: string;
@@ -27,6 +27,8 @@ interface Player {
     trueFalse: number | null;
     countdown: number | null;
     pointless: number | null;
+    pokedle: number | null;
+    hpdle: number | null;
   };
   connected: boolean;
 }
@@ -42,7 +44,7 @@ interface RoundLeaderboardEntry {
 }
 
 interface RoundLeaderboardState {
-  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle';
   duration: number;
   leaderboard: RoundLeaderboardEntry[];
   roundNumber?: number | null;
@@ -471,7 +473,9 @@ export const Display = () => {
       quiz: 'Quiz',
       trueFalse: 'True/False',
       countdown: 'Countdown',
-      pointless: 'Pointless'
+      pointless: 'Pointless',
+      pokedle: 'Pokédle',
+      hpdle: 'HP-dle'
     }[roundLeaderboard.game];
 
     return (
@@ -620,7 +624,9 @@ export const Display = () => {
                     quiz: 'Quiz',
                     trueFalse: 'True/False',
                     countdown: 'Countdown',
-                    pointless: 'Pointless'
+                    pointless: 'Pointless',
+                    pokedle: 'Pokédle',
+                    hpdle: 'HP-dle'
                   }[activeGame]} Placements`}
                 </h1>
                 <p className="mt-3 text-2xl text-ui-textMuted">
