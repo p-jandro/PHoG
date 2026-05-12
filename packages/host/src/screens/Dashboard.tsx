@@ -24,16 +24,20 @@ interface Player {
     trueFalse: number | null;
     countdown: number | null;
     pointless: number | null;
+    pokedle: number | null;
+    hpdle: number | null;
   };
   connected: boolean;
 }
 
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle';
 const GAME_LABELS: Record<GameKey, string> = {
   quiz: 'Quiz',
   trueFalse: 'True/False',
   countdown: 'Countdown',
-  pointless: 'Pointless'
+  pointless: 'Pointless',
+  pokedle: 'Pokédle',
+  hpdle: 'HP-dle'
 };
 
 export const Dashboard = () => {
