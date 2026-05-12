@@ -5,6 +5,7 @@ import { Quiz } from './screens/Quiz';
 import { TrueFalse } from './screens/TrueFalse';
 import { Countdown } from './screens/Countdown';
 import { Pointless } from './screens/Pointless';
+import { ThemedDle } from './screens/ThemedDle';
 import { FinalLeaderboard } from './screens/FinalLeaderboard';
 import { PausedOverlay } from './components/PausedOverlay';
 import { RoundLeaderboardOverlay } from './components/RoundLeaderboardOverlay';
@@ -30,6 +31,9 @@ function App() {
             return <Countdown socket={socket} />;
           case 'pointless':
             return <Pointless socket={socket} />;
+          case 'pokedle':
+          case 'hpdle':
+            return <ThemedDle socket={socket} />;
           default:
             return (
               <div className="min-h-screen flex items-center justify-center">
