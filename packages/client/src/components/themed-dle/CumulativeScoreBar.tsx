@@ -24,7 +24,8 @@ const THEME_LABEL: Record<string, string> = {
 export const CumulativeScoreBar = ({
   theme, mode, modeIndex, totalModes, cumulative, timerMs, totalMs
 }: CumulativeScoreBarProps) => {
-  const progress = (typeof timerMs === 'number' && totalMs) ? (timerMs / totalMs) * 100 : null;
+  const hasTimer = typeof timerMs === 'number' && typeof totalMs === 'number' && totalMs > 0;
+  const progress = hasTimer ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : null;
 
   return (
     <div className="mb-4 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">

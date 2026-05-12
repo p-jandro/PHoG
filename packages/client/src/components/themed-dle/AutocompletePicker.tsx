@@ -48,12 +48,22 @@ export const AutocompletePicker = ({
         value={query}
         onChange={(e) => { setQuery(e.target.value); setActive(0); }}
         onKeyDown={(e) => {
-          if (e.key === 'ArrowDown') { e.preventDefault(); setActive((i) => Math.min(suggestions.length - 1, i + 1)); }
-          if (e.key === 'ArrowUp')   { e.preventDefault(); setActive((i) => Math.max(0, i - 1)); }
-          if (e.key === 'Enter') {
+          if (e.key === 'ArrowDown' && suggestions.length > 0) {
+            e.preventDefault();
+            setActive((i) => Math.min(suggestions.length - 1, i + 1));
+          }
+          if (e.key === 'ArrowUp' && suggestions.length > 0) {
+            e.preventDefault();
+            setActive((i) => Math.max(0, i - 1));
+          }
+          if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
             e.preventDefault();
             if (suggestions[active]) submit(suggestions[active].name);
             else if (query.trim()) submit(query.trim());
+          }
+          if (e.key === 'Escape') {
+            setQuery('');
+            setActive(0);
           }
         }}
         placeholder={placeholder}
