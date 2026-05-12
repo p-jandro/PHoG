@@ -23,8 +23,8 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
   const [introData, setIntroData] = useState<any>(null);
   const [playData, setPlayData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
-  const [_guessEvents, setGuessEvents] = useState<any[]>([]);
-  const [_cellEvents, setCellEvents] = useState<any[]>([]);
+  const [guessEvents, setGuessEvents] = useState<any[]>([]);
+  const [cellEvents, setCellEvents] = useState<any[]>([]);
   const [cumulative, setCumulative] = useState(0);
   const [timerMs, setTimerMs] = useState(0);
   const [totalMs, setTotalMs] = useState(0);
@@ -130,10 +130,14 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
   );
 
   function ModeBodyPlaceholder({ mode }: { mode: Mode }) {
+    const interactions = guessEvents.length + cellEvents.length;
     return (
       <div className="rounded-2xl border border-white/10 bg-black/20 p-6 text-center text-ui-textMuted">
         Mode <strong>{mode}</strong> UI coming next.
         <p className="mt-2 text-xs">Use the host display to advance the round.</p>
+        {interactions > 0 && (
+          <p className="mt-2 text-xs">{interactions} interaction{interactions === 1 ? '' : 's'} received</p>
+        )}
       </div>
     );
   }
