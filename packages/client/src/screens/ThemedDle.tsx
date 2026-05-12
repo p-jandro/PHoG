@@ -8,25 +8,13 @@ import { ClassicMatrix } from '../components/themed-dle/ClassicMatrix';
 import { EmojiClue } from '../components/themed-dle/EmojiClue';
 import { Silhouette } from '../components/themed-dle/Silhouette';
 import { SpellHint } from '../components/themed-dle/SpellHint';
+import { Grid3x3 } from '../components/themed-dle/Grid3x3';
 
 type Phase = 'intro' | 'playing' | 'results';
 type Mode = 'classic' | 'emoji' | 'silhouette' | 'spell' | 'grid';
 
 interface ThemedDleProps {
   socket: Socket | null;
-}
-
-function ModeBodyPlaceholder({ mode, guessEvents, cellEvents }: { mode: Mode; guessEvents: any[]; cellEvents: any[] }) {
-  const interactions = guessEvents.length + cellEvents.length;
-  return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 p-6 text-center text-ui-textMuted">
-      Mode <strong>{mode}</strong> UI coming next.
-      <p className="mt-2 text-xs">Use the host display to advance the round.</p>
-      {interactions > 0 && (
-        <p className="mt-2 text-xs">{interactions} interaction{interactions === 1 ? '' : 's'} received</p>
-      )}
-    </div>
-  );
 }
 
 export const ThemedDle = ({ socket }: ThemedDleProps) => {
@@ -156,9 +144,7 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
         {mode === 'emoji' && <EmojiClue data={playData} guesses={guessEvents} onGuess={submit} />}
         {mode === 'silhouette' && <Silhouette data={playData} guesses={guessEvents} onGuess={submit} />}
         {mode === 'spell' && <SpellHint data={playData} guesses={guessEvents} onGuess={submit} />}
-        {!['classic','emoji','silhouette','spell'].includes(mode) && (
-          <ModeBodyPlaceholder mode={mode} guessEvents={guessEvents} cellEvents={cellEvents} />
-        )}
+        {mode === 'grid' && <Grid3x3 data={playData} cellEvents={cellEvents} onGuess={submit} />}
       </div>
     </div>
   );
