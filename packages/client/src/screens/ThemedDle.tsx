@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { ModeIntro } from '../components/themed-dle/ModeIntro';
@@ -10,6 +10,19 @@ type Mode = 'classic' | 'emoji' | 'silhouette' | 'spell' | 'grid';
 
 interface ThemedDleProps {
   socket: Socket | null;
+}
+
+function ModeBodyPlaceholder({ mode, guessEvents, cellEvents }: { mode: Mode; guessEvents: any[]; cellEvents: any[] }) {
+  const interactions = guessEvents.length + cellEvents.length;
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-6 text-center text-ui-textMuted">
+      Mode <strong>{mode}</strong> UI coming next.
+      <p className="mt-2 text-xs">Use the host display to advance the round.</p>
+      {interactions > 0 && (
+        <p className="mt-2 text-xs">{interactions} interaction{interactions === 1 ? '' : 's'} received</p>
+      )}
+    </div>
+  );
 }
 
 export const ThemedDle = ({ socket }: ThemedDleProps) => {
@@ -29,6 +42,7 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
   const [timerMs, setTimerMs] = useState(0);
   const [totalMs, setTotalMs] = useState(0);
   const [invalidToast, setInvalidToast] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Drive the playing-phase timer
   useEffect(() => {
@@ -63,9 +77,13 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
     const onGuessResult = (d: any) => setGuessEvents((prev) => [...prev, d]);
     const onCellResult = (d: any) => setCellEvents((prev) => [...prev, d]);
     const onInvalid = (d: any) => {
-      const msg = d.reason === 'duplicate' ? `"${d.name}" already used` : `"${d.name}" not in roster`;
+      const msg = d.reason === 'duplicate' ? `"${d.name ?? 'Unknown'}" already used` : `"${d.name ?? 'Unknown'}" not in roster`;
       setInvalidToast(msg);
-      setTimeout(() => setInvalidToast(null), 2500);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = setTimeout(() => {
+        setInvalidToast(null);
+        toastTimeoutRef.current = null;
+      }, 2500);
     };
     const onResults = (d: any) => {
       setPhase('results');
@@ -89,6 +107,10 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
       socket.off(`${gamePrefix}:grid:cell:result`, onCellResult);
       socket.off(`${gamePrefix}:guess:invalid`, onInvalid);
       socket.off(`${gamePrefix}:mode:results`, onResults);
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+        toastTimeoutRef.current = null;
+      }
     };
   }, [socket, gamePrefix, playerId]);
 
@@ -112,7 +134,7 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
           theme={theme}
           mode={mode}
           modeIndex={playData.modeIndex ?? modeIndex}
-          totalModes={4}
+          totalModes={playData.totalModes ?? 4}
           cumulative={cumulative}
           timerMs={timerMs}
           totalMs={totalMs}
@@ -124,21 +146,8 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
         )}
 
         {/* Mode bodies (filled in Phases 3–7) */}
-        <ModeBodyPlaceholder mode={mode} />
+        <ModeBodyPlaceholder mode={mode} guessEvents={guessEvents} cellEvents={cellEvents} />
       </div>
     </div>
   );
-
-  function ModeBodyPlaceholder({ mode }: { mode: Mode }) {
-    const interactions = guessEvents.length + cellEvents.length;
-    return (
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-6 text-center text-ui-textMuted">
-        Mode <strong>{mode}</strong> UI coming next.
-        <p className="mt-2 text-xs">Use the host display to advance the round.</p>
-        {interactions > 0 && (
-          <p className="mt-2 text-xs">{interactions} interaction{interactions === 1 ? '' : 's'} received</p>
-        )}
-      </div>
-    );
-  }
 };

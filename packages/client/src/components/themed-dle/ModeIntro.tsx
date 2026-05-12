@@ -24,7 +24,9 @@ export const ModeIntro = ({ data }: ModeIntroProps) => {
     return () => clearInterval(i);
   }, [data.endsAt]);
 
-  const progress = data.duration ? ((data.duration - remaining) / data.duration) * 100 : 0;
+  const progress = data.duration
+    ? Math.max(0, Math.min(100, ((data.duration - remaining) / data.duration) * 100))
+    : 0;
 
   return (
     <div className="screen-shell flex flex-col items-center justify-center">
