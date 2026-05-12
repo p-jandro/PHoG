@@ -6,6 +6,7 @@ import { ModeResults } from '../components/themed-dle/ModeResults';
 import { CumulativeScoreBar } from '../components/themed-dle/CumulativeScoreBar';
 import { ClassicMatrix } from '../components/themed-dle/ClassicMatrix';
 import { EmojiClue } from '../components/themed-dle/EmojiClue';
+import { Silhouette } from '../components/themed-dle/Silhouette';
 
 type Phase = 'intro' | 'playing' | 'results';
 type Mode = 'classic' | 'emoji' | 'silhouette' | 'spell' | 'grid';
@@ -152,7 +153,8 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
         {/* Mode bodies */}
         {mode === 'classic' && <ClassicMatrix data={playData} guesses={guessEvents} onGuess={submit} />}
         {mode === 'emoji' && <EmojiClue data={playData} guesses={guessEvents} onGuess={submit} />}
-        {!['classic','emoji'].includes(mode) && (
+        {mode === 'silhouette' && <Silhouette data={playData} guesses={guessEvents} onGuess={submit} />}
+        {!['classic','emoji','silhouette'].includes(mode) && (
           <ModeBodyPlaceholder mode={mode} guessEvents={guessEvents} cellEvents={cellEvents} />
         )}
       </div>
