@@ -1,13 +1,8 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { ModeIntroSplash } from '../components/themed-dle/ModeIntroSplash';
 import { ModeResultsReveal } from '../components/themed-dle/ModeResultsReveal';
-import { PlayerProgressPanel } from '../components/themed-dle/PlayerProgressPanel';
-import { HostClassicView } from '../components/themed-dle/HostClassicView';
-import { HostEmojiView } from '../components/themed-dle/HostEmojiView';
-import { HostSilhouetteView } from '../components/themed-dle/HostSilhouetteView';
-import { HostSpellView } from '../components/themed-dle/HostSpellView';
-import { HostGridView } from '../components/themed-dle/HostGridView';
 
 interface Player { id: string; name: string; connected: boolean; }
 
@@ -36,6 +31,7 @@ export const ThemedDleDisplay = ({ socket, currentGame, players }: ThemedDleDisp
   const [playData, setPlayData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
   const [progress, setProgress] = useState<Record<string, any>>({});
+  const [timerMs, setTimerMs] = useState(0);
 
   useEffect(() => {
     if (!socket) return;
@@ -58,6 +54,14 @@ export const ThemedDleDisplay = ({ socket, currentGame, players }: ThemedDleDisp
     };
   }, [socket, currentGame]);
 
+  useEffect(() => {
+    if (phase !== 'playing' || !playData?.endsAt) return;
+    const tick = () => setTimerMs(Math.max(0, playData.endsAt - Date.now()));
+    tick();
+    const i = setInterval(tick, 100);
+    return () => clearInterval(i);
+  }, [phase, playData]);
+
   if (phase === 'intro' && introData) return (
     <div className="h-screen w-screen px-16 py-20">
       <ModeIntroSplash data={introData} />
@@ -74,28 +78,68 @@ export const ThemedDleDisplay = ({ socket, currentGame, players }: ThemedDleDisp
     return <div className="flex h-screen w-screen items-center justify-center text-2xl">Loading…</div>;
   }
 
-  const maxGuess = Math.max(0, ...Object.values(progress).map((p: any) => p.guessCount ?? 0));
-  const minGuess = Object.keys(progress).length > 0
-    ? Math.min(...Object.values(progress).map((p: any) => p.guessCount ?? 0))
-    : 0;
-  const emojiRevealCount = Math.min(5, 1 + maxGuess);
-  const hintsUnlocked = Math.min(3, maxGuess);
+  const connected = players.filter((p) => p.connected);
+  const themeName = theme === 'pokemon' ? 'Pokédle' : 'HP-dle';
+  const maxGuesses: number = playData.maxGuesses ?? 6;
+  const solvedCount = mode === 'grid'
+    ? 0
+    : connected.filter((p) => progress[p.id]?.solved).length;
 
   return (
-    <div className="flex h-screen w-screen gap-8 px-12 py-10">
-      <main className="flex flex-1 flex-col">
-        <header className="mb-6">
-          <p className="eyebrow">{theme === 'pokemon' ? 'Pokédle' : 'HP-dle'} · {MODE_LABELS[mode]}</p>
-        </header>
-        <div className="flex-1 rounded-3xl border border-white/10 bg-black/30 p-8">
-          {mode === 'classic' && <HostClassicView attributes={(introData?.attributes) || []} />}
-          {mode === 'emoji'   && <HostEmojiView initialEmojis={playData.emojis || []} maxRevealed={emojiRevealCount} />}
-          {mode === 'silhouette' && <HostSilhouetteView spriteUrl={playData.spriteUrl} stage={minGuess} />}
-          {mode === 'spell'   && <HostSpellView effect={playData.effect} category={playData.category} incantationLength={playData.incantationLength} hintsUnlocked={hintsUnlocked} />}
-          {mode === 'grid'    && <HostGridView rows={playData.rows || []} cols={playData.cols || []} />}
-        </div>
-      </main>
-      <PlayerProgressPanel mode={mode} players={players} progress={progress} maxGuesses={playData.maxGuesses || undefined} />
+    <div className="flex h-screen w-screen flex-col items-center px-10 py-10">
+      <header className="w-full text-center">
+        <p className="eyebrow text-xl">{themeName} · {MODE_LABELS[mode]}</p>
+      </header>
+
+      <div className="my-6 tabular-nums text-7xl font-bold text-white">{Math.ceil(timerMs / 1000)}s</div>
+
+      <div className="w-full max-w-5xl flex-1 overflow-y-auto">
+        {mode !== 'grid' && (
+          <p className="mb-3 text-center text-lg text-ui-textMuted">
+            {solvedCount} of {connected.length} solved
+          </p>
+        )}
+        {connected.length === 0 ? (
+          <p className="text-center text-ui-textMuted">No players connected.</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {connected.map((p) => {
+              const s = progress[p.id];
+              let isSolved = false;
+              let isFailed = false;
+              let statusLabel: string;
+              if (mode === 'grid') {
+                const filled = s?.filledCells ?? 0;
+                statusLabel = `${filled}/9 filled`;
+              } else {
+                const guessCount = s?.guessCount ?? 0;
+                isSolved = s?.solved ?? false;
+                isFailed = !isSolved && guessCount >= maxGuesses;
+                if (isSolved) statusLabel = `✓ solved in ${guessCount}`;
+                else if (isFailed) statusLabel = '✗ out of guesses';
+                else statusLabel = `${guessCount}/${maxGuesses} guesses`;
+              }
+              const tone = isSolved
+                ? 'border-game-correct bg-game-correct/10 text-game-correct'
+                : isFailed
+                  ? 'border-game-incorrect bg-game-incorrect/10 text-game-incorrect'
+                  : 'border-white/10 bg-black/30 text-white';
+              return (
+                <motion.div
+                  key={p.id}
+                  layout
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`rounded-3xl border-2 px-5 py-4 ${tone}`}
+                >
+                  <p className="truncate text-2xl font-bold">{p.name}</p>
+                  <p className="mt-1 text-sm">{statusLabel}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
