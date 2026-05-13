@@ -14,3 +14,5 @@ export { ScoreDrop } from './ScoreDrop';
 export { ThemeToggle } from './ThemeToggle';
 export { UiShowcase } from './UiShowcase';
 export { HostScreenShell } from './HostScreenShell';
+export { PlayerTracker } from './PlayerTracker';
+export type { TrackedPlayer } from './PlayerTracker';
