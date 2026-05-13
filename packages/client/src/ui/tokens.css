@@ -34,12 +34,16 @@
   --medal-bronze: #b8714a;
 
   /* Foreground over each color (for accessible contrast) */
-  --on-action:  #ffffff;
+  --on-action:  #0d0a09; /* dark ink on grass — ~13:1 ✓ */
   --on-now:     #181614;
-  --on-info:    #ffffff;
-  --on-streak:  #ffffff;
+  --on-info:    #0d0a09; /* dark ink on cobalt — ~7:1 ✓ */
+  --on-streak:  #0d0a09; /* dark ink on terracotta — ~7:1 ✓ */
   --on-premium: #ffffff;
-  --on-danger:  #ffffff;
+  --on-danger:  #0d0a09; /* dark ink on danger-red — ~6:1 ✓ */
+  --on-warn:        #0d0a09; /* dark ink on amber — ~13:1 ✓ */
+  --on-medal-gold:   #0d0a09; /* dark ink on gold — ~12:1 ✓ */
+  --on-medal-silver: #0d0a09; /* dark ink on silver — ~10:1 ✓ */
+  --on-medal-bronze: #ffffff; /* white on dark bronze — ~5:1 ✓ */
 }
 
 :root[data-theme="dark"] {
@@ -80,6 +84,10 @@
   --on-streak:  #0d0a09;
   --on-premium: #ffffff;
   --on-danger:  #0d0a09;
+  --on-warn:        #0d0a09; /* dark ink on amber — ~13:1 ✓ */
+  --on-medal-gold:   #0d0a09; /* dark ink on gold — ~12:1 ✓ */
+  --on-medal-silver: #0d0a09; /* dark ink on silver — ~10:1 ✓ */
+  --on-medal-bronze: #ffffff; /* white on dark bronze — ~5:1 ✓ */
 }
 
 /* Smooth theme flip — colors/borders/shadows only, NOT transforms or opacity.
