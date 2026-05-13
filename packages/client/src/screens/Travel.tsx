@@ -15,7 +15,8 @@ export const Travel = ({ socket }: TravelProps) => {
   const [introData, setIntroData] = useState<any>(null);
   const [roundData, setRoundData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
-  const [history, setHistory] = useState<Array<{name: string; color: 'green'|'orange'|'red'}>>([]);
+  const [frontChain, setFrontChain] = useState<Array<{ name: string; color?: 'green'|'orange'|'red' }>>([]);
+  const [backChain, setBackChain] = useState<Array<{ name: string; color?: 'green'|'orange'|'red' }>>([]);
   const [solved, setSolved] = useState(false);
   const [countries, setCountries] = useState<Country[]>([]);
   const [invalidToast, setInvalidToast] = useState<string | null>(null);
@@ -35,17 +36,20 @@ export const Travel = ({ socket }: TravelProps) => {
       setPhase('intro');
       setIntroData(d);
       setCountries(d.countries || []);
-      setHistory([]);
+      setFrontChain([]);
+      setBackChain([]);
       setSolved(false);
     };
     const onStart = (d: any) => {
       setPhase('playing');
       setRoundData(d);
-      setHistory([]);
+      setFrontChain([{ name: d.start }]);
+      setBackChain([{ name: d.end }]);
       setSolved(false);
     };
     const onResult = (d: any) => {
-      setHistory((prev) => [...prev, { name: d.name, color: d.color }]);
+      if (Array.isArray(d.frontChain)) setFrontChain(d.frontChain);
+      if (Array.isArray(d.backChain)) setBackChain(d.backChain);
       if (d.solved) setSolved(true);
     };
     const onInvalid = (d: any) => {
@@ -132,7 +136,8 @@ export const Travel = ({ socket }: TravelProps) => {
 
   const totalMs = roundData.duration || 90000;
   const progress = totalMs > 0 ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : 0;
-  const guessesLeft = roundData.maxGuesses - history.length;
+  const guessesUsed = Math.max(0, (frontChain.length - 1) + (backChain.length - 1));
+  const guessesLeft = roundData.maxGuesses - guessesUsed;
   const noBudget = guessesLeft <= 0;
 
   return (
@@ -149,7 +154,7 @@ export const Travel = ({ socket }: TravelProps) => {
           <div className="h-full bg-game-leader" style={{ width: `${progress}%` }} />
         </div>
 
-        <ChainList start={roundData.start} end={roundData.end} history={history} />
+        <ChainList frontChain={frontChain} backChain={backChain} solved={solved} />
 
         {invalidToast && (
           <div className="rounded-xl border border-game-incorrect/40 bg-game-incorrect/10 px-3 py-2 text-center text-sm text-game-incorrect">
@@ -158,7 +163,7 @@ export const Travel = ({ socket }: TravelProps) => {
         )}
 
         {!solved && !noBudget && (
-          <CountryAutocomplete countries={countries} onSubmit={submit} placeholder={`Border of ${history.length ? history[history.length - 1].name : roundData.start}…`} />
+          <CountryAutocomplete countries={countries} onSubmit={submit} placeholder={`Border of ${frontChain[frontChain.length-1]?.name ?? roundData.start} or ${backChain[0]?.name ?? roundData.end}…`} />
         )}
         {solved && <p className="text-center text-lg font-bold text-game-correct">🎉 reached {roundData.end}!</p>}
         {!solved && noBudget && (

@@ -59,11 +59,12 @@ export class TravelGame {
       maxGuesses: null,
       duration: PLAY_DURATION,
       endsAt: null,
-      players: {} // playerId → { chain: [name], history: [{name, color}], solved, solvedAtMs, guessesUsed }
+      players: {} // playerId → { frontChain, backChain, history, solved, solvedAtMs, guessesUsed }
     };
     for (const [pid] of this.gameState.players) {
       this.gameState.travel.players[pid] = {
-        chain: [],
+        frontChain: [],
+        backChain: [],
         history: [],
         solved: false,
         solvedAtMs: null,
@@ -114,10 +115,11 @@ export class TravelGame {
     this.gameState.travel.endsAt = endsAt;
     this.firstSolverId = null;
 
-    // Seed each player's chain with the start
+    // Seed each player's chains with start and end
     for (const [pid] of this.gameState.players) {
       this.gameState.travel.players[pid] = {
-        chain: [start],
+        frontChain: [{ name: start }],
+        backChain: [{ name: end }],
         history: [],
         solved: false,
         solvedAtMs: null,
@@ -151,29 +153,43 @@ export class TravelGame {
       this._ackInvalid(playerId, `"${name}" not recognized`);
       return;
     }
-    const head = ps.chain[ps.chain.length - 1];
-    if (!isAdjacent(head, resolved)) {
-      this._ackInvalid(playerId, `${resolved} doesn't border ${head}`);
+
+    const frontHead = ps.frontChain[ps.frontChain.length - 1].name;
+    const backHead = ps.backChain[0].name;
+    const adjFront = isAdjacent(frontHead, resolved);
+    const adjBack = isAdjacent(backHead, resolved);
+
+    if (!adjFront && !adjBack) {
+      this._ackInvalid(playerId, `${resolved} doesn't border ${frontHead} or ${backHead}`);
       return;
     }
 
-    // Compute color
-    const dest = this.gameState.travel.end;
+    // Pick side — front wins ties.
+    const side = adjFront ? 'front' : 'back';
+    const extendingHead = side === 'front' ? frontHead : backHead;
+    const otherHead = side === 'front' ? backHead : frontHead;
+
     let color;
-    if (resolved === dest) {
-      color = 'green';
+    if (resolved === otherHead) {
+      color = 'green'; // closes the gap by landing on the other head
     } else {
-      const info = shortestPathInfo(head, dest);
+      const info = shortestPathInfo(extendingHead, otherHead);
       if (info && info.nextOnShortestPath.has(resolved)) color = 'green';
-      else if (canReach(resolved, dest)) color = 'orange';
+      else if (canReach(resolved, otherHead)) color = 'orange';
       else color = 'red';
     }
 
-    ps.chain.push(resolved);
-    ps.history.push({ name: resolved, color });
+    if (side === 'front') {
+      ps.frontChain.push({ name: resolved, color });
+    } else {
+      ps.backChain.unshift({ name: resolved, color });
+    }
+    ps.history.push({ name: resolved, color, side });
     ps.guessesUsed++;
 
-    if (resolved === dest) {
+    const newFront = ps.frontChain[ps.frontChain.length - 1].name;
+    const newBack = ps.backChain[0].name;
+    if (newFront === newBack || isAdjacent(newFront, newBack)) {
       ps.solved = true;
       ps.solvedAtMs = Date.now();
       if (this.firstSolverId === null) this.firstSolverId = playerId;
@@ -184,7 +200,9 @@ export class TravelGame {
       socket.emit('travel:guess:result', {
         name: resolved,
         color,
-        chain: ps.chain,
+        side,
+        frontChain: ps.frontChain,
+        backChain: ps.backChain,
         guessesUsed: ps.guessesUsed,
         guessesRemaining: this.gameState.travel.maxGuesses - ps.guessesUsed,
         solved: ps.solved
@@ -201,13 +219,12 @@ export class TravelGame {
   }
 
   _broadcastProgress() {
-    // Host gets each player's chain *length* and the last country (the head),
-    // plus the colors per step. No leaks since everyone sees the same pair.
     const playerProgress = {};
     for (const [pid, ps] of Object.entries(this.gameState.travel.players)) {
       playerProgress[pid] = {
-        chainLength: ps.chain.length,
-        head: ps.chain[ps.chain.length - 1] || null,
+        frontHead: ps.frontChain[ps.frontChain.length - 1]?.name || null,
+        backHead: ps.backChain[0]?.name || null,
+        chainTotal: ps.frontChain.length + ps.backChain.length, // total nodes across both
         colors: ps.history.map((h) => h.color),
         solved: ps.solved,
         guessesUsed: ps.guessesUsed
@@ -243,24 +260,37 @@ export class TravelGame {
       const ps = this.gameState.travel.players[pid];
       if (!ps) {
         p.score = 0;
-        playerResults.push({ playerId: pid, playerName: p.name, score: 0, solved: false, chain: [], history: [] });
+        playerResults.push({ playerId: pid, playerName: p.name, score: 0, solved: false, frontChain: [], backChain: [], history: [] });
         continue;
       }
+
+      let combined;
+      const fh = ps.frontChain[ps.frontChain.length - 1].name;
+      const bh = ps.backChain[0].name;
+      if (fh === bh) {
+        combined = ps.frontChain.concat(ps.backChain.slice(1));
+      } else {
+        combined = ps.frontChain.concat(ps.backChain);
+      }
+      const yourLength = Math.max(0, combined.length - 1);
+
       let score = 0;
       if (ps.solved) {
         const remainingMs = Math.max(0, (this.phaseStartMs + total) - ps.solvedAtMs);
-        const yourLength = ps.chain.length - 1; // exclude the seeded start
         score = scoreSolved(yourLength, optimalDistance, remainingMs, total, this.firstSolverId === pid);
       } else {
         score = scorePartial(ps.history);
       }
       p.score = score;
+
       playerResults.push({
         playerId: pid,
         playerName: p.name,
         score,
         solved: ps.solved,
-        chain: ps.chain,
+        frontChain: ps.frontChain,
+        backChain: ps.backChain,
+        combinedChain: combined,
         history: ps.history,
         firstSolver: this.firstSolverId === pid
       });

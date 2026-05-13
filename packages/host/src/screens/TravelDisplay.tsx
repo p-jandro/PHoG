@@ -108,8 +108,9 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
             <HostChainCard
               key={p.id}
               playerName={p.name}
-              head={s?.head ?? roundData.start}
-              chainLength={s?.chainLength ?? 1}
+              frontHead={s?.frontHead ?? roundData.start}
+              backHead={s?.backHead ?? roundData.end}
+              chainTotal={s?.chainTotal ?? 2}
               colors={s?.colors ?? []}
               solved={s?.solved ?? false}
               maxGuesses={maxGuesses}
