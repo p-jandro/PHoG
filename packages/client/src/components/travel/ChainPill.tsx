@@ -15,7 +15,7 @@ interface ChainPillProps {
  * red = invalid / dead end (still consumes a guess; shown for history) */
 const TONE: Record<ChainColor, string> = {
   green:  'border-ink bg-action text-on-action',
-  orange: 'border-ink bg-warn text-ink',
+  orange: 'border-ink bg-warn text-on-warn',
   red:    'border-ink bg-danger text-on-danger',
 };
 

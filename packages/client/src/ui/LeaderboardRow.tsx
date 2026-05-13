@@ -10,9 +10,9 @@ interface LeaderboardRowProps {
 }
 
 function medalCls(rank: number): string {
-  if (rank === 1) return 'bg-medal-gold text-ink';
-  if (rank === 2) return 'bg-medal-silver text-ink';
-  if (rank === 3) return 'bg-medal-bronze text-white';
+  if (rank === 1) return 'bg-medal-gold text-on-medal-gold';
+  if (rank === 2) return 'bg-medal-silver text-on-medal-silver';
+  if (rank === 3) return 'bg-medal-bronze text-on-medal-bronze';
   return 'bg-bg-surface text-ink';
 }
 
