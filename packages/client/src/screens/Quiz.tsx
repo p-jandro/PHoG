@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { GamePromptHeader } from '../components/GamePromptHeader';
+import { Chip } from '../ui/Chip';
+import { AnswerFeedback } from '../ui/AnswerFeedback';
 
 interface QuizProps {
   socket: Socket | null;
@@ -27,11 +29,11 @@ interface QuizQuestion {
   duration: number;
 }
 
-const QUIZ_ANSWER_COLORS: Record<string, string> = {
-  A: '#7186be',
-  B: '#6f9a79',
-  C: '#d7a348',
-  D: '#8b5f6b'
+const ANSWER_BG_CLASS: Record<string, string> = {
+  A: 'bg-answer-a',
+  B: 'bg-answer-b',
+  C: 'bg-answer-c',
+  D: 'bg-answer-d',
 };
 
 export const Quiz = ({ socket }: QuizProps) => {
@@ -409,22 +411,14 @@ export const Quiz = ({ socket }: QuizProps) => {
   // Question Phase
   if (phase === 'question' && currentQuestion) {
     const timeSeconds = Math.ceil(timeRemaining / 1000);
-    const timePercent = (timeRemaining / currentQuestion.duration) * 100;
-    const timerToneClass =
-      timePercent > 50 ? 'bg-game-correct' :
-      timePercent > 25 ? 'bg-game-warning' :
-      'bg-game-incorrect';
-    const timerTextClass =
-      timePercent > 50 ? 'text-game-correct' :
-      timePercent > 25 ? 'text-game-warning' :
-      'text-game-incorrect';
 
     return (
-      <div className="screen-shell py-8 text-white">
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="screen-frame max-w-5xl"
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="mx-auto max-w-5xl"
         >
           <GamePromptHeader
             eyebrow="Quiz"
@@ -432,50 +426,61 @@ export const Quiz = ({ socket }: QuizProps) => {
             title={currentQuestion.question}
             details={(
               <>
-                <span className="status-pill">
-                  <span className="text-xl font-bold text-primary-blue">{currentScore}</span>
-                  <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ui-textMuted">pts</span>
-                </span>
+                <Chip variant="info">
+                  <span className="font-display text-base font-black">{currentScore}</span>
+                  <span className="text-[0.65rem] tracking-[0.18em] uppercase">pts</span>
+                </Chip>
                 {currentPlacement ? (
-                  <span className="status-pill">
-                    {currentPlacement}
-                    {getOrdinalSuffix(currentPlacement)} in Quiz
-                  </span>
+                  <Chip>
+                    <span className="font-display text-base font-black">
+                      {currentPlacement}{getOrdinalSuffix(currentPlacement)}
+                    </span>
+                    <span className="text-[0.65rem] tracking-[0.18em] uppercase">in Quiz</span>
+                  </Chip>
                 ) : null}
               </>
             )}
             timerMs={timeRemaining}
             totalMs={currentQuestion.duration}
-            timerBarClassName={timerToneClass}
-            timerTextClassName={timerTextClass}
           />
 
           <div className="mx-auto max-w-4xl">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-              {Object.entries(currentQuestion.answers).map(([key, value]) => (
-              <motion.button
-                key={key}
-                onClick={() => handleAnswer(key)}
-                disabled={!!selectedAnswer}
-                  whileTap={{ scale: selectedAnswer ? 1 : 0.95 }}
-                  className={`btn-answer min-h-[100px] sm:min-h-[88px] ${
-                    selectedAnswer === key ? 'ring-4 ring-white' : ''
-                  } ${selectedAnswer && selectedAnswer !== key ? 'opacity-50' : ''} 
-                  active:scale-95 transition-all touch-manipulation`}
-                  style={{ backgroundColor: QUIZ_ANSWER_COLORS[key] }}
-                >
-                  <div className="text-center w-full text-2xl font-medium leading-tight px-4 sm:text-xl">
-                    {value}
-                  </div>
-                </motion.button>
-              ))}
+              {Object.entries(currentQuestion.answers).map(([key, value]) => {
+                const isPicked = selectedAnswer === key;
+                const dimmed = !!selectedAnswer && !isPicked;
+                return (
+                  <motion.button
+                    key={key}
+                    onClick={() => handleAnswer(key)}
+                    disabled={!!selectedAnswer}
+                    whileHover={!selectedAnswer ? { x: -1, y: -1 } : undefined}
+                    whileTap={!selectedAnswer ? { x: 4, y: 4 } : undefined}
+                    transition={{ duration: 0.08, ease: [0, 0, 0.2, 1] }}
+                    className={[
+                      'flex min-h-[100px] w-full items-center gap-4 rounded-2xl border-2 border-ink p-4 text-left text-white shadow-ink touch-manipulation sm:min-h-[88px] sm:p-5',
+                      ANSWER_BG_CLASS[key] || 'bg-bg-surface',
+                      isPicked ? 'ring-4 ring-now' : '',
+                      dimmed ? 'opacity-40' : '',
+                    ].join(' ')}
+                  >
+                    <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border-2 border-ink bg-bg-surface font-display text-2xl font-black text-ink shadow-ink-sm">
+                      {key}
+                    </span>
+                    <span className="flex-1 text-xl font-extrabold leading-tight sm:text-2xl">
+                      {value}
+                    </span>
+                  </motion.button>
+                );
+              })}
             </div>
 
             {selectedAnswer && (
               <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center mt-6 text-game-correct font-medium"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className="mt-6 text-center text-base font-extrabold text-action"
               >
                 Answer submitted. Locked in with {submittedTimeSeconds ?? timeSeconds}s remaining.
               </motion.p>
@@ -491,77 +496,101 @@ export const Quiz = ({ socket }: QuizProps) => {
     const myResult = results.results.find((r: any) => r.playerId === playerId);
     const myRank = results.leaderboard?.findIndex((p: any) => p.id === playerId) + 1 || 0;
     const correctAnswerKey = results.correctAnswer;
-    const correctAnswerText = currentQuestion.answers[correctAnswerKey];
+    const wasCorrect = !!myResult?.isCorrect;
+    const hadAnswer = !!selectedAnswer;
 
     return (
-      <div className="screen-shell py-8 text-white">
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="screen-frame max-w-5xl"
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="mx-auto max-w-5xl"
         >
+          {/* Banner: Correct! / Wrong / No answer */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto mb-6 max-w-2xl"
+          >
+            <div
+              className={[
+                'rounded-2xl border-2 border-ink px-6 py-4 text-center font-display text-3xl font-black shadow-ink',
+                wasCorrect ? 'bg-action text-on-action' : hadAnswer ? 'bg-danger text-on-danger' : 'bg-bg-sunken text-ink',
+              ].join(' ')}
+            >
+              {wasCorrect ? 'Correct!' : hadAnswer ? 'Wrong' : 'No answer'}
+              <div className="mt-1 font-sans text-sm font-bold uppercase tracking-[0.18em] opacity-90">
+                {myResult ? `+${myResult.points} points` : '0 points'}
+              </div>
+            </div>
+          </motion.div>
+
           <GamePromptHeader
             eyebrow="Quiz"
             meta={`${currentQuestion.category} • ${currentQuestion.difficulty}`}
             title={currentQuestion.question}
             details={(
               <>
-                <span className="status-pill">
-                  <span className="text-xl font-bold text-primary-blue">{myResult?.newScore ?? currentScore}</span>
-                  <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ui-textMuted">pts</span>
-                </span>
+                <Chip variant="info">
+                  <span className="font-display text-base font-black">{myResult?.newScore ?? currentScore}</span>
+                  <span className="text-[0.65rem] tracking-[0.18em] uppercase">pts</span>
+                </Chip>
                 {myRank > 0 ? (
-                  <span className="status-pill">
-                    {myRank}
-                    {getOrdinalSuffix(myRank)} in Quiz
-                  </span>
+                  <Chip>
+                    <span className="font-display text-base font-black">
+                      {myRank}{getOrdinalSuffix(myRank)}
+                    </span>
+                    <span className="text-[0.65rem] tracking-[0.18em] uppercase">in Quiz</span>
+                  </Chip>
                 ) : null}
               </>
             )}
           />
 
           <div className="mx-auto max-w-4xl">
-            <div className="mb-6 rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-5 text-center">
-              <p className={`text-2xl font-bold ${myResult?.isCorrect ? 'text-game-correct' : 'text-game-incorrect'}`}>
-                {myResult?.isCorrect ? 'Correct' : selectedAnswer ? 'Wrong' : 'No answer'}
-              </p>
-              <p className="mt-2 text-lg text-ui-textMuted">
-                {myResult ? `+${myResult.points} points this question` : '0 points this question'}
-              </p>
-              <p className="mt-3 text-base font-semibold text-white">
-                Correct answer: {correctAnswerKey} • {correctAnswerText}
-              </p>
-            </div>
-
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
               {Object.entries(currentQuestion.answers).map(([key, value]) => {
                 const isCorrectAnswer = key === correctAnswerKey;
-                const isSelectedAnswer = selectedAnswer === key;
-                const resultClass = isCorrectAnswer
-                  ? 'border-white ring-4 ring-game-correct/70 brightness-110'
-                  : isSelectedAnswer
-                    ? 'border-white ring-4 ring-white/80 opacity-80'
-                    : 'border-white/10 opacity-35 brightness-50';
+                const isPlayerPick = selectedAnswer === key;
+                const playerPickedThis = isPlayerPick;
+                // Feedback animation: only on the player's pick.
+                const feedbackState: 'idle' | 'correct' | 'wrong' =
+                  playerPickedThis ? (wasCorrect ? 'correct' : 'wrong') : 'idle';
 
                 return (
-                  <motion.div
-                    key={key}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.08 * ['A', 'B', 'C', 'D'].indexOf(key) }}
-                    className={`rounded-[1.8rem] border p-6 text-left shadow-[0_18px_30px_rgba(0,0,0,0.22)] transition-all sm:p-8 ${resultClass}`}
-                    style={{ backgroundColor: QUIZ_ANSWER_COLORS[key] }}
-                  >
-                    <div className="mb-2 flex items-center justify-between gap-4">
-                      <div className="text-2xl font-bold text-white/80 sm:text-3xl">{key}</div>
-                      {isSelectedAnswer ? (
-                        <div className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-                          Your pick
-                        </div>
-                      ) : null}
-                    </div>
-                    <div className="text-2xl text-white sm:text-3xl">{value}</div>
-                  </motion.div>
+                  <AnswerFeedback key={key} state={feedbackState}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.08 * ['A', 'B', 'C', 'D'].indexOf(key), duration: 0.22, ease: 'easeOut' }}
+                      className={[
+                        'flex min-h-[100px] w-full items-center gap-4 rounded-2xl border-2 border-ink p-4 text-left text-white shadow-ink sm:p-5',
+                        ANSWER_BG_CLASS[key] || 'bg-bg-surface',
+                        isCorrectAnswer ? 'ring-4 ring-action' : '',
+                        !isCorrectAnswer && !isPlayerPick ? 'opacity-40' : '',
+                        isPlayerPick && !wasCorrect ? 'ring-4 ring-danger' : '',
+                      ].join(' ')}
+                    >
+                      <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border-2 border-ink bg-bg-surface font-display text-2xl font-black text-ink shadow-ink-sm">
+                        {key}
+                      </span>
+                      <div className="flex-1">
+                        <div className="text-xl font-extrabold leading-tight sm:text-2xl">{value}</div>
+                        {isPlayerPick && (
+                          <div className="mt-1 text-xs font-extrabold uppercase tracking-[0.18em] opacity-90">
+                            Your pick
+                          </div>
+                        )}
+                      </div>
+                      {isCorrectAnswer && (
+                        <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 border-ink bg-action text-on-action font-black shadow-ink-sm">
+                          ✓
+                        </span>
+                      )}
+                    </motion.div>
+                  </AnswerFeedback>
                 );
               })}
             </div>
@@ -573,9 +602,9 @@ export const Quiz = ({ socket }: QuizProps) => {
 
   // Loading state
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="card">
-        <h2 className="text-2xl font-bold text-center">Loading Quiz...</h2>
+    <div className="min-h-screen bg-bg-base flex items-center justify-center px-4">
+      <div className="rounded-2xl border-2 border-ink bg-bg-surface p-8 shadow-ink-lg">
+        <h2 className="text-center text-2xl font-extrabold text-ink">Loading Quiz…</h2>
       </div>
     </div>
   );
