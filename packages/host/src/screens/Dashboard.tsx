@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
-import { Button, Card, HostScreenShell, Input, Pill } from '../ui';
+import { Button, Card, Chip, HostScreenShell, Input, Pill, PlayerTracker } from '../ui';
+import type { TrackedPlayer } from '../ui';
 import { screenEnter } from '../lib/motion';
+import { QRCodeSVG } from 'qrcode.react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
   typeof window !== 'undefined'
@@ -58,15 +60,15 @@ export const Dashboard = () => {
 
   const [players, setPlayers] = useState<Player[]>([]);
 
-  // Live Game State
-  const [liveData, setLiveData] = useState<any>(null);
-  const [answeredPlayers, setAnsweredPlayers] = useState<Map<string, 'correct' | 'incorrect' | 'answered'>>(new Map());
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [totalTime, setTotalTime] = useState(0);
+  // Live Game State — kept temporarily; cleaned up in Task 8
+  const [_liveData, setLiveData] = useState<any>(null);
+  const [_answeredPlayers, setAnsweredPlayers] = useState<Map<string, 'correct' | 'incorrect' | 'answered'>>(new Map());
+  const [_timeRemaining, setTimeRemaining] = useState(0);
+  const [_totalTime, setTotalTime] = useState(0);
   const [timerEndsAt, setTimerEndsAt] = useState<number | null>(null);
   const [pointlessReadyToReveal, setPointlessReadyToReveal] = useState(false);
   const [championshipActive, setChampionshipActive] = useState(false);
-  
+
   // Championship state
   const [championshipMode, setChampionshipMode] = useState(false);
   const [selectedGames, setSelectedGames] = useState<Set<string>>(new Set(['quiz', 'trueFalse', 'pointless']));
@@ -81,24 +83,7 @@ export const Dashboard = () => {
     { id: 'travel', name: 'Travel' }
   ];
 
-  const activeGame = (gameState?.currentGame || null) as GameKey | null;
   const playerJoinLabel = PLAYER_URL.replace(/^https?:\/\//, '');
-  const championshipPlayers = [...players].sort((a, b) => {
-    const aPlacement = a.totalPlacementScore || 0;
-    const bPlacement = b.totalPlacementScore || 0;
-
-    if (aPlacement === 0 && bPlacement === 0) {
-      return activeGame === 'pointless'
-        ? (a.currentGameScore || a.score || 0) - (b.currentGameScore || b.score || 0)
-        : (b.currentGameScore || b.score || 0) - (a.currentGameScore || a.score || 0);
-    }
-
-    if (aPlacement === 0) return 1;
-    if (bPlacement === 0) return -1;
-    if (aPlacement !== bPlacement) return aPlacement - bPlacement;
-
-    return a.name.localeCompare(b.name);
-  });
 
   useEffect(() => {
     if (!timerEndsAt) {
@@ -210,17 +195,6 @@ export const Dashboard = () => {
       }
     });
 
-    // Listen for championship updates (need to handle player list update for championship state)
-    // Since getGameState() returns championship state inside the main object, players:update might not carry it unless we add it
-    // For now, let's assume we get it from initial host:joined or rely on inference
-    // Ideally, we should listen to an event or poll, but let's stick to existing flow for now.
-    // Actually, let's add a listener for gameEnd to update championship state if needed locally, 
-    // though the server handles the logic. We just need to know if we can show "Continue".
-    
-    // Better: Update setGameState when we get players update if it includes meta, but it doesn't.
-    // Let's just use the phase change.
-
-
     // Live Game Events
     newSocket.on('quiz:question:start', (data) => {
       setLiveData({ type: 'quiz', text: data.question, subtext: `Question ${data.questionNumber}/${data.totalQuestions} — ${data.category} (${data.difficulty})` });
@@ -268,7 +242,6 @@ export const Dashboard = () => {
     const clearLive = () => {
       setTimeRemaining(0);
       setTimerEndsAt(null);
-      // Keep the text but maybe indicate "Ended"
     };
     newSocket.on('quiz:question:end', clearLive);
     newSocket.on('truefalse:answer', clearLive);
@@ -304,7 +277,7 @@ export const Dashboard = () => {
       const sortedSequence = availableGames
         .filter(g => selectedGames.has(g.id))
         .map(g => g.id);
-        
+
       socket.emit('host:control', { action: 'startChampionship', sequence: sortedSequence });
     }
   };
@@ -422,98 +395,69 @@ export const Dashboard = () => {
     );
   }
 
+  const status: 'connected' | 'connecting' | 'offline' = connected ? 'connected' : 'offline';
+  const connectedCount = players.filter((p) => p.connected).length;
+  const totalCount = players.length;
+
+  // Build the player tracker rows. Sort: highest score first, except Pointless which sorts low-first.
+  const sortedPlayers = [...players].sort((a, b) =>
+    gameState?.currentGame === 'pointless'
+      ? a.score - b.score
+      : b.score - a.score,
+  );
+  const trackerPlayers: TrackedPlayer[] = sortedPlayers.map((p) => ({
+    id: p.id,
+    name: p.name,
+    connected: p.connected,
+    score: gameState?.phase === 'lobby' ? undefined : p.score,
+    status:
+      gameState?.phase === 'lobby' && p.connected
+        ? 'Ready'
+        : undefined,
+  }));
+
   return (
-    <div className="screen-shell">
-      <div className="screen-frame">
-        <div className="card mb-6 p-7 sm:p-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="eyebrow mb-3">Control Room</p>
-              <h1 className="text-4xl font-bold sm:text-5xl">Host Dashboard</h1>
-              <p className="mt-2 text-ui-textMuted">
-                Session phase <span className="font-semibold text-primary-teal">{gameState?.phase || 'lobby'}</span>
-                {gameState?.currentGame && (
-                  <> • current game <span className="font-semibold text-primary-blue">{gameState.currentGame}</span></>
-                )}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <span className="status-pill">{players.filter(p => p.connected).length} players connected</span>
-              <button
-                onClick={handleLogout}
-                className="btn bg-white/10 text-ui-text"
-              >
-                Logout
-              </button>
-            </div>
+    <HostScreenShell
+      location={`Host Dashboard · ${gameState?.phase === 'lobby' ? 'Lobby' : gameState?.phase === 'leaderboard' ? 'Leaderboard' : 'Playing'}`}
+      topRight={{ kind: 'theme-toggle' }}
+    >
+      <motion.div variants={screenEnter} initial="hidden" animate="visible" className="flex flex-col gap-4">
+        {/* Header strip — session state + logout */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Pill status={status}>
+              {connected ? 'Live' : 'Reconnecting'}
+            </Pill>
+            <Chip variant="info">{`${connectedCount} of ${totalCount} players connected`}</Chip>
+            {gameState?.currentGame && (
+              <Chip variant="muted">{`Current game · ${GAME_LABELS[gameState.currentGame as GameKey] ?? gameState.currentGame}`}</Chip>
+            )}
           </div>
+          <Button variant="ghost" size="sm" onClick={handleLogout}>
+            Logout
+          </Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* 3-column body: QR · launcher · player tracker */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[18rem_minmax(0,1fr)_22rem]">
 
-          {/* Live Game View */}
-          {gameState?.phase === 'playing' && (
-            <div className="card lg:col-span-3 border-2 border-primary-blue bg-ui-background">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">Live Game</h2>
-                  {liveData && (
-                    <>
-                      <p className="text-xl mt-2 font-bold text-primary-teal">{liveData.text}</p>
-                      <p className="text-sm text-ui-textMuted">{liveData.subtext}</p>
-                    </>
-                  )}
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-mono font-bold text-white">
-                    {Math.ceil(timeRemaining / 1000)}s
-                  </div>
-                </div>
+          {/* LEFT: QR + URL card */}
+          <Card eyebrow="Join the Room" title="Scan to play">
+            <div className="flex flex-col items-center gap-3">
+              <div className="rounded-2xl border-2 border-ink bg-white p-3 shadow-ink">
+                <QRCodeSVG value={PLAYER_URL} size={200} bgColor="#ffffff" fgColor="#181614" />
               </div>
-
-              {/* Timer Bar */}
-              <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden mb-6">
-                <motion.div
-                  className="h-full bg-primary-blue"
-                  initial={{ width: '100%' }}
-                  animate={{ width: `${totalTime > 0 ? (timeRemaining / totalTime) * 100 : 0}%` }}
-                  transition={{ duration: 0.1, ease: "linear" }}
-                />
+              <div className="w-full break-words rounded-xl border-2 border-ink bg-bg-sunken px-3 py-2 text-center font-display text-base font-black tracking-tight text-ink">
+                {playerJoinLabel}
               </div>
-
-              {/* Answer Tracker */}
-              <div>
-                <h3 className="text-sm font-bold text-ui-textMuted uppercase mb-2">Answer Tracker</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                  {players.filter(p => p.connected).map(player => {
-                    const answerStatus = answeredPlayers.get(player.id);
-                    let bgClass = 'bg-ui-card border border-ui-border text-ui-textMuted'; // not answered
-                    if (answerStatus === 'correct') {
-                      bgClass = 'bg-emerald-800 text-white border border-emerald-600'; // darker green for correct
-                    } else if (answerStatus === 'incorrect') {
-                      bgClass = 'bg-red-800 text-white border border-red-600'; // red for incorrect
-                    } else if (answerStatus === 'answered') {
-                      bgClass = 'bg-game-correct text-white'; // generic answered (no correctness info)
-                    }
-                    return (
-                      <div
-                        key={player.id}
-                        className={`p-2 rounded text-center text-sm font-medium transition-colors ${bgClass}`}
-                      >
-                        {player.name}
-                        {answerStatus === 'correct' && ' ✓'}
-                        {answerStatus === 'incorrect' && ' ✗'}
-                        {answerStatus === 'answered' && ' ✓'}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              <p className="text-xs text-ink-muted">
+                Players join from any device on the same network.
+              </p>
             </div>
-          )}
+          </Card>
 
-          {/* Game Controls */}
-          <div className="card lg:col-span-2">
+          {/* MIDDLE: launcher area — REBUILT IN TASK 7. For now, keep the existing legacy JSX so the build keeps working. */}
+          <div className="card lg:col-span-1" data-phase3-legacy-launcher>
             <p className="eyebrow mb-3">Session Controls</p>
             <h2 className="text-2xl font-bold mb-4">Game Controls</h2>
 
@@ -521,7 +465,7 @@ export const Dashboard = () => {
             <div className="mb-6 p-4 bg-ui-background rounded-lg border border-ui-border">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg">Championship Mode</h3>
-                <button 
+                <button
                   onClick={() => setChampionshipMode(!championshipMode)}
                   disabled={gameState?.phase !== 'lobby'}
                   className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
@@ -534,8 +478,8 @@ export const Dashboard = () => {
 
               {championshipMode && (
                 <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {availableGames.map(game => (
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {availableGames.map(game => (
                       <label key={game.id} className="flex items-center space-x-2 p-2 rounded hover:bg-ui-card cursor-pointer">
                         <input
                           type="checkbox"
@@ -548,7 +492,6 @@ export const Dashboard = () => {
                       </label>
                     ))}
                   </div>
-                  
                   <button
                     onClick={startChampionship}
                     disabled={gameState?.phase !== 'lobby' || selectedGames.size === 0}
@@ -562,268 +505,56 @@ export const Dashboard = () => {
 
             {!championshipMode && (
               <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <button
-                  onClick={() => startGame('quiz')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-primary-blue"
-                >
-                  Start Quiz
-                </button>
-                <button
-                  onClick={() => startGame('trueFalse')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-primary-teal"
-                >
-                  Start True/False
-                </button>
-                <button
-                  onClick={() => startGame('pointless')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-game-incorrect"
-                >
-                  Start Pointless
-                </button>
-                <button
-                  onClick={() => startGame('pokedle')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-yellow-500 text-black"
-                >
-                  Start Pokédle
-                </button>
-                <button
-                  onClick={() => startGame('hpdle')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-purple-600"
-                >
-                  Start HP-dle
-                </button>
-                <button
-                  onClick={() => startGame('numbers')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-emerald-600"
-                >
-                  Start Numbers Round
-                </button>
-                <button
-                  onClick={() => startGame('wordle')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-slate-600"
-                >
-                  Start Wordle
-                </button>
-                <button
-                  onClick={() => startGame('travel')}
-                  disabled={gameState?.phase !== 'lobby'}
-                  className="btn bg-sky-600"
-                >
-                  Start Travel
-                </button>
+                <button onClick={() => startGame('quiz')} disabled={gameState?.phase !== 'lobby'} className="btn bg-primary-blue">Start Quiz</button>
+                <button onClick={() => startGame('trueFalse')} disabled={gameState?.phase !== 'lobby'} className="btn bg-primary-teal">Start True/False</button>
+                <button onClick={() => startGame('pointless')} disabled={gameState?.phase !== 'lobby'} className="btn bg-game-incorrect">Start Pointless</button>
+                <button onClick={() => startGame('pokedle')} disabled={gameState?.phase !== 'lobby'} className="btn bg-yellow-500 text-black">Start Pokédle</button>
+                <button onClick={() => startGame('hpdle')} disabled={gameState?.phase !== 'lobby'} className="btn bg-purple-600">Start HP-dle</button>
+                <button onClick={() => startGame('numbers')} disabled={gameState?.phase !== 'lobby'} className="btn bg-emerald-600">Start Numbers Round</button>
+                <button onClick={() => startGame('wordle')} disabled={gameState?.phase !== 'lobby'} className="btn bg-slate-600">Start Wordle</button>
+                <button onClick={() => startGame('travel')} disabled={gameState?.phase !== 'lobby'} className="btn bg-sky-600">Start Travel</button>
               </div>
             )}
 
             {/* Championship Continue Button */}
             {gameState?.phase === 'leaderboard' && championshipActive && (
-               <div className="mb-6 p-4 border-2 border-game-leader rounded-lg bg-game-leader/10 animate-pulse">
-                 <h3 className="font-bold text-center mb-2 text-game-leader">Championship in Progress</h3>
-                 <button
-                   onClick={nextChampionshipGame}
-                   className="btn w-full bg-game-leader text-black font-bold hover:scale-105 transition-transform"
-                 >
-                   Continue to Next Round
-                 </button>
-               </div>
+              <div className="mb-6 p-4 border-2 border-game-leader rounded-lg bg-game-leader/10 animate-pulse">
+                <h3 className="font-bold text-center mb-2 text-game-leader">Championship in Progress</h3>
+                <button onClick={nextChampionshipGame} className="btn w-full bg-game-leader text-black font-bold hover:scale-105 transition-transform">
+                  Continue to Next Round
+                </button>
+              </div>
             )}
 
             {/* Pointless Controls */}
             {gameState?.currentGame === 'pointless' && pointlessReadyToReveal && (
               <div className="mb-6 p-4 border border-ui-border rounded-lg bg-ui-background/50">
                 <h3 className="font-bold mb-2 text-sm text-ui-textMuted uppercase">Pointless Controls</h3>
-                <button
-                  onClick={revealResults}
-                  className="btn w-full bg-primary-teal animate-pulse"
-                >
-                  Reveal Results
-                </button>
+                <button onClick={revealResults} className="btn w-full bg-primary-teal animate-pulse">Reveal Results</button>
               </div>
             )}
 
             <div className="grid grid-cols-1 gap-4 border-t border-ui-border pt-4 sm:grid-cols-2">
-              <button
-                onClick={returnToLobby}
-                disabled={gameState?.phase === 'lobby'}
-                className="btn bg-game-warning"
-              >
-                Return to Lobby
-              </button>
-              <button
-                onClick={emergencySkip}
-                disabled={gameState?.phase === 'lobby' || gameState?.phase === 'leaderboard'}
-                className="btn bg-orange-600 hover:bg-orange-700 text-white"
-              >
-                ⚠ Emergency Skip
-              </button>
-              <button
-                onClick={resetGame}
-                className="btn bg-game-incorrect sm:col-span-2"
-              >
-                Reset Game
-              </button>
+              <button onClick={returnToLobby} disabled={gameState?.phase === 'lobby'} className="btn bg-game-warning">Return to Lobby</button>
+              <button onClick={emergencySkip} disabled={gameState?.phase === 'lobby' || gameState?.phase === 'leaderboard'} className="btn bg-orange-600 hover:bg-orange-700 text-white">⚠ Emergency Skip</button>
+              <button onClick={resetGame} className="btn bg-game-incorrect sm:col-span-2">Reset Game</button>
             </div>
           </div>
 
-          {/* Player Stats */}
-          <div className="card">
-            <div className="mb-4 flex justify-between items-center">
-              <div>
-                <p className="eyebrow mb-2">Room Overview</p>
-                <h2 className="text-2xl font-bold">
-                Players ({players.filter(p => p.connected).length}/{players.length})
-                </h2>
-              </div>
-              {gameState?.phase === 'lobby' && players.length > 0 && (
-                <span className="text-sm text-game-correct animate-pulse">
-                  ● Waiting Room
-                </span>
-              )}
-            </div>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {players.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-ui-textMuted text-lg mb-2">
-                    No players yet
-                  </p>
-                  <p className="text-ui-textMuted text-sm">
-                    Share {playerJoinLabel} with players
-                  </p>
-                </div>
-              ) : (
-                players
-                  .sort((a, b) => gameState?.currentGame === 'pointless' ? a.score - b.score : b.score - a.score)
-                  .map((player, index) => (
-                    <motion.div
-                      key={player.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className={`p-3 rounded-lg transition-all ${player.connected
-                        ? 'bg-ui-background border-l-4 border-game-correct'
-                        : 'bg-ui-background opacity-50 border-l-4 border-ui-textMuted'
-                        }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-ui-textMuted font-mono text-sm w-8">
-                            #{index + 1}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${player.connected ? 'bg-game-correct animate-pulse' : 'bg-ui-textMuted'
-                              }`} />
-                            <span className="font-medium text-lg">{player.name}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          {gameState?.phase !== 'lobby' && (
-                            <span className={`font-bold text-lg ${index === 0 && player.score > 0 ? 'text-game-leader' : 'text-primary-teal'
-                              }`}>
-                              {player.score} pts
-                            </span>
-                          )}
-                          {gameState?.phase === 'lobby' && player.connected && (
-                            <span className="text-sm text-game-correct">
-                              Ready
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))
-              )}
-            </div>
-          </div>
-
-          <div className="card lg:col-span-3">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="eyebrow mb-2">Championship Table</p>
-                <h2 className="text-2xl font-bold">Current Standings</h2>
-              </div>
-              <span className="status-pill">
-                {activeGame ? `${GAME_LABELS[activeGame]} just ended` : 'Live placements'}
-              </span>
-            </div>
-
-            {championshipPlayers.length === 0 ? (
-              <div className="rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-6 text-ui-textMuted">
-                Championship standings will appear once players join the room.
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {championshipPlayers.slice(0, 9).map((player, index) => (
-                  <div
-                    key={player.id}
-                    className={`rounded-[1.6rem] border px-5 py-5 ${
-                      index < 3 ? 'border-white/10 bg-white/[0.07]' : 'border-ui-border/80 bg-black/20'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="truncate text-xl font-semibold">
-                          {index + 1}. {player.name}
-                        </p>
-                        <p className="mt-2 text-sm text-ui-textMuted">
-                          Championship total: {player.totalPlacementScore || '-'}
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {(['quiz', 'trueFalse', 'pointless', 'pokedle', 'hpdle', 'numbers', 'wordle', 'travel'] as GameKey[]).map((game) => (
-                            <span
-                              key={game}
-                              className="rounded-full border border-ui-border/70 bg-black/20 px-3 py-1 text-xs font-semibold text-ui-textMuted"
-                            >
-                              {GAME_LABELS[game]}: {player.gamePlacements?.[game] ?? '-'}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-3xl font-bold ${index === 0 ? 'text-game-leader' : 'text-primary-teal'}`}>
-                          {player.totalPlacementScore || '-'}
-                        </p>
-                        <p className="mt-2 text-xs uppercase tracking-[0.18em] text-ui-textMuted">
-                          Total place
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* RIGHT: player tracker */}
+          <PlayerTracker
+            title={`Players · ${connectedCount} of ${totalCount} connected`}
+            players={trackerPlayers}
+            emptyState={(
+              <>
+                No players yet.
+                <br />
+                Share <span className="font-bold text-ink">{playerJoinLabel}</span> with players.
+              </>
             )}
-          </div>
-
-          {/* Instructions */}
-          <div className="card lg:col-span-3">
-            <h2 className="text-2xl font-bold mb-4">Quick Guide</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-ui-background rounded-lg">
-                <h3 className="font-bold mb-2 text-primary-blue">1. Setup</h3>
-                <p className="text-sm text-ui-textMuted">
-                  Wait for players to join via the player app. Share the URL with participants.
-                </p>
-              </div>
-              <div className="p-4 bg-ui-background rounded-lg">
-                <h3 className="font-bold mb-2 text-primary-teal">2. Start Game</h3>
-                <p className="text-sm text-ui-textMuted">
-                  Click one of the game buttons to start. Games will automatically progress through rounds.
-                </p>
-              </div>
-              <div className="p-4 bg-ui-background rounded-lg">
-                <h3 className="font-bold mb-2 text-primary-purple">3. Manage</h3>
-                <p className="text-sm text-ui-textMuted">
-                  Use the control buttons to return to lobby or reset the entire game if needed.
-                </p>
-              </div>
-            </div>
-          </div>
+          />
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </HostScreenShell>
   );
 };
