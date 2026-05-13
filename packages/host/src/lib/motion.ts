@@ -19,8 +19,10 @@ export const easing = {
 
 export const stagger = {
   short: 0.08,
-  tile: 0.18,
-  rank: 0.6,
+  cell:  0.08,
+  emoji: 0.09,
+  tile:  0.18,
+  rank:  0.6,
 } as const;
 
 /* ---------- Variants ---------- */
@@ -105,6 +107,36 @@ export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
+
+/* ---------- Per-game animation variants (§4.4) ---------- */
+
+/* Grid 3×3 cell scale-pop */
+export const cellScalePop: Variants = {
+  hidden:  { scale: 0.7, opacity: 0 },
+  visible: { scale: [0.7, 1.05, 1.0], opacity: 1,
+             transition: { duration: 0.22, times: [0, 0.6, 1], ease: easing.backOut } },
+};
+
+/* Emoji clue sequential pop */
+export const emojiPop: Variants = {
+  hidden:  { scale: 0, opacity: 0 },
+  visible: { scale: [0, 1.15, 1.0], opacity: 1,
+             transition: { duration: 0.14, times: [0, 0.65, 1], ease: easing.backOut } },
+};
+
+/* Silhouette correct reveal — brightness crossfade handled by inline style, scale pulse here */
+export const silhouetteReveal: Variants = {
+  obscured: { scale: 1.0 },
+  revealed: { scale: [1.0, 1.03, 1.0],
+              transition: { duration: 0.35, times: [0, 0.55, 1], ease: easing.easeOut } },
+};
+
+/* Universal shake (§4.3) */
+export const shake: Variants = {
+  rest:    { x: 0 },
+  shaking: { x: [0, -8, 8, -8, 8, 0],
+             transition: { duration: 0.32, ease: 'linear' } },
+};
 
 /* ---------- Pointless score-drop timing (§3.9) ---------- */
 export const pointlessDrop = {
