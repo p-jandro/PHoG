@@ -479,6 +479,74 @@ export const Display = () => {
     );
   };
 
+  const renderRedesignedIntroView = (eyebrow: string, intro: IntroState | null) => {
+    if (!intro) return null;
+    const countdown = getCountdownSeconds(intro.endsAt);
+
+    return (
+      <>
+        <div className="min-h-screen bg-bg-base text-ink overflow-y-auto py-8 px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto max-w-6xl"
+          >
+            {/* Skeleton header */}
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+                  {eyebrow}
+                </p>
+                <p className="mt-1 text-base font-bold text-ink-muted">Get ready</p>
+              </div>
+              <div className="rounded-xl border-2 border-ink bg-bg-surface px-4 py-2 font-display text-2xl font-black text-ink shadow-ink-sm">
+                {countdown !== null ? `${countdown}s` : '—:—'}
+              </div>
+            </div>
+
+            <div className="rounded-3xl border-2 border-ink bg-bg-surface p-8 shadow-ink-lg sm:p-10">
+              <h1 className="font-serif text-5xl font-extrabold leading-tight tracking-tight text-ink sm:text-6xl">
+                {intro.title}
+              </h1>
+              <p className="mt-4 text-xl font-semibold leading-relaxed text-ink-muted sm:text-2xl">
+                {intro.description}
+              </p>
+
+              <div className="mt-8 grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink-sm">
+                  <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-streak">
+                    How this game works
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {(intro.scoringRules || []).slice(0, 6).map((rule) => (
+                      <div
+                        key={rule}
+                        className="rounded-xl border-2 border-ink bg-bg-surface px-4 py-3 text-base font-semibold text-ink shadow-ink-sm"
+                      >
+                        {rule}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink-sm">
+                  <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-streak">
+                    Placement
+                  </p>
+                  <p className="text-xl font-bold leading-relaxed text-ink">
+                    {intro.placementInfo || 'Results on the house display determine the standings.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+        {displayControl}
+      </>
+    );
+  };
+
   if (roundLeaderboard) {
     const gameLabel = {
       quiz: 'Quiz',
@@ -620,11 +688,11 @@ export const Display = () => {
   }
 
   if (currentGame === 'quiz' && quizIntro) {
-    return renderIntroView('Quiz Briefing', 'text-primary-blue', quizIntro);
+    return renderRedesignedIntroView('Quiz Briefing', quizIntro);
   }
 
   if (currentGame === 'trueFalse' && trueFalseIntro) {
-    return renderIntroView('True or False', 'text-game-correct', trueFalseIntro);
+    return renderRedesignedIntroView('True or False', trueFalseIntro);
   }
 
   if (currentGame === 'pointless' && pointlessIntro) {
