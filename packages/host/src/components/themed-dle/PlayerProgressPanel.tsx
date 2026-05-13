@@ -17,7 +17,7 @@ export const PlayerProgressPanel = ({ mode, players, progress, maxGuesses }: Pla
 
   return (
     <aside className="w-80 rounded-3xl border border-white/10 bg-black/30 p-5">
-      <p className="eyebrow mb-3">Players</p>
+      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ink-muted mb-3">Players</p>
       <ul className="space-y-2">
         {connected.map((p) => {
           const ps = progress[p.id];
@@ -32,12 +32,12 @@ export const PlayerProgressPanel = ({ mode, players, progress, maxGuesses }: Pla
           return (
             <li key={p.id} className="flex items-baseline justify-between gap-3 rounded-xl bg-black/30 px-3 py-2">
               <span className="font-medium">{p.name}</span>
-              <span className="text-sm text-ui-textMuted">{detail}</span>
+              <span className="text-sm text-ink-muted">{detail}</span>
             </li>
           );
         })}
         {connected.length === 0 && (
-          <li className="rounded-xl bg-black/30 px-3 py-3 text-center text-sm text-ui-textMuted">No players connected.</li>
+          <li className="rounded-xl bg-black/30 px-3 py-3 text-center text-sm text-ink-muted">No players connected.</li>
         )}
       </ul>
     </aside>

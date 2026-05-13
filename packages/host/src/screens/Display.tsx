@@ -103,20 +103,20 @@ const getRankDeltaMeta = (rankDelta: number | null | undefined) => {
   if (rankDelta > 0) {
     return {
       label: `↑${rankDelta} since last round`,
-      className: 'bg-game-correct/20 text-game-correct'
+      className: 'bg-action/20 text-action'
     };
   }
 
   if (rankDelta < 0) {
     return {
       label: `↓${Math.abs(rankDelta)} since last round`,
-      className: 'bg-game-incorrect/20 text-game-incorrect'
+      className: 'bg-danger/20 text-danger'
     };
   }
 
   return {
     label: 'No change',
-    className: 'bg-white/10 text-ui-textMuted'
+    className: 'bg-ink/10 text-ink-muted'
   };
 };
 
@@ -427,34 +427,34 @@ export const Display = () => {
 
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-8">
+        <div className="min-h-screen px-6 py-8 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="screen-frame max-w-6xl"
+            className="mx-auto w-full max-w-6xl"
           >
-            <div className="card p-8 sm:p-10">
+            <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface p-8 shadow-ink-lg sm:p-10">
               <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-4xl">
-                  <p className="eyebrow mb-3">{eyebrow}</p>
+                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ink-muted mb-3">{eyebrow}</p>
                   <h1 className={`text-4xl font-bold sm:text-6xl ${accentClassName}`}>{intro.title}</h1>
-                  <p className="mt-4 text-xl leading-relaxed text-ui-textMuted sm:text-2xl">
+                  <p className="mt-4 text-xl leading-relaxed text-ink-muted sm:text-2xl">
                     {intro.description}
                   </p>
                 </div>
-                <span className="status-pill">
+                <Chip variant="default">
                   {countdown !== null ? `Starting in ${countdown}s` : 'Starting shortly'}
-                </span>
+                </Chip>
               </div>
 
               <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-                <div className="rounded-[1.7rem] border border-ui-border/80 bg-black/20 p-6">
-                  <p className="section-label mb-4">How This Game Works</p>
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted mb-4">How This Game Works</p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {(intro.scoringRules || []).slice(0, 6).map((rule) => (
                       <div
                         key={rule}
-                        className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] px-4 py-3 text-lg font-medium text-white"
+                        className="rounded-xl border-2 border-ink bg-bg-surface px-4 py-3 text-base font-semibold text-ink shadow-ink-sm"
                       >
                         {rule}
                       </div>
@@ -462,9 +462,9 @@ export const Display = () => {
                   </div>
                 </div>
 
-                <div className="rounded-[1.7rem] border border-ui-border/80 bg-black/20 p-6">
-                  <p className="section-label mb-3">Placement</p>
-                  <p className="text-2xl font-semibold leading-relaxed text-white">
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted mb-3">Placement</p>
+                  <p className="text-xl font-bold leading-relaxed text-ink">
                     {intro.placementInfo || 'Results on the house display determine the standings.'}
                   </p>
                 </div>
@@ -560,30 +560,30 @@ export const Display = () => {
 
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-6">
+        <div className="min-h-screen px-6 py-6 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="screen-frame"
+            className="mx-auto w-full max-w-7xl"
           >
-            <div className="card p-8 sm:p-10">
+            <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface p-8 shadow-ink-lg sm:p-10">
             <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="eyebrow mb-3">Round Standings</p>
-                <h1 className="text-4xl font-bold sm:text-6xl">{gameLabel} Leaderboard</h1>
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ink-muted mb-3">Round Standings</p>
+                <h1 className="text-4xl font-bold sm:text-6xl text-ink">{gameLabel} Leaderboard</h1>
                 {roundLeaderboard.roundNumber && roundLeaderboard.totalRounds ? (
-                  <p className="mt-3 text-lg text-ui-textMuted sm:text-2xl">
+                  <p className="mt-3 text-lg text-ink-muted sm:text-2xl">
                     {roundLeaderboard.unitLabel || 'Round'} {roundLeaderboard.roundNumber} of {roundLeaderboard.totalRounds}
                   </p>
                 ) : null}
               </div>
-              <span className="status-pill">
+              <Chip variant="default">
                 {roundLeaderboard.game === 'pointless' ? 'Lower score leads' : 'Higher score leads'}
-              </span>
+              </Chip>
             </div>
 
-            <div className="overflow-hidden rounded-[1.6rem] border border-ui-border/80">
-              <div className="grid grid-cols-[4rem_minmax(0,1.7fr)_1fr_1.2fr_1fr] gap-3 border-b border-ui-border/80 bg-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ui-textMuted">
+            <div className="overflow-hidden rounded-2xl border-2 border-ink">
+              <div className="grid grid-cols-[4rem_minmax(0,1.7fr)_1fr_1.2fr_1fr] gap-3 border-b-2 border-ink bg-bg-sunken px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted">
                 <span>Rank</span>
                 <span>Player</span>
                 <span className="text-right">Score</span>
@@ -591,7 +591,7 @@ export const Display = () => {
                 <span>Streak</span>
               </div>
 
-              <div className="max-h-[62vh] divide-y divide-ui-border/70 overflow-y-auto">
+              <div className="max-h-[62vh] divide-y divide-ink/20 overflow-y-auto">
               {roundLeaderboard.leaderboard.map((entry, index) => {
                 const rankDeltaMeta = getRankDeltaMeta(entry.rankDelta);
 
@@ -599,19 +599,19 @@ export const Display = () => {
                   <div
                     key={entry.id}
                     className={`grid grid-cols-[4rem_minmax(0,1.7fr)_1fr_1.2fr_1fr] items-center gap-3 px-5 py-3 ${
-                      index < 3 ? 'bg-white/[0.05]' : 'bg-black/15'
+                      index < 3 ? 'bg-now/10' : 'bg-bg-surface'
                     }`}
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 font-bold text-white">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink bg-bg-sunken font-bold text-ink shadow-ink-sm">
                       {entry.rank}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-3">
-                        <span className={`h-2.5 w-2.5 rounded-full ${entry.connected ? 'bg-game-correct' : 'bg-ui-textMuted'}`} />
-                        <p className="truncate text-xl font-semibold">{entry.name}</p>
+                        <span className={`h-2.5 w-2.5 rounded-full ${entry.connected ? 'bg-action' : 'bg-ink-muted'}`} />
+                        <p className="truncate text-xl font-semibold text-ink">{entry.name}</p>
                       </div>
                     </div>
-                    <p className="text-right text-2xl font-bold text-white">
+                    <p className="text-right text-2xl font-bold text-ink">
                       {entry.score}
                     </p>
                     <div>
@@ -620,16 +620,16 @@ export const Display = () => {
                           {rankDeltaMeta.label}
                         </span>
                       ) : (
-                        <span className="text-sm text-ui-textMuted">Opening round</span>
+                        <span className="text-sm text-ink-muted">Opening round</span>
                       )}
                     </div>
                     <div>
                       {roundLeaderboard.game === 'trueFalse' && (entry.streak || 0) > 3 ? (
-                        <span className="inline-flex items-center rounded-full border border-game-warning/60 bg-game-warning/30 px-3.5 py-1.5 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-[0_12px_24px_rgba(0,0,0,0.22)]">
+                        <Chip variant="streak">
                           {entry.streak}x streak
-                        </span>
+                        </Chip>
                       ) : (
-                        <span className="text-sm text-ui-textMuted">-</span>
+                        <span className="text-sm text-ink-muted">-</span>
                       )}
                     </div>
                   </div>
@@ -694,7 +694,7 @@ export const Display = () => {
   }
 
   if (currentGame === 'pointless' && pointlessIntro) {
-    return renderIntroView('Pointless Briefing', 'text-primary-teal', pointlessIntro);
+    return renderIntroView('Pointless Briefing', 'text-action', pointlessIntro);
   }
 
   if ((phase === 'leaderboard' || phase === 'finished') && currentGame) {
@@ -727,19 +727,19 @@ export const Display = () => {
 
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-6">
+        <div className="min-h-screen px-6 py-6 overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="screen-frame"
+            className="mx-auto w-full max-w-7xl"
           >
-            <div className="card p-8 sm:p-10">
+            <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface p-8 shadow-ink-lg sm:p-10">
             <div className="mb-8 flex items-end justify-between gap-6">
               <div>
-                <p className="eyebrow mb-3">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ink-muted mb-3">
                   {phase === 'finished' ? 'Session Complete' : showChampionship ? 'Championship Snapshot' : 'Game Complete'}
                 </p>
-                <h1 className="text-5xl font-bold sm:text-6xl">
+                <h1 className="text-5xl font-bold text-ink sm:text-6xl">
                   {showChampionship ? 'Championship Table' : `${{
                     quiz: 'Quiz',
                     trueFalse: 'True/False',
@@ -752,21 +752,21 @@ export const Display = () => {
                     travel: 'Travel'
                   }[activeGame]} Placements`}
                 </h1>
-                <p className="mt-3 text-2xl text-ui-textMuted">
+                <p className="mt-3 text-2xl text-ink-muted">
                   {showChampionship
                     ? 'Lowest combined placement leads the session.'
                     : 'Final standings for the game that just ended.'}
                 </p>
               </div>
-              <span className="status-pill">
+              <Chip variant="default">
                 {showChampionship ? 'Championship view' : 'Per-game results'}
-              </span>
+              </Chip>
             </div>
 
-            <div className="overflow-hidden rounded-[1.6rem] border border-ui-border/80">
+            <div className="overflow-hidden rounded-2xl border-2 border-ink">
               {showChampionship ? (
                 <>
-                  <div className="grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-3 border-b border-ui-border/80 bg-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ui-textMuted">
+                  <div className="grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-3 border-b-2 border-ink bg-bg-sunken px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted">
                     <span>Rank</span>
                     <span>Player</span>
                     <span className="text-right">Quiz</span>
@@ -779,65 +779,65 @@ export const Display = () => {
                     <span className="text-right">TRV</span>
                     <span className="text-right">Total</span>
                   </div>
-                  <div className="max-h-[62vh] divide-y divide-ui-border/70 overflow-y-auto">
+                  <div className="max-h-[62vh] divide-y divide-ink/20 overflow-y-auto">
                     {sortedPlayers.map((player, index) => (
                       <div
                         key={player.id}
                         className={`grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-3 px-5 py-3 ${
-                          index < 3 ? 'bg-white/[0.05]' : 'bg-black/15'
+                          index < 3 ? 'bg-now/10' : 'bg-bg-surface'
                         }`}
                       >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 font-bold text-white">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink bg-bg-sunken font-bold text-ink shadow-ink-sm">
                           {index + 1}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-3">
-                            <span className={`h-2.5 w-2.5 rounded-full ${player.connected ? 'bg-game-correct' : 'bg-ui-textMuted'}`} />
-                            <p className="truncate text-xl font-semibold">{player.name}</p>
+                            <span className={`h-2.5 w-2.5 rounded-full ${player.connected ? 'bg-action' : 'bg-ink-muted'}`} />
+                            <p className="truncate text-xl font-semibold text-ink">{player.name}</p>
                           </div>
                         </div>
-                        <p className="text-right text-lg">{player.gamePlacements?.quiz || '-'}</p>
-                        <p className="text-right text-lg">{player.gamePlacements?.trueFalse || '-'}</p>
-                        <p className="text-right text-lg">{player.gamePlacements?.pointless || '-'}</p>
-                        <p className="text-right text-lg">{player.gamePlacements?.pokedle || '-'}</p>
-                        <p className="text-right text-lg">{player.gamePlacements?.hpdle || '-'}</p>
-                        <p className="text-right text-lg">{player.gamePlacements?.numbers || '-'}</p>
-                        <p className="text-right text-lg">{player.gamePlacements?.wordle || '-'}</p>
-                        <p className="text-right text-lg">{player.gamePlacements?.travel || '-'}</p>
-                        <p className="text-right text-2xl font-bold text-white">{player.totalPlacementScore || '-'}</p>
+                        <p className="text-right text-lg text-ink">{player.gamePlacements?.quiz || '-'}</p>
+                        <p className="text-right text-lg text-ink">{player.gamePlacements?.trueFalse || '-'}</p>
+                        <p className="text-right text-lg text-ink">{player.gamePlacements?.pointless || '-'}</p>
+                        <p className="text-right text-lg text-ink">{player.gamePlacements?.pokedle || '-'}</p>
+                        <p className="text-right text-lg text-ink">{player.gamePlacements?.hpdle || '-'}</p>
+                        <p className="text-right text-lg text-ink">{player.gamePlacements?.numbers || '-'}</p>
+                        <p className="text-right text-lg text-ink">{player.gamePlacements?.wordle || '-'}</p>
+                        <p className="text-right text-lg text-ink">{player.gamePlacements?.travel || '-'}</p>
+                        <p className="text-right text-2xl font-bold text-ink">{player.totalPlacementScore || '-'}</p>
                       </div>
                     ))}
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr] gap-3 border-b border-ui-border/80 bg-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ui-textMuted">
+                  <div className="grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr] gap-3 border-b-2 border-ink bg-bg-sunken px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted">
                     <span>Rank</span>
                     <span>Player</span>
                     <span className="text-right">Place</span>
                     <span className="text-right">Score</span>
                     <span className="text-right">Total</span>
                   </div>
-                  <div className="max-h-[62vh] divide-y divide-ui-border/70 overflow-y-auto">
+                  <div className="max-h-[62vh] divide-y divide-ink/20 overflow-y-auto">
                     {sortedPlayers.map((player, index) => (
                       <div
                         key={player.id}
                         className={`grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr] items-center gap-3 px-5 py-3 ${
-                          index < 3 ? 'bg-white/[0.05]' : 'bg-black/15'
+                          index < 3 ? 'bg-now/10' : 'bg-bg-surface'
                         }`}
                       >
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 font-bold text-white">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink bg-bg-sunken font-bold text-ink shadow-ink-sm">
                           {index + 1}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-3">
-                            <span className={`h-2.5 w-2.5 rounded-full ${player.connected ? 'bg-game-correct' : 'bg-ui-textMuted'}`} />
-                            <p className="truncate text-xl font-semibold">{player.name}</p>
+                            <span className={`h-2.5 w-2.5 rounded-full ${player.connected ? 'bg-action' : 'bg-ink-muted'}`} />
+                            <p className="truncate text-xl font-semibold text-ink">{player.name}</p>
                           </div>
                         </div>
-                        <p className="text-right text-xl font-semibold">{player.gamePlacements?.[activeGame] ?? '-'}</p>
-                        <p className="text-right text-2xl font-bold text-primary-teal">{player.currentGameScore}</p>
-                        <p className="text-right text-lg">{player.totalPlacementScore || '-'}</p>
+                        <p className="text-right text-xl font-semibold text-ink">{player.gamePlacements?.[activeGame] ?? '-'}</p>
+                        <p className="text-right text-2xl font-bold text-action">{player.currentGameScore}</p>
+                        <p className="text-right text-lg text-ink">{player.totalPlacementScore || '-'}</p>
                       </div>
                     ))}
                   </div>
@@ -856,16 +856,16 @@ export const Display = () => {
   if (phase === 'lobby') {
     return (
       <>
-        <div className="screen-shell flex items-center">
+        <div className="min-h-screen px-6 flex items-center">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame text-center"
+            className="mx-auto w-full max-w-7xl text-center"
           >
-            <div className="card p-8 sm:p-10">
-            <p className="eyebrow mb-4">House Display</p>
-            <h1 className="text-6xl font-bold sm:text-8xl">PHoG</h1>
-            <p className="mx-auto mt-4 max-w-3xl text-2xl leading-relaxed text-ui-textMuted sm:text-3xl">
+            <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface p-8 shadow-ink-lg sm:p-10">
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ink-muted mb-4">House Display</p>
+            <h1 className="text-6xl font-bold text-ink sm:text-8xl">PHoG</h1>
+            <p className="mx-auto mt-4 max-w-3xl text-2xl leading-relaxed text-ink-muted sm:text-3xl">
               Join the room, keep your device open, and wait for the host to send everyone into the first round.
             </p>
 
@@ -880,27 +880,27 @@ export const Display = () => {
               </div>
 
               <div className="grid flex-1 gap-4 text-left sm:grid-cols-2">
-                <div className="rounded-[1.6rem] border border-ui-border/80 bg-black/20 p-6">
-                  <p className="section-label mb-2">Join Link</p>
-                  <p className="break-all text-xl font-semibold sm:text-2xl">{playerJoinLabel}</p>
-                  <p className="mt-2 text-sm text-ui-textMuted">Players can scan the code or type the address directly.</p>
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted mb-2">Join Link</p>
+                  <p className="break-all text-xl font-semibold text-ink sm:text-2xl">{playerJoinLabel}</p>
+                  <p className="mt-2 text-sm text-ink-muted">Players can scan the code or type the address directly.</p>
                 </div>
-                <div className="rounded-[1.6rem] border border-ui-border/80 bg-black/20 p-6">
-                  <p className="section-label mb-2">Players Ready</p>
-                  <p className="text-2xl font-semibold">{players.filter(p => p.connected).length}</p>
-                  <p className="mt-2 text-sm text-ui-textMuted">The board updates live as people join the room.</p>
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted mb-2">Players Ready</p>
+                  <p className="text-2xl font-semibold text-ink">{players.filter(p => p.connected).length}</p>
+                  <p className="mt-2 text-sm text-ink-muted">The board updates live as people join the room.</p>
                 </div>
               </div>
             </div>
             </div>
 
-            <div className="card mt-6 p-8">
+            <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface mt-6 p-8 shadow-ink-lg">
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="eyebrow mb-2">Room List</p>
-                <h2 className="text-3xl font-bold">Players Checked In</h2>
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ink-muted mb-2">Room List</p>
+                <h2 className="text-3xl font-bold text-ink">Players Checked In</h2>
               </div>
-              <span className="status-pill">Waiting for host to start</span>
+              <Chip variant="default">Waiting for host to start</Chip>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {players.map((player) => (
@@ -908,11 +908,11 @@ export const Display = () => {
                   key={player.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-[1.4rem] border border-ui-border/80 bg-black/20 p-4 text-left"
+                  className="rounded-xl border-2 border-ink bg-bg-sunken p-4 text-left shadow-ink-sm"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <p className="truncate text-xl font-medium">{player.name}</p>
-                    <span className={`h-2.5 w-2.5 rounded-full ${player.connected ? 'bg-game-correct' : 'bg-ui-textMuted'}`} />
+                    <p className="truncate text-xl font-medium text-ink">{player.name}</p>
+                    <span className={`h-2.5 w-2.5 rounded-full ${player.connected ? 'bg-action' : 'bg-ink-muted'}`} />
                   </div>
                 </motion.div>
               ))}
@@ -1300,20 +1300,20 @@ export const Display = () => {
   if (currentGame === 'countdown' && countdownRound) {
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-8">
+        <div className="min-h-screen px-6 py-8 overflow-y-auto">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame"
+            className="mx-auto w-full max-w-7xl"
           >
           <div className="mb-8">
-            <span className="text-xl text-ui-textMuted sm:text-3xl">
+            <span className="text-xl text-ink-muted sm:text-3xl">
               Round {countdownRound.roundNumber} of {countdownRound.totalRounds}
             </span>
           </div>
 
-          <div className="card mb-8 p-6 sm:p-12">
-            <h2 className="mb-8 text-3xl font-bold sm:text-5xl">Make the longest word!</h2>
+          <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface mb-8 p-6 shadow-ink-lg sm:p-12">
+            <h2 className="mb-8 text-3xl font-bold text-ink sm:text-5xl">Make the longest word!</h2>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
               {countdownRound.letters.map((letter: string, index: number) => (
                 <motion.div
@@ -1321,7 +1321,7 @@ export const Display = () => {
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="flex h-16 w-16 items-center justify-center rounded-[1.1rem] bg-primary-purple text-4xl font-bold text-white shadow-[0_14px_24px_rgba(0,0,0,0.22)] sm:h-20 sm:w-20 sm:rounded-[1.35rem] sm:text-5xl"
+                  className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-ink bg-premium text-4xl font-bold text-on-premium shadow-ink sm:h-20 sm:w-20 sm:text-5xl"
                 >
                   {letter}
                 </motion.div>
@@ -1329,7 +1329,7 @@ export const Display = () => {
             </div>
           </div>
 
-          <p className="text-lg text-ui-textMuted sm:text-2xl">
+          <p className="text-lg text-ink-muted sm:text-2xl">
             Players have 30 seconds to form a word
           </p>
           </motion.div>
@@ -1473,17 +1473,17 @@ export const Display = () => {
   // Default/Generic View
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-primary-navy to-ui-background flex flex-col items-center justify-center p-8">
+      <div className="min-h-screen bg-bg-base flex flex-col items-center justify-center p-8">
         <div className="text-center">
           <motion.div
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <h1 className="text-6xl font-bold mb-4">PHoG Display</h1>
-            <p className="text-2xl text-ui-textMuted">
+            <h1 className="text-6xl font-bold text-ink mb-4">PHoG Display</h1>
+            <p className="text-2xl text-ink-muted">
               {connected ? 'Connected to server' : 'Connecting...'}
             </p>
-            <p className="text-xl text-ui-textMuted mt-4">
+            <p className="text-xl text-ink-muted mt-4">
               Phase: {phase} | Game: {currentGame || 'None'}
             </p>
           </motion.div>

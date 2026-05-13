@@ -26,13 +26,13 @@ function App() {
     <div className="min-h-screen">
       <div className="sticky top-0 z-30 px-4 pt-4 sm:px-6">
         <div className="mx-auto flex w-full max-w-7xl justify-end">
-          <div className="inline-flex w-full max-w-[20rem] rounded-full border border-ui-border/80 bg-black/30 p-1 shadow-[0_16px_30px_rgba(0,0,0,0.25)] backdrop-blur-md">
+          <div className="inline-flex w-full max-w-[20rem] rounded-full border border-ink/20 bg-bg-surface p-1 shadow-ink-lg">
             <button
               onClick={() => setView('dashboard')}
               className={`flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition-all sm:text-base ${
                 view === 'dashboard'
-                  ? 'bg-primary-blue text-white shadow-[0_12px_20px_rgba(0,0,0,0.22)]'
-                  : 'text-ui-textMuted hover:text-ui-text'
+                  ? 'bg-action text-on-action shadow-ink-sm'
+                  : 'text-ink-muted hover:text-ink'
               }`}
             >
               Dashboard
@@ -41,8 +41,8 @@ function App() {
               onClick={() => setView('display')}
               className={`flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition-all sm:text-base ${
                 view === 'display'
-                  ? 'bg-primary-teal text-white shadow-[0_12px_20px_rgba(0,0,0,0.22)]'
-                  : 'text-ui-textMuted hover:text-ui-text'
+                  ? 'bg-info text-on-info shadow-ink-sm'
+                  : 'text-ink-muted hover:text-ink'
               }`}
             >
               Display

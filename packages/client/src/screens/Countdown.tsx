@@ -176,12 +176,12 @@ export const Countdown = ({ socket }: CountdownProps) => {
   // Intro Phase
   if (phase === 'intro' && introData) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 flex flex-col items-center justify-center">
         <motion.div
           variants={enterVariants}
           initial="hidden"
           animate="visible"
-          className="screen-frame max-w-4xl space-y-6 text-center"
+          className="mx-auto w-full max-w-4xl space-y-6 text-center"
         >
           <Card
             eyebrow="Countdown Briefing"
@@ -230,12 +230,12 @@ export const Countdown = ({ socket }: CountdownProps) => {
     const totalSeconds = Math.max(1, Math.ceil(currentRound.duration / 1000));
 
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 flex flex-col items-center justify-center">
         <motion.div
           variants={enterVariants}
           initial="hidden"
           animate="visible"
-          className="screen-frame max-w-5xl space-y-6"
+          className="mx-auto w-full max-w-5xl space-y-6"
         >
           <div className="flex items-center justify-between gap-4">
             <Chip variant="info">
@@ -329,12 +329,12 @@ export const Countdown = ({ socket }: CountdownProps) => {
     });
 
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 flex flex-col items-center justify-center">
         <motion.div
           variants={enterVariants}
           initial="hidden"
           animate="visible"
-          className="screen-frame max-w-4xl space-y-5"
+          className="mx-auto w-full max-w-4xl space-y-5"
         >
           <Card eyebrow="Round Complete" title={mySubmission?.word || '(No word)'}>
             {mySubmission && (
@@ -384,12 +384,12 @@ export const Countdown = ({ socket }: CountdownProps) => {
   // Game End Phase
   if (phase === 'gameEnd' && gameResults) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 flex flex-col items-center justify-center">
         <motion.div
           variants={enterVariants}
           initial="hidden"
           animate="visible"
-          className="screen-frame max-w-3xl"
+          className="mx-auto w-full max-w-3xl"
         >
           <Card eyebrow="Countdown Complete" title="Well done to all players!">
             <p className="text-lg text-ink-muted">
@@ -403,10 +403,10 @@ export const Countdown = ({ socket }: CountdownProps) => {
 
   // Loading state
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="card">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <Card>
         <h2 className="text-2xl font-bold text-center">Loading...</h2>
-      </div>
+      </Card>
     </div>
   );
 };

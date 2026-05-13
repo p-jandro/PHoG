@@ -50,9 +50,9 @@ function App() {
             return <Travel socket={socket} />;
           default:
             return (
-              <div className="min-h-screen flex items-center justify-center">
-                <div className="card">
-                  <h1 className="text-3xl font-bold text-center">Loading game...</h1>
+              <div className="min-h-screen flex items-center justify-center px-4">
+                <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface p-6 shadow-ink-lg">
+                  <h1 className="text-3xl font-bold text-center text-ink">Loading game...</h1>
                 </div>
               </div>
             );
@@ -64,9 +64,9 @@ function App() {
       
       default:
         return (
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="card">
-              <h1 className="text-3xl font-bold text-center">Loading...</h1>
+          <div className="min-h-screen flex items-center justify-center px-4">
+            <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface p-6 shadow-ink-lg">
+              <h1 className="text-3xl font-bold text-center text-ink">Loading...</h1>
             </div>
           </div>
         );

@@ -113,12 +113,12 @@ export const FinalLeaderboard = () => {
     : `Your ${activeGameLabel} Result`;
 
   return (
-    <div className="screen-shell overflow-y-auto">
+    <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 overflow-y-auto">
       <motion.div
         variants={enterVariants}
         initial="hidden"
         animate="visible"
-        className="screen-frame max-w-4xl space-y-5 py-6"
+        className="mx-auto w-full max-w-4xl space-y-5 py-6"
       >
         <Card eyebrow={eyebrow} title={<span className="font-serif text-4xl sm:text-5xl">{headline}</span>}>
           <div className="flex flex-col gap-3">

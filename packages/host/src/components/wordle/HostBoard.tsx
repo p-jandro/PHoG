@@ -6,9 +6,9 @@ interface HostBoardProps {
 }
 
 const TONE: Record<Color, string> = {
-  green: 'bg-game-correct',
-  yellow: 'bg-game-warning',
-  grey: 'bg-ui-textMuted/40'
+  green: 'bg-action',
+  yellow: 'bg-warn',
+  grey: 'bg-ink-muted/40'
 };
 
 export const HostBoard = ({ rows, maxGuesses }: HostBoardProps) => {

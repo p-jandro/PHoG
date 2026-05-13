@@ -81,7 +81,7 @@ export const Travel = ({ socket }: TravelProps) => {
   // ── INTRO ──────────────────────────────────────────────────────────────
   if (phase === 'intro' && introData) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen px-4 py-6 sm:py-8 flex flex-col items-center justify-center">
         <motion.div variants={screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl">
           <Card>
             <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-streak">Game starting</p>
@@ -120,7 +120,7 @@ export const Travel = ({ socket }: TravelProps) => {
     const streakCardCls = 'border-streak bg-streak text-on-streak shadow-[4px_4px_0_var(--ink)]';
 
     return (
-      <div className="screen-shell flex flex-col items-center overflow-y-auto px-4 py-4">
+      <div className="min-h-screen flex flex-col items-center overflow-y-auto px-4 py-4">
         <motion.div variants={screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl space-y-4">
           <Card>
             <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-streak">Travel — Reveal</p>
@@ -184,7 +184,7 @@ export const Travel = ({ socket }: TravelProps) => {
   // ── LOADING ────────────────────────────────────────────────────────────
   if (phase !== 'playing' || !roundData) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen px-4 py-6 sm:py-8 flex flex-col items-center justify-center">
         <Card>
           <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink-muted">Travel</p>
           <h1 className="mt-2 text-3xl font-extrabold text-ink">Loading…</h1>
@@ -201,7 +201,7 @@ export const Travel = ({ socket }: TravelProps) => {
   const totalSec = Math.max(1, Math.ceil((roundData.duration || 90000) / 1000));
 
   return (
-    <div className="screen-shell flex flex-col items-center px-4 py-4">
+    <div className="min-h-screen flex flex-col items-center px-4 py-4">
       <motion.div variants={screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl space-y-4">
         {/* Challenge banner */}
         <Card>

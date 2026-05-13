@@ -9,7 +9,7 @@ export const HostEmojiView = ({ initialEmojis, maxRevealed, fullPuzzle }: HostEm
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6">
       <div className="flex gap-4 text-9xl">{visible.map((e, i) => <span key={i}>{e}</span>)}</div>
-      <p className="text-2xl text-ui-textMuted">{visible.length}/5 emojis</p>
+      <p className="text-2xl text-ink-muted">{visible.length}/5 emojis</p>
     </div>
   );
 };
