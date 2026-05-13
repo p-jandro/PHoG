@@ -330,6 +330,9 @@ export const Dashboard = () => {
   const connectedCount = players.filter((p) => p.connected).length;
   const totalCount = players.length;
 
+  const championshipCompleted = gameState?.championship?.currentIndex as number | undefined;
+  const championshipTotal = gameState?.championship?.sequence?.length as number | undefined;
+
   // Build the player tracker rows. Sort: highest score first, except Pointless which sorts low-first.
   const sortedPlayers = [...players].sort((a, b) =>
     gameState?.currentGame === 'pointless'
@@ -362,6 +365,9 @@ export const Dashboard = () => {
             <Chip variant="info">{`${connectedCount} of ${totalCount} players connected`}</Chip>
             {gameState?.currentGame && (
               <Chip variant="muted">{`Current game · ${GAME_LABELS[gameState.currentGame as GameKey] ?? gameState.currentGame}`}</Chip>
+            )}
+            {championshipActive && typeof championshipCompleted === 'number' && typeof championshipTotal === 'number' && (
+              <Chip variant="streak">{`Championship · game ${championshipCompleted + 1} of ${championshipTotal}`}</Chip>
             )}
           </div>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
