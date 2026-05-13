@@ -19,14 +19,14 @@ export const NumbersDisplay = ({ socket, players }: NumbersDisplayProps) => {
   const [introData, setIntroData] = useState<any>(null);
   const [roundData, setRoundData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
-  const [submitted, setSubmitted] = useState<Record<string, any>>({});
+  const [progress, setProgress] = useState<Record<string, any>>({});
   const [timerMs, setTimerMs] = useState(0);
 
   useEffect(() => {
     if (!socket) return;
-    const onIntro = (d: any) => { setPhase('intro'); setIntroData(d); setSubmitted({}); };
-    const onStart = (d: any) => { setPhase('playing'); setRoundData(d); setSubmitted({}); };
-    const onProgress = (d: any) => setSubmitted(d.submitted || {});
+    const onIntro = (d: any) => { setPhase('intro'); setIntroData(d); setProgress({}); };
+    const onStart = (d: any) => { setPhase('playing'); setRoundData(d); setProgress({}); };
+    const onProgress = (d: any) => setProgress(d.playerProgress || {});
     const onResults = (d: any) => { setPhase('results'); setResultsData(d); };
 
     socket.on('numbers:intro', onIntro);
@@ -68,7 +68,7 @@ export const NumbersDisplay = ({ socket, players }: NumbersDisplayProps) => {
     const top = sorted.slice(0, 5);
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center gap-8 px-16 py-12 text-center">
-        <p className="eyebrow text-2xl">Round {resultsData.roundNumber} / {resultsData.totalRounds} — Reveal</p>
+        <p className="eyebrow text-2xl">Round {resultsData.roundNumber} / {resultsData.totalRounds} · {resultsData.difficulty} — Reveal</p>
         <div>
           <p className="text-2xl text-ui-textMuted">Target</p>
           <p className="text-8xl font-bold text-game-leader">{resultsData.target}</p>
@@ -102,13 +102,13 @@ export const NumbersDisplay = ({ socket, players }: NumbersDisplayProps) => {
     <div className="flex h-screen w-screen gap-8 px-12 py-8">
       <main className="flex flex-1 flex-col items-center justify-center gap-10">
         <div className="flex w-full items-baseline justify-between">
-          <p className="eyebrow text-xl">Numbers · Round {roundData.roundNumber}/{roundData.totalRounds}</p>
+          <p className="eyebrow text-xl">Numbers · Round {roundData.roundNumber}/{roundData.totalRounds} · {roundData.difficulty}</p>
           <p className="tabular-nums text-4xl font-bold text-white">{Math.ceil(timerMs / 1000)}s</p>
         </div>
         <HostTarget target={roundData.target} />
         <HostTilePool tiles={roundData.tiles || []} />
       </main>
-      <NumbersProgressPanel players={players} submitted={submitted} />
+      <NumbersProgressPanel players={players} progress={progress} />
     </div>
   );
 };

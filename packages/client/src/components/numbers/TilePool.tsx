@@ -1,32 +1,43 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export interface Tile { id: string; value: number; }
 
 interface TilePoolProps {
-  tiles: number[];
-  usedIndexes: Set<number>;   // which slots are currently consumed by the live expression
-  onTileClick: (index: number, value: number) => void;
+  tiles: Tile[];
+  selectedId: string | null;     // the "a" operand awaiting an operator (or "b" if a+op already chosen)
+  pendingBId?: string | null;    // not normally needed — we auto-execute on second tap
+  onTileClick: (id: string) => void;
+  disabled?: boolean;
 }
 
-export const TilePool = ({ tiles, usedIndexes, onTileClick }: TilePoolProps) => (
-  <div className="grid grid-cols-6 gap-2 sm:gap-3">
-    {tiles.map((value, idx) => {
-      const used = usedIndexes.has(idx);
-      return (
-        <motion.button
-          key={idx}
-          disabled={used}
-          onClick={() => onTileClick(idx, value)}
-          whileTap={{ scale: used ? 1 : 0.92 }}
-          className={`aspect-square rounded-2xl border-2 text-2xl font-bold transition-all sm:text-3xl ${
-            used
-              ? 'border-white/10 bg-black/30 text-ui-textMuted opacity-40'
-              : value >= 25
-                ? 'border-game-leader bg-game-leader/15 text-white hover:brightness-110'
-                : 'border-white/20 bg-white/10 text-white hover:bg-white/20'
-          }`}
-        >
-          {value}
-        </motion.button>
-      );
-    })}
+export const TilePool = ({ tiles, selectedId, onTileClick, disabled }: TilePoolProps) => (
+  <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+    <AnimatePresence>
+      {tiles.map((t) => {
+        const isSelected = selectedId === t.id;
+        const big = t.value >= 25;
+        const tone = isSelected
+          ? 'border-game-leader bg-game-leader text-black ring-4 ring-game-leader/40'
+          : big
+            ? 'border-game-leader bg-game-leader/15 text-white hover:brightness-110'
+            : 'border-white/20 bg-white/10 text-white hover:bg-white/20';
+        return (
+          <motion.button
+            key={t.id}
+            layout
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.4 }}
+            transition={{ duration: 0.25 }}
+            disabled={disabled}
+            onClick={() => onTileClick(t.id)}
+            whileTap={{ scale: disabled ? 1 : 0.94 }}
+            className={`aspect-square rounded-2xl border-2 text-3xl font-bold transition-all sm:text-4xl ${tone} disabled:opacity-50`}
+          >
+            {t.value}
+          </motion.button>
+        );
+      })}
+    </AnimatePresence>
   </div>
 );

@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
-import { TilePool } from '../components/numbers/TilePool';
+import { TilePool, Tile } from '../components/numbers/TilePool';
 import { TargetDisplay } from '../components/numbers/TargetDisplay';
-import { ExpressionInput } from '../components/numbers/ExpressionInput';
+import { OperationBuilder } from '../components/numbers/OperationBuilder';
 import { RoundResults } from '../components/numbers/RoundResults';
 
 type Phase = 'intro' | 'playing' | 'results';
@@ -13,42 +13,20 @@ interface NumbersProps {
   socket: Socket | null;
 }
 
-// Derive which tile slots are consumed by the current expression string.
-// We tokenize the expression for numeric literals and greedy-match against tile values.
-function deriveUsedIndexes(expression: string, tiles: number[]): Set<number> {
-  const literals: number[] = [];
-  let i = 0;
-  while (i < expression.length) {
-    const ch = expression[i];
-    if (ch >= '0' && ch <= '9') {
-      let j = i;
-      while (j < expression.length && expression[j] >= '0' && expression[j] <= '9') j++;
-      literals.push(Number(expression.slice(i, j)));
-      i = j;
-    } else {
-      i++;
-    }
-  }
-  const remaining = tiles.map((v, idx) => ({ v, idx }));
-  const used = new Set<number>();
-  for (const lit of literals) {
-    const slot = remaining.findIndex((t) => t.v === lit && !used.has(t.idx));
-    if (slot !== -1) used.add(remaining[slot].idx);
-  }
-  return used;
-}
-
 export const Numbers = ({ socket }: NumbersProps) => {
-  const { playerId } = useGameStore();
+  useGameStore();
   const [phase, setPhase] = useState<Phase>('intro');
   const [introData, setIntroData] = useState<any>(null);
   const [roundData, setRoundData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
-  const [expression, setExpression] = useState('');
-  const [ackToast, setAckToast] = useState<string | null>(null);
+  const [pool, setPool] = useState<Tile[]>([]);
+  const [selectedAId, setSelectedAId] = useState<string | null>(null);
+  const [op, setOp] = useState<string | null>(null);
+  const [solved, setSolved] = useState(false);
+  const [errorToast, setErrorToast] = useState<string | null>(null);
   const [timerMs, setTimerMs] = useState(0);
 
-  // Timer for the playing phase
+  // Playing-phase timer
   useEffect(() => {
     if (phase !== 'playing' || !roundData?.endsAt) return;
     const tick = () => setTimerMs(Math.max(0, roundData.endsAt - Date.now()));
@@ -57,56 +35,98 @@ export const Numbers = ({ socket }: NumbersProps) => {
     return () => clearInterval(i);
   }, [phase, roundData]);
 
+  // Socket subscriptions
   useEffect(() => {
     if (!socket) return;
-    const onIntro = (d: any) => { setPhase('intro'); setIntroData(d); setExpression(''); };
-    const onStart = (d: any) => { setPhase('playing'); setRoundData(d); setExpression(''); };
-    const onAck = (d: any) => {
-      if (d.accepted) setAckToast(`✓ submitted: ${d.value}`);
-      else setAckToast(`✗ ${d.error || 'invalid'}`);
-      setTimeout(() => setAckToast(null), 2500);
+    const onIntro = (d: any) => {
+      setPhase('intro');
+      setIntroData(d);
+      setPool([]);
+      setSelectedAId(null);
+      setOp(null);
+      setSolved(false);
     };
-    const onResults = (d: any) => { setPhase('results'); setResultsData(d); };
-
+    const onStart = (d: any) => {
+      setPhase('playing');
+      setRoundData(d);
+      setPool(d.tiles || []);
+      setSelectedAId(null);
+      setOp(null);
+      setSolved(false);
+    };
+    const onAck = (d: any) => {
+      if (!d.accepted) {
+        setErrorToast(d.error || 'invalid');
+        setTimeout(() => setErrorToast(null), 2200);
+        return;
+      }
+      if (Array.isArray(d.pool)) setPool(d.pool);
+      setSelectedAId(null);
+      setOp(null);
+      if (d.solved) setSolved(true);
+    };
+    const onResults = (d: any) => {
+      setPhase('results');
+      setResultsData(d);
+    };
     socket.on('numbers:intro', onIntro);
     socket.on('numbers:round:start', onStart);
-    socket.on('numbers:submit:ack', onAck);
+    socket.on('numbers:operation:ack', onAck);
     socket.on('numbers:round:results', onResults);
-
     return () => {
       socket.off('numbers:intro', onIntro);
       socket.off('numbers:round:start', onStart);
-      socket.off('numbers:submit:ack', onAck);
+      socket.off('numbers:operation:ack', onAck);
       socket.off('numbers:round:results', onResults);
     };
-  }, [socket, playerId]);
+  }, [socket]);
 
-  const tiles: number[] = roundData?.tiles || [];
-  const usedIndexes = useMemo(() => deriveUsedIndexes(expression, tiles), [expression, tiles]);
+  const target = roundData?.target;
+  const totalMs = roundData?.duration || 60000;
+  const progress = totalMs > 0 ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : 0;
 
-  const appendTile = (_idx: number, value: number) => {
-    setExpression((e) => e + String(value));
+  const aTile = pool.find((t) => t.id === selectedAId) || null;
+
+  const handleTileClick = (id: string) => {
+    if (solved) return;
+    if (!selectedAId) {
+      // First selection: pick A
+      setSelectedAId(id);
+      setOp(null);
+      return;
+    }
+    if (selectedAId === id) {
+      // Tapping the same tile again deselects
+      setSelectedAId(null);
+      setOp(null);
+      return;
+    }
+    if (!op) {
+      // A is selected but no op yet — treat as "switch A"
+      setSelectedAId(id);
+      return;
+    }
+    // We have A + op; this tile is B → execute
+    socket?.emit('numbers:operation', { aId: selectedAId, op, bId: id });
+    // Optimistic clear; will be overwritten by ack
+    // (We don't clear selectedAId here — the ack will. Keeps the highlight visible during the round-trip.)
   };
-  const appendOp = (op: string) => {
-    setExpression((e) => e + op);
+
+  const handleOperator = (newOp: string) => {
+    if (!selectedAId || solved) return;
+    setOp(newOp);
   };
-  const backspace = () => {
-    setExpression((e) => {
-      if (!e) return e;
-      // If the last char is a digit, peel off the whole literal in one step
-      const lastChar = e[e.length - 1];
-      if (lastChar >= '0' && lastChar <= '9') {
-        let i = e.length - 1;
-        while (i > 0 && e[i - 1] >= '0' && e[i - 1] <= '9') i--;
-        return e.slice(0, i);
-      }
-      return e.slice(0, -1);
-    });
+
+  const handleCancel = () => {
+    setSelectedAId(null);
+    setOp(null);
   };
-  const clearExpr = () => setExpression('');
-  const submit = () => {
-    if (!socket || !expression) return;
-    socket.emit('numbers:submit', { expression });
+
+  const handleReset = () => {
+    socket?.emit('numbers:reset', {});
+    setSelectedAId(null);
+    setOp(null);
+    setSolved(false);
   };
 
   // Intro splash
@@ -124,13 +144,13 @@ export const Numbers = ({ socket }: NumbersProps) => {
               ))}
             </ul>
           )}
-          <p className="text-sm text-ui-textMuted">{introData.totalRounds} rounds total</p>
+          <p className="text-sm text-ui-textMuted">{introData.totalRounds} rounds · easy → medium → difficult</p>
         </motion.div>
       </div>
     );
   }
 
-  // Results
+  // Results splash
   if (phase === 'results' && resultsData) {
     return (
       <div className="screen-shell flex flex-col items-center justify-center">
@@ -139,40 +159,46 @@ export const Numbers = ({ socket }: NumbersProps) => {
     );
   }
 
-  // Playing — show the build pad
+  // Playing
   if (phase === 'playing' && roundData) {
-    const totalMs = roundData.duration || 45000;
-    const progress = totalMs > 0 ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : 0;
-
     return (
       <div className="screen-shell py-4">
-        <div className="screen-frame max-w-3xl space-y-4">
-          <div className="flex items-center justify-between gap-3">
-            <p className="eyebrow">Numbers · Round {roundData.roundNumber}/{roundData.totalRounds}</p>
+        <div className="screen-frame max-w-2xl space-y-4">
+          <div className="flex items-baseline justify-between">
+            <div>
+              <p className="eyebrow">Numbers · Round {roundData.roundNumber}/{roundData.totalRounds}</p>
+              <p className="text-xs uppercase tracking-wider text-game-leader">{roundData.difficulty}</p>
+            </div>
             <p className="tabular-nums text-2xl font-bold text-white">{Math.ceil(timerMs / 1000)}s</p>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
             <div className="h-full bg-game-leader" style={{ width: `${progress}%` }} />
           </div>
 
-          <TargetDisplay target={roundData.target} />
-          <TilePool tiles={tiles} usedIndexes={usedIndexes} onTileClick={appendTile} />
-          <ExpressionInput
-            expression={expression}
-            onOperator={appendOp}
-            onBackspace={backspace}
-            onClear={clearExpr}
-            onSubmit={submit}
-            canSubmit={expression.length > 0}
+          <TargetDisplay target={target} />
+
+          <TilePool tiles={pool} selectedId={selectedAId} onTileClick={handleTileClick} disabled={solved} />
+
+          <OperationBuilder
+            aValue={aTile?.value ?? null}
+            op={op}
+            bValue={null}
+            onOperator={handleOperator}
+            onCancel={handleCancel}
+            onReset={handleReset}
+            disabled={solved}
+            errorToast={errorToast}
           />
-          {ackToast && (
-            <div className="rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-center text-sm">{ackToast}</div>
+
+          {solved && (
+            <p className="text-center text-2xl font-bold text-game-correct">🎉 reached {target}!</p>
           )}
         </div>
       </div>
     );
   }
 
+  // Loading fallback
   return (
     <div className="screen-shell flex flex-col items-center justify-center">
       <div className="screen-frame max-w-md text-center">
