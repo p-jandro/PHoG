@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { useGameStore } from '../../stores/gameStore';
+import { Card, Chip } from '../../ui';
 
 interface ModeResultsProps {
   data: {
@@ -21,26 +21,27 @@ interface ModeResultsProps {
   };
 }
 
-const MODE_LABELS: Record<string, string> = {
-  classic: 'Classic', emoji: 'Emoji', silhouette: 'Silhouette', spell: 'Spell', grid: '3×3 Grid'
-};
-
 const renderTarget = (mode: string, target: any) => {
   if (!target) return null;
-  if (mode === 'grid') return <p className="text-lg">Grid revealed</p>;
+  if (mode === 'grid') return (
+    <>
+      <p className="text-2xl font-extrabold text-ink">Grid revealed</p>
+      <div className="flex justify-center mt-1"><Chip variant="muted">see grid below on host</Chip></div>
+    </>
+  );
   if (mode === 'spell') return (
     <>
-      <p className="text-3xl font-bold text-game-leader">{target.incantation}</p>
-      <p className="text-base text-ui-textMuted mt-1">{target.effect}</p>
+      <p className="font-serif text-5xl font-bold text-premium">{target.incantation}</p>
+      <p className="mt-2 text-base text-ink-muted">{target.effect}</p>
     </>
   );
   if (mode === 'silhouette') return (
     <>
-      <p className="text-3xl font-bold text-game-leader">{target.name}</p>
       {target.spriteUrl && <img src={target.spriteUrl} alt={target.name} className="mx-auto mt-3 h-40 w-40 object-contain" />}
+      <p className="font-serif text-4xl font-bold text-premium">{target.name}</p>
     </>
   );
-  return <p className="text-3xl font-bold text-game-leader">{target.name}</p>;
+  return <p className="font-serif text-4xl font-bold text-premium">{target.name}</p>;
 };
 
 export const ModeResults = ({ data }: ModeResultsProps) => {
@@ -55,28 +56,28 @@ export const ModeResults = ({ data }: ModeResultsProps) => {
   const me = data.results.find((r) => r.playerId === playerId);
   const sorted = [...data.results].sort((a, b) => b.cumulativeScore - a.cumulativeScore);
   const myRank = sorted.findIndex((r) => r.playerId === playerId) + 1;
+  const cumulative = me?.cumulativeScore ?? 0;
 
   return (
-    <div className="screen-shell flex flex-col items-center justify-center">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="screen-frame max-w-3xl text-center space-y-5">
-        <p className="eyebrow">{MODE_LABELS[data.mode]}</p>
-        <h1 className="text-3xl font-bold">It was…</h1>
-        {renderTarget(data.mode, data.target)}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-bg-base px-4 py-6">
+      <div className="w-full max-w-3xl space-y-4">
+        <Card eyebrow="It was…" className="text-center space-y-3">
+          {renderTarget(data.mode, data.target)}
+        </Card>
 
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-5">
-          <p className="text-base text-ui-textMuted">You scored</p>
-          <p className="text-4xl font-bold text-game-leader">+{me?.modeScore ?? 0}</p>
-          <p className="mt-2 text-base">
-            Cumulative: <span className="font-bold text-white">{me?.cumulativeScore ?? 0}</span>
-            {myRank > 0 && <> · Rank <span className="font-bold">#{myRank}</span></>}
+        <Card className="mt-4 text-center space-y-2">
+          <div className="flex justify-center"><Chip variant="muted">You scored</Chip></div>
+          <p className="text-5xl font-extrabold text-action font-display">+{me?.modeScore ?? 0}</p>
+          <p className="text-base text-ink">
+            Cumulative: <span className="font-extrabold text-ink">{cumulative}</span>
+            {myRank > 0 && <> · Rank <Chip variant="now">#{myRank}</Chip></>}
           </p>
-        </div>
+        </Card>
 
-        <p className="text-sm text-ui-textMuted">
-          {data.isLastMode ? 'Game wrapping up…' : 'Next mode in '}
-          {!data.isLastMode && `${Math.ceil(remaining / 1000)}s`}
+        <p className="text-sm text-ink-muted text-center">
+          {data.isLastMode ? 'Game wrapping up…' : `Next mode in ${Math.ceil(remaining / 1000)}s`}
         </p>
-      </motion.div>
+      </div>
     </div>
   );
 };
