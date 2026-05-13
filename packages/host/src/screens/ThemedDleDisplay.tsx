@@ -162,6 +162,7 @@ export const ThemedDleDisplay = ({ socket, currentGame, players }: ThemedDleDisp
                   layout
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
                   className={`rounded-2xl border-2 px-5 py-4 shadow-ink-sm ${tone}`}
                 >
                   <p className="truncate text-2xl font-extrabold">{p.name}</p>
