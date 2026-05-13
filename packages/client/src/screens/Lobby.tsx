@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import type { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { joinGame } from '../hooks/useSocket';
-import { Socket } from 'socket.io-client';
+import { Button, Input, Card, Pill, ThemeToggle } from '../ui';
+import { screenEnter } from '../lib/motion';
 
 interface LobbyProps {
   socket: Socket | null;
@@ -18,13 +20,11 @@ export const Lobby = ({ socket }: LobbyProps) => {
     if (name.trim() && socket && connected) {
       setIsJoining(true);
       joinGame(socket, name.trim());
-      
-      // Reset after a delay
       setTimeout(() => setIsJoining(false), 2000);
     }
   };
 
-  // If player has joined, show waiting room
+  // Post-join branch — still uses legacy classes; migrated in Task 2.
   if (playerId && playerName) {
     return (
       <div className="screen-shell flex items-center">
@@ -45,7 +45,6 @@ export const Lobby = ({ socket }: LobbyProps) => {
                 </p>
               </div>
             </div>
-
             <div className="rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-5">
               <p className="text-lg font-semibold text-game-correct">Ready</p>
               <p className="mt-2 text-sm text-ui-textMuted">Waiting for the host.</p>
@@ -56,61 +55,58 @@ export const Lobby = ({ socket }: LobbyProps) => {
     );
   }
 
+  // Pre-join branch — new design.
+  const status: 'connected' | 'connecting' | 'offline' = connected
+    ? 'connected'
+    : connectionError
+      ? 'offline'
+      : 'connecting';
+  const statusLabel = connected
+    ? 'Connected to game server'
+    : connectionError
+      ? 'Offline'
+      : 'Connecting to game server';
+
   return (
-    <div className="screen-shell flex items-center">
-      <div className="screen-frame max-w-3xl">
+    <div className="min-h-screen bg-bg-base text-ink">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pt-4 sm:px-6">
+        <header className="flex items-center justify-end">
+          <ThemeToggle />
+        </header>
+
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card p-7 sm:p-8"
+          variants={screenEnter}
+          initial="hidden"
+          animate="visible"
         >
-          <div className="mb-6">
-            <span className="eyebrow">Player Entry</span>
-            <h2 className="mt-2 text-3xl font-bold">Join the Room</h2>
-          </div>
-
-          <div className="mb-6 rounded-[1.35rem] border border-ui-border/80 bg-black/20 p-4">
-            <div className="flex items-center gap-3">
-              <div
-                className={`h-2.5 w-2.5 rounded-full ${
-                  connected ? 'bg-game-correct' : 'bg-game-incorrect'
-                }`}
-              />
-              <span className="font-medium">
-                {connected ? 'Connected to game server' : 'Connecting to game server'}
-              </span>
+          <Card eyebrow="Player Entry" title="Join the Room">
+            <div className="mt-2 mb-5 flex flex-wrap items-center gap-2">
+              <Pill status={status}>{statusLabel}</Pill>
             </div>
-            {connectionError && (
-              <p className="mt-3 text-sm text-game-incorrect">{connectionError}</p>
-            )}
-          </div>
 
-          <form onSubmit={handleJoin} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="section-label mb-2 block">
-                Display Name
-              </label>
-              <input
-                id="name"
-                type="text"
+            <form onSubmit={handleJoin} className="flex flex-col gap-5">
+              <Input
+                label="Display Name"
+                placeholder="Enter your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
-                className="input-field"
                 maxLength={30}
                 required
                 disabled={!connected || isJoining}
+                error={connectionError ?? undefined}
               />
-            </div>
-
-            <button
-              type="submit"
-              disabled={!connected || !name.trim() || isJoining}
-              className="btn-primary w-full"
-            >
-              {isJoining ? 'Joining Room...' : 'Join Game'}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                variant="action"
+                size="lg"
+                disabled={!connected || !name.trim() || isJoining}
+                loading={isJoining}
+                className="w-full"
+              >
+                {isJoining ? 'Joining Room' : 'Join Game'}
+              </Button>
+            </form>
+          </Card>
         </motion.div>
       </div>
     </div>
