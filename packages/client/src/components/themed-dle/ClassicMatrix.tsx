@@ -1,5 +1,7 @@
-import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
+import { Tile, Chip } from '../../ui';
+import { stagger, duration } from '../../lib/motion';
 
 type Cell = { key: string; label: string; value: any; color: 'green' | 'yellow' | 'red' };
 type GuessResult = {
@@ -22,46 +24,70 @@ interface ClassicMatrixProps {
   onGuess: (payload: { name: string }) => void;
 }
 
-const COLOR_CLASSES: Record<Cell['color'], string> = {
-  green: 'bg-game-correct text-black',
-  yellow: 'bg-game-warning text-black',
-  red: 'bg-game-incorrect/80 text-white'
-};
-
 export const ClassicMatrix = ({ data, guesses, onGuess }: ClassicMatrixProps) => {
   const solved = guesses.some((g) => g.solved);
   const used = guesses.length;
   const headerRow = guesses[0]?.feedback?.map((c) => c.label) ?? [];
+  const colCount = headerRow.length;
+
+  // Track which guess rows have already completed their flip animation
+  const flippedRows = useRef<Set<number>>(new Set());
+  const latestIdx = used - 1;
+
+  // Mark the latest row as "done flipping" after the cascade completes
+  useEffect(() => {
+    if (latestIdx < 0 || flippedRows.current.has(latestIdx)) return;
+    const totalFlipMs = ((colCount * stagger.tile) + duration.reveal) * 1000;
+    const t = setTimeout(() => {
+      flippedRows.current.add(latestIdx);
+    }, totalFlipMs);
+    return () => clearTimeout(t);
+  }, [latestIdx, colCount]);
 
   return (
     <div className="space-y-4">
       {headerRow.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full table-fixed border-separate border-spacing-1 text-sm">
-            <thead>
-              <tr>
-                <th className="text-left text-xs text-ui-textMuted">Guess</th>
-                {headerRow.map((label) => (
-                  <th key={label} className="text-xs text-ui-textMuted">{label}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {guesses.map((g, idx) => (
-                <motion.tr key={idx} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-                  <td className="rounded-xl bg-black/30 px-3 py-2 font-medium">{g.guess}</td>
-                  {g.feedback.map((c) => {
+          <div
+            className="grid gap-1"
+            style={{ gridTemplateColumns: `minmax(7rem, 1.5fr) repeat(${colCount}, minmax(0, 1fr))` }}
+          >
+            {/* Header row */}
+            <div /> {/* empty top-left corner */}
+            {headerRow.map((label) => (
+              <div key={label} className="flex justify-center">
+                <Chip variant="muted">{label}</Chip>
+              </div>
+            ))}
+
+            {/* Guess rows */}
+            {guesses.map((g, idx) => {
+              const isLatest = idx === latestIdx;
+              const shouldFlip = isLatest && !flippedRows.current.has(idx);
+              return (
+                <>
+                  <div key={`name-${idx}`} className="flex items-center">
+                    <Chip variant="default">{g.guess}</Chip>
+                  </div>
+                  {g.feedback.map((c, cellIdx) => {
                     const v = Array.isArray(c.value) ? c.value.join(', ') : (c.value ?? '—');
+                    const state = c.color === 'green' ? 'correct' : c.color === 'yellow' ? 'partial' : 'wrong';
                     return (
-                      <td key={c.key} className={`rounded-xl px-2 py-2 text-center font-semibold ${COLOR_CLASSES[c.color]}`}>
-                        {String(v)}
-                      </td>
+                      <Tile
+                        key={c.key}
+                        state={state}
+                        flipping={shouldFlip}
+                        flipDelaySec={cellIdx * stagger.tile}
+                        className="w-full aspect-square min-h-[3rem]"
+                      >
+                        <span className="px-1 text-center text-[10px] leading-tight font-extrabold">{String(v)}</span>
+                      </Tile>
                     );
                   })}
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
+                </>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -74,13 +100,19 @@ export const ClassicMatrix = ({ data, guesses, onGuess }: ClassicMatrixProps) =>
       )}
 
       {solved && (
-        <p className="text-center text-game-correct text-lg font-bold">🎉 Solved in {used} {used === 1 ? 'guess' : 'guesses'}</p>
+        <div className="flex justify-center">
+          <Chip variant="streak">Solved in {used} {used === 1 ? 'guess' : 'guesses'}</Chip>
+        </div>
       )}
       {!solved && used >= data.maxGuesses && (
-        <p className="text-center text-game-incorrect text-lg font-bold">Out of guesses</p>
+        <div className="flex justify-center">
+          <Chip variant="muted">Out of guesses — the answer was hidden</Chip>
+        </div>
       )}
       {!solved && used < data.maxGuesses && (
-        <p className="text-center text-xs text-ui-textMuted">{data.maxGuesses - used} guesses left</p>
+        <div className="flex justify-center">
+          <Chip variant="info">{data.maxGuesses - used} guesses left</Chip>
+        </div>
       )}
     </div>
   );
