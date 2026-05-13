@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { AutocompletePicker } from './AutocompletePicker';
+import { Card, Chip } from '../../ui';
+import { letterDrop, popIn, easing } from '../../lib/motion';
 
 type SpellResult = {
   guess: string;
@@ -37,28 +39,50 @@ export const SpellHint = ({ data, guesses, onGuess }: SpellHintProps) => {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-3xl border border-white/10 bg-black/40 p-6 text-center">
-        <p className="eyebrow">{data.category}</p>
-        <p className="mt-2 text-2xl font-bold text-white">{data.effect}</p>
-        <p className="mt-2 text-sm text-ui-textMuted">Incantation: {data.incantationLength} characters</p>
-      </div>
+      <Card eyebrow={data.category} title={data.effect}>
+        <div className="flex justify-center gap-2">
+          {Array.from({ length: data.incantationLength }).map((_, i) => (
+            <motion.span
+              key={i}
+              variants={letterDrop}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: i * 0.09, duration: 0.28, ease: easing.easeOut }}
+              className="inline-flex h-10 w-7 items-center justify-center rounded-md border-2 border-ink bg-bg-sunken font-serif text-xl font-bold text-ink-muted shadow-ink-sm"
+            >
+              ·
+            </motion.span>
+          ))}
+        </div>
+        <p className="mt-3 text-center">
+          <Chip variant="muted">{data.incantationLength} letters</Chip>
+        </p>
+      </Card>
 
       {revealedHints.length > 0 && (
         <div className="space-y-2">
           {revealedHints.map((h, i) => (
-            <motion.div key={i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
-              className="rounded-2xl border border-game-leader/30 bg-game-leader/10 px-4 py-3">
-              <p className="text-xs uppercase tracking-wider text-game-leader">{HINT_TITLES[h.type] || 'Hint'}</p>
-              <p className="text-base">{h.text}</p>
+            <motion.div
+              key={i}
+              variants={popIn}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: i * 0.1 }}
+            >
+              <Card className="!p-4">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-premium">{HINT_TITLES[h.type] || 'Hint'}</p>
+                <p className="mt-1 text-base text-ink">{h.text}</p>
+              </Card>
             </motion.div>
           ))}
         </div>
       )}
 
-      <ul className="space-y-1">
+      <ul className="space-y-2">
         {guesses.map((g, i) => (
-          <li key={i} className={`rounded-xl px-3 py-2 ${g.correct ? 'bg-game-correct/30 text-game-correct' : 'bg-game-incorrect/15 text-ui-textMuted'}`}>
-            <span className="mr-2">{g.correct ? '✓' : '✗'}</span>{g.guess}
+          <li key={i} className="flex items-center gap-2 rounded-xl border-2 border-ink bg-bg-surface px-3 py-2 shadow-ink-sm">
+            <Chip variant={g.correct ? 'streak' : 'muted'}>{g.correct ? 'Correct' : 'Wrong'}</Chip>
+            <span className="font-semibold text-ink">{g.guess}</span>
           </li>
         ))}
       </ul>
@@ -70,12 +94,20 @@ export const SpellHint = ({ data, guesses, onGuess }: SpellHintProps) => {
           placeholder="Speak the incantation…"
         />
       )}
-      {solved && <p className="text-center text-game-correct text-lg font-bold">🎉 Spell cast!</p>}
+      {solved && (
+        <div className="flex justify-center">
+          <Chip variant="streak">Spell cast in {used} {used === 1 ? 'attempt' : 'attempts'}</Chip>
+        </div>
+      )}
       {!solved && used >= data.maxGuesses && (
-        <p className="text-center text-game-incorrect text-lg font-bold">Out of attempts</p>
+        <div className="flex justify-center">
+          <Chip variant="muted">Out of attempts</Chip>
+        </div>
       )}
       {!solved && used < data.maxGuesses && (
-        <p className="text-center text-xs text-ui-textMuted">{data.maxGuesses - used} attempts left</p>
+        <div className="flex justify-center">
+          <Chip variant="info">{data.maxGuesses - used} attempts left</Chip>
+        </div>
       )}
     </div>
   );
