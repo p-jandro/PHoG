@@ -1,12 +1,12 @@
-import { motion } from 'framer-motion';
+import { Button } from '../../ui/Button';
 
 interface OperationBuilderProps {
   aValue: number | null;
-  op: string | null;            // '+' | '-' | '*' | '/' | null
-  bValue: number | null;        // usually null — set briefly during the auto-complete animation
+  op: string | null;
+  bValue: number | null;
   onOperator: (op: string) => void;
-  onCancel: () => void;         // clears the in-progress selection (deselects A)
-  onReset: () => void;          // restores the original tile pool (server round-trip)
+  onCancel: () => void;
+  onReset: () => void;
   disabled?: boolean;
   errorToast?: string | null;
 }
@@ -15,21 +15,29 @@ const OP_BUTTONS: Array<{ value: string; label: string }> = [
   { value: '+', label: '+' },
   { value: '-', label: '−' },
   { value: '*', label: '×' },
-  { value: '/', label: '÷' }
+  { value: '/', label: '÷' },
 ];
 
-const Slot = ({ value, highlight }: { value: number | null | string; highlight?: boolean }) => (
-  <div className={`flex h-16 flex-1 items-center justify-center rounded-xl border-2 text-2xl font-bold ${
-    value !== null && value !== ''
-      ? (highlight ? 'border-game-leader bg-game-leader/20 text-game-leader' : 'border-white/20 bg-white/10 text-white')
-      : 'border-dashed border-white/15 text-ui-textMuted'
-  }`}>
-    {value !== null && value !== '' ? value : '…'}
-  </div>
-);
+const Slot = ({ value, highlight }: { value: number | null | string; highlight?: boolean }) => {
+  const filled = value !== null && value !== '';
+  return (
+    <div
+      className={[
+        'flex h-16 flex-1 items-center justify-center rounded-xl border-2 font-display text-2xl font-extrabold tabular-nums',
+        filled
+          ? highlight
+            ? 'border-ink bg-now text-on-now shadow-ink'
+            : 'border-ink bg-bg-surface text-ink shadow-ink'
+          : 'border-dashed border-ink/30 bg-bg-sunken text-ink-muted',
+      ].join(' ')}
+    >
+      {filled ? value : '…'}
+    </div>
+  );
+};
 
 export const OperationBuilder = ({
-  aValue, op, bValue, onOperator, onCancel, onReset, disabled, errorToast
+  aValue, op, bValue, onOperator, onCancel, onReset, disabled, errorToast,
 }: OperationBuilderProps) => {
   const aSet = aValue !== null;
   const opSet = op !== null;
@@ -43,41 +51,39 @@ export const OperationBuilder = ({
       </div>
       <div className="grid grid-cols-4 gap-2">
         {OP_BUTTONS.map((o) => (
-          <motion.button
+          <Button
             key={o.value}
+            variant={op === o.value ? 'now' : 'ghost'}
+            size="md"
             disabled={disabled || !aSet}
-            whileTap={{ scale: 0.92 }}
             onClick={() => onOperator(o.value)}
-            className={`rounded-xl border py-3 text-2xl font-bold ${
-              op === o.value
-                ? 'border-game-leader bg-game-leader text-black'
-                : 'border-white/15 bg-white/5 text-white hover:bg-white/15'
-            } disabled:opacity-40`}
+            className="border-2 border-ink"
           >
             {o.label}
-          </motion.button>
+          </Button>
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <motion.button
-          whileTap={{ scale: aSet ? 0.95 : 1 }}
+        <Button
+          variant="ghost"
+          size="md"
           onClick={onCancel}
           disabled={disabled || !aSet}
-          className="rounded-xl border border-white/15 bg-white/5 py-3 text-lg font-medium text-white disabled:opacity-40"
+          className="border-2 border-ink"
         >
           Deselect
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.95 }}
+        </Button>
+        <Button
+          variant="danger"
+          size="md"
           onClick={onReset}
           disabled={disabled}
-          className="rounded-xl border border-game-incorrect/40 bg-game-incorrect/10 py-3 text-lg font-medium text-game-incorrect hover:bg-game-incorrect/20 disabled:opacity-40"
         >
           Reset tiles
-        </motion.button>
+        </Button>
       </div>
       {errorToast && (
-        <div className="rounded-xl border border-game-incorrect/40 bg-game-incorrect/10 px-3 py-2 text-center text-sm text-game-incorrect">
+        <div className="rounded-xl border-2 border-ink bg-danger px-3 py-2 text-center text-sm font-bold text-on-danger shadow-ink-sm">
           {errorToast}
         </div>
       )}
