@@ -9,6 +9,7 @@ import { EmojiClue } from '../components/themed-dle/EmojiClue';
 import { Silhouette } from '../components/themed-dle/Silhouette';
 import { SpellHint } from '../components/themed-dle/SpellHint';
 import { Grid3x3 } from '../components/themed-dle/Grid3x3';
+import { Card, Chip } from '../ui';
 
 type Phase = 'intro' | 'playing' | 'results';
 type Mode = 'classic' | 'emoji' | 'silhouette' | 'spell' | 'grid';
@@ -110,18 +111,20 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
   if (phase === 'results' && resultsData) return <ModeResults data={resultsData} />;
   if (phase !== 'playing' || !playData) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
-        <div className="screen-frame max-w-xl text-center">
-          <p className="eyebrow">{theme === 'pokemon' ? 'Pokédle' : 'HP-dle'}</p>
-          <h1 className="text-3xl font-bold">Loading…</h1>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-bg-base px-4 text-ink">
+        <Card className="w-full max-w-md text-center">
+          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-streak">
+            {theme === 'pokemon' ? 'Pokédle' : 'HP-dle'}
+          </p>
+          <h1 className="mt-2 text-3xl font-extrabold">Loading…</h1>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="screen-shell py-6">
-      <div className="screen-frame max-w-3xl">
+    <div className="min-h-screen bg-bg-base px-4 py-6 text-ink">
+      <div className="mx-auto max-w-3xl">
         <CumulativeScoreBar
           theme={theme}
           mode={mode}
@@ -130,8 +133,10 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
           totalMs={totalMs}
         />
         {invalidToast && (
-          <div className="mb-3 rounded-xl border border-game-incorrect/40 bg-game-incorrect/10 px-3 py-2 text-center text-sm text-game-incorrect">
-            {invalidToast}
+          <div className="mb-3 flex justify-center">
+            <Chip variant="muted" className="!bg-danger !text-on-danger !border-ink">
+              {invalidToast}
+            </Chip>
           </div>
         )}
 
