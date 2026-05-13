@@ -9,10 +9,5 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['react-simple-maps', 'prop-types']
-  },
-  build: {
-    rollupOptions: {
-      external: ['prop-types']
-    }
   }
 })
