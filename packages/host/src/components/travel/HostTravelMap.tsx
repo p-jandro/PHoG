@@ -4,6 +4,8 @@ import { geoMercator, geoCentroid } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import worldData from 'world-atlas/countries-110m.json';
+import { GuessPin } from './GuessPin';
+import { GuessArc } from './GuessArc';
 
 const NAME_OVERRIDES: Record<string, string> = {
   'United States of America': 'United States',
@@ -32,6 +34,13 @@ export interface HostChainEntry {
   color?: Color;
 }
 
+export interface HostMapGuess {
+  guess: string;
+  answer: string;            // start or end, per the heuristic in Travel.tsx
+  color: 'green' | 'orange' | 'red';
+  playerId: string;          // for unique React keys
+}
+
 interface HostTravelMapProps {
   startName: string;
   endName: string;
@@ -40,23 +49,25 @@ interface HostTravelMapProps {
   optimalChainNames?: string[];
   width?: number;
   height?: number;
+  playerGuesses?: HostMapGuess[];
 }
 
 const FILL = {
-  unvisited: '#1e293b',
-  start: '#facc15',
-  end: '#facc15',
-  green: '#16a34a',
-  orange: '#f97316',
-  red: '#dc2626',
-  optimal: '#fbbf24'
-};
+  unvisited: 'var(--bg-sunken)',
+  start:     'var(--now)',
+  end:       'var(--now)',
+  green:     'var(--action)',
+  orange:    'var(--warn)',
+  red:       'var(--danger)',
+  optimal:   'var(--streak)',   // heritage terracotta — celebration only
+} as const;
 
-const STROKE_BRIGHT = '#f8fafc';
+const STROKE_BRIGHT = 'var(--ink)';
 
 export const HostTravelMap = ({
   startName, endName, relevantNames, visitedNamesByColor, optimalChainNames,
-  width = 1100, height = 620
+  width = 1100, height = 620,
+  playerGuesses,
 }: HostTravelMapProps) => {
   const featureCollection = useMemo(() => {
     const topology = worldData as unknown as Topology<{ countries: GeometryCollection }>;
@@ -109,8 +120,51 @@ export const HostTravelMap = ({
     return p;
   }, [relevantFeatures, width, height]);
 
+  // Compute screen-space points for player guess pins and arcs
+  const points = useMemo(() => {
+    if (!playerGuesses || playerGuesses.length === 0) return [];
+    const featureByName = new Map<string, any>();
+    for (const f of featureCollection.features) featureByName.set(canonicalName(f), f);
+
+    const project = (name: string) => {
+      const f = featureByName.get(name);
+      if (!f) return null;
+      const centroid = geoCentroid(f);
+      const p = projection(centroid);
+      return p ? { x: p[0], y: p[1] } : null;
+    };
+
+    return playerGuesses
+      .map((g) => {
+        const from = project(g.guess);
+        const to = project(g.answer);
+        if (!from || !to) return null;
+        return { ...g, from, to };
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null);
+  }, [playerGuesses, featureCollection, projection]);
+
+  // Compute start/end screen-space points for labels
+  const { startPoint, endPoint } = useMemo(() => {
+    const featureByName = new Map<string, any>();
+    for (const f of featureCollection.features) featureByName.set(canonicalName(f), f);
+
+    const project = (name: string) => {
+      const f = featureByName.get(name);
+      if (!f) return null;
+      const centroid = geoCentroid(f);
+      const p = projection(centroid);
+      return p ? { x: p[0], y: p[1] } : null;
+    };
+
+    return {
+      startPoint: project(startName),
+      endPoint: project(endName),
+    };
+  }, [featureCollection, projection, startName, endName]);
+
   return (
-    <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/40">
+    <div className="overflow-hidden rounded-3xl border-2 border-ink bg-bg-sunken shadow-ink-lg">
       <ComposableMap projection={projection} width={width} height={height} style={{ width: '100%', height: 'auto' }}>
         <Geographies geography={featureCollection}>
           {({ geographies }: { geographies: any[] }) =>
@@ -135,6 +189,52 @@ export const HostTravelMap = ({
             })
           }
         </Geographies>
+        {points.length > 0 && (
+          <>
+            <g>
+              {points.map((p, i) => (
+                <GuessArc
+                  key={`arc-${p.playerId}-${i}`}
+                  x1={p.from.x} y1={p.from.y}
+                  x2={p.to.x}   y2={p.to.y}
+                  color={p.color}
+                  delaySec={Math.min(i * 0.04, 1.2)}
+                />
+              ))}
+            </g>
+            <g>
+              {points.map((p, i) => (
+                <GuessPin
+                  key={`pin-${p.playerId}-${i}`}
+                  cx={p.from.x} cy={p.from.y}
+                  color={p.color}
+                  delaySec={Math.min(i * 0.04, 1.2)}
+                />
+              ))}
+            </g>
+          </>
+        )}
+        {/* Start/end full-text labels */}
+        {startPoint && (
+          <g>
+            <rect x={startPoint.x - 60} y={startPoint.y + 12} width={120} height={24}
+                  rx={6} fill="var(--bg-surface)" stroke="var(--ink)" strokeWidth={2} />
+            <text x={startPoint.x} y={startPoint.y + 28}
+                  textAnchor="middle" fontSize={12} fontWeight={800} fill="var(--ink)">
+              Start: {startName}
+            </text>
+          </g>
+        )}
+        {endPoint && (
+          <g>
+            <rect x={endPoint.x - 60} y={endPoint.y + 12} width={120} height={24}
+                  rx={6} fill="var(--bg-surface)" stroke="var(--ink)" strokeWidth={2} />
+            <text x={endPoint.x} y={endPoint.y + 28}
+                  textAnchor="middle" fontSize={12} fontWeight={800} fill="var(--ink)">
+              End: {endName}
+            </text>
+          </g>
+        )}
       </ComposableMap>
     </div>
   );
