@@ -354,29 +354,33 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
     const myResult = results.results.find((r: any) => r.playerId === playerId);
 
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-bg-base flex items-center justify-center px-4 py-8 text-ink">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="card w-full max-w-3xl p-6 sm:p-8"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="w-full max-w-3xl rounded-3xl border-2 border-ink bg-bg-surface p-8 shadow-ink-lg sm:p-10"
         >
-          <h2 className="mb-6 text-center text-3xl font-bold sm:text-4xl">
-            Game Over!
+          <p className="mb-2 text-center text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+            True or False
+          </p>
+          <h2 className="mb-6 text-center font-serif text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Game Over
           </h2>
 
           {myResult && (
-            <div className="text-center mb-8">
-              <p className="mb-2 text-5xl font-bold sm:text-6xl" style={{ color: '#00D4AA' }}>
+            <div className="text-center">
+              <p className="font-display text-6xl font-black leading-none text-action sm:text-7xl">
                 {myResult.accuracy}%
               </p>
-              <p className="mb-4 text-xl text-ui-textMuted sm:text-2xl">
+              <p className="mt-3 text-xl font-bold text-ink-muted sm:text-2xl">
                 {myResult.correct} / {myResult.total} correct
               </p>
-              <p className="text-xl">
-                You earned <span className="text-game-leader font-bold">{myResult.points}</span> points!
+              <p className="mt-6 text-lg font-semibold text-ink">
+                You earned <span className="font-display text-2xl font-black text-streak">{myResult.points}</span> points
               </p>
-              <p className="text-ui-textMuted mt-2">
-                Total score: {myResult.newScore}
+              <p className="mt-2 text-sm font-bold text-ink-muted">
+                Total score: <span className="font-display text-base text-ink">{myResult.newScore}</span>
               </p>
             </div>
           )}
@@ -387,9 +391,9 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
 
   // Loading state
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="card">
-        <h2 className="text-2xl font-bold text-center">Loading...</h2>
+    <div className="min-h-screen bg-bg-base flex items-center justify-center px-4">
+      <div className="rounded-2xl border-2 border-ink bg-bg-surface p-8 shadow-ink-lg">
+        <h2 className="text-center text-2xl font-extrabold text-ink">Loading…</h2>
       </div>
     </div>
   );
