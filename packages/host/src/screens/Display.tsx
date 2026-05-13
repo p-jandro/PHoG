@@ -931,31 +931,48 @@ export const Display = () => {
   if (currentGame === 'quiz' && quizVoting && !quizVotingResults) {
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-8">
+        <div className="min-h-screen bg-bg-base text-ink overflow-y-auto py-8 px-6">
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame card p-8 text-center sm:p-10"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto max-w-6xl"
           >
-          <p className="eyebrow mb-3">Round Vote</p>
-          <h1 className="text-4xl font-bold sm:text-6xl">Choose the next question</h1>
-          <p className="mb-8 mt-4 text-lg text-ui-textMuted sm:mb-12 sm:text-2xl">
-            Question {quizVoting.questionNumber} of {quizVoting.totalQuestions}
-          </p>
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+                  Quiz Round · Question {quizVoting.questionNumber} of {quizVoting.totalQuestions}
+                </p>
+                <p className="mt-1 text-base font-bold text-ink-muted">Players are voting</p>
+              </div>
+              <div className="rounded-xl border-2 border-ink bg-bg-surface px-4 py-2 font-display text-2xl font-black text-ink shadow-ink-sm">
+                —:—
+              </div>
+            </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
-            {quizVoting.options.map((category: any) => (
-              <motion.div
-                key={category.id}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="rounded-[1.8rem] border border-white/10 p-6 text-center shadow-[0_18px_30px_rgba(0,0,0,0.22)] sm:p-10"
-                style={{ backgroundColor: category.color }}
-              >
-                <p className="text-2xl font-bold text-white sm:text-3xl">{category.label}</p>
-              </motion.div>
-            ))}
-          </div>
+            <div className="rounded-3xl border-2 border-ink bg-bg-surface p-8 text-center shadow-ink-lg sm:p-10">
+              <h1 className="font-serif text-5xl font-extrabold tracking-tight text-ink sm:text-6xl">
+                Choose the next category
+              </h1>
+              <p className="mt-3 text-lg font-bold text-ink-muted sm:text-2xl">
+                The leader's vote counts 2×
+              </p>
+
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
+                {quizVoting.options.map((category: any) => (
+                  <motion.div
+                    key={category.id}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.22, ease: 'easeOut' }}
+                    className="rounded-2xl border-2 border-ink p-6 text-center text-white shadow-ink sm:p-8"
+                    style={{ backgroundColor: category.color }}
+                  >
+                    <p className="text-2xl font-extrabold sm:text-3xl">{category.label}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </motion.div>
         </div>
         {displayControl}
@@ -966,44 +983,56 @@ export const Display = () => {
   if (currentGame === 'quiz' && quizVoting && quizVotingResults) {
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-8">
+        <div className="min-h-screen bg-bg-base text-ink overflow-y-auto py-8 px-6">
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto max-w-6xl"
           >
-            <div className="card p-8 text-center sm:p-10">
-              <p className="eyebrow mb-3">Vote Locked</p>
-              <h1 className="text-4xl font-bold sm:text-6xl">Voting Results</h1>
-              <p className="mb-8 mt-4 text-lg text-ui-textMuted sm:mb-12 sm:text-2xl">
-                Question {quizVoting.questionNumber} of {quizVoting.totalQuestions}
-              </p>
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+                  Quiz Round · Question {quizVoting.questionNumber} of {quizVoting.totalQuestions}
+                </p>
+                <p className="mt-1 text-base font-bold text-ink-muted">Votes are in</p>
+              </div>
+              <div className="rounded-xl border-2 border-ink bg-bg-surface px-4 py-2 font-display text-2xl font-black text-ink shadow-ink-sm">
+                —:—
+              </div>
+            </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
+            <div className="rounded-3xl border-2 border-ink bg-bg-surface p-8 text-center shadow-ink-lg sm:p-10">
+              <h1 className="font-serif text-5xl font-extrabold tracking-tight text-ink sm:text-6xl">
+                Voting Results
+              </h1>
+
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
                 {quizVoting.options.map((category: any) => {
                   const voteCount = quizVotingResults.voteCounts?.[category.id] || 0;
                   const isWinner = quizVotingResults.winningOptionId === category.id;
-
                   return (
                     <motion.div
                       key={category.id}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`rounded-[1.8rem] border p-6 text-center shadow-[0_18px_30px_rgba(0,0,0,0.22)] sm:p-10 ${
-                        isWinner ? 'border-white ring-4 ring-white/60' : 'border-white/10'
-                      }`}
+                      transition={{ duration: 0.22, ease: 'easeOut' }}
+                      className={[
+                        'rounded-2xl border-2 border-ink p-6 text-center text-white shadow-ink sm:p-8',
+                        isWinner ? 'ring-4 ring-now' : '',
+                      ].join(' ')}
                       style={{ backgroundColor: category.color }}
                     >
-                      <p className="text-2xl font-bold text-white sm:text-3xl">{category.label}</p>
-                      <p className="mt-4 text-4xl font-bold text-white sm:text-5xl">{voteCount}</p>
-                      <p className="mt-2 text-sm uppercase tracking-[0.24em] text-white/75">
-                        Vote{voteCount === 1 ? '' : 's'}
+                      <p className="text-2xl font-extrabold sm:text-3xl">{category.label}</p>
+                      <p className="mt-4 font-display text-4xl font-black sm:text-5xl">{voteCount}</p>
+                      <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] opacity-90">
+                        vote{voteCount === 1 ? '' : 's'}
                       </p>
-                      {isWinner ? (
-                        <p className="mt-5 text-lg font-semibold uppercase tracking-[0.22em] text-white">
+                      {isWinner && (
+                        <p className="mt-4 text-base font-extrabold uppercase tracking-[0.18em]">
                           Selected
                         </p>
-                      ) : null}
+                      )}
                     </motion.div>
                   );
                 })}
@@ -1018,67 +1047,101 @@ export const Display = () => {
 
   // Quiz Question View
   if (currentGame === 'quiz' && quizQuestion) {
-    const quizAnswerPalette: Record<string, string> = {
-      A: '#7186be',
-      B: '#6f9a79',
-      C: '#d7a348',
-      D: '#8b5f6b'
+    const ANSWER_BG_CLASS: Record<string, string> = {
+      A: 'bg-answer-a',
+      B: 'bg-answer-b',
+      C: 'bg-answer-c',
+      D: 'bg-answer-d',
     };
+    const submittedCount = players.filter((p) => p.connected).length; // best-effort; server tally not available here
+    const totalConnected = players.filter((p) => p.connected).length;
 
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-8">
+        <div className="min-h-screen bg-bg-base text-ink overflow-y-auto py-8 px-6">
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto max-w-6xl"
           >
-          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-lg text-ui-textMuted sm:text-2xl">
-              Question {quizQuestion.questionNumber} of {quizQuestion.totalQuestions}
-            </span>
-            <span
-              className="text-sm font-bold px-4 py-2 rounded-full sm:ml-4 sm:text-2xl"
-              style={{ backgroundColor: quizQuestion.color || '#0066FF', color: 'white' }}
-            >
-              {quizQuestion.category.toUpperCase()} • {quizQuestion.difficulty.toUpperCase()}
-            </span>
-          </div>
-
-          <div className="card mb-8 p-6 sm:p-12">
-            <h2 className="text-3xl font-bold sm:text-5xl">{quizQuestion.question}</h2>
-          </div>
-
-          {quizResults ? (
-            <div className="mb-6 rounded-[1.6rem] border border-ui-border/80 bg-black/20 px-6 py-5 text-center">
-              <p className="section-label mb-2">Correct Answer</p>
-              <p className="text-2xl font-bold text-white sm:text-3xl">
-                {quizResults.correctAnswer} • {quizResults.correctAnswerText}
-              </p>
+            {/* Skeleton header: location top-left, time-left top-right */}
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+                  Quiz Round · Question {quizQuestion.questionNumber} of {quizQuestion.totalQuestions}
+                </p>
+                <p className="mt-1 text-base font-bold text-ink-muted">
+                  {quizQuestion.category} · {quizQuestion.difficulty}
+                </p>
+              </div>
+              <div className="rounded-xl border-2 border-ink bg-bg-surface px-4 py-2 font-display text-2xl font-black text-ink shadow-ink-sm">
+                {quizResults ? '—:—' : `${Math.ceil(((quizQuestion.endsAt ?? 0) - now) / 1000)}s`}
+              </div>
             </div>
-          ) : null}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-            {Object.entries(quizQuestion.answers).map(([key, value]: [string, any]) => (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * ['A', 'B', 'C', 'D'].indexOf(key) }}
-                className={`rounded-[1.8rem] border p-6 text-left shadow-[0_18px_30px_rgba(0,0,0,0.22)] transition-all sm:p-8 ${
-                  quizResults
-                    ? key === quizResults.correctAnswer
-                      ? 'border-white ring-4 ring-game-correct/70 brightness-110'
-                      : 'border-white/10 opacity-35 brightness-50'
-                    : 'border-white/10'
-                }`}
-                style={{ backgroundColor: quizAnswerPalette[key] }}
-              >
-                <div className="mb-2 text-2xl font-bold text-white opacity-75 sm:text-3xl">{key}</div>
-                <div className="text-2xl text-white sm:text-3xl">{value}</div>
-              </motion.div>
-            ))}
-          </div>
+            {/* Centre: question and answers */}
+            <div className="rounded-3xl border-2 border-ink bg-bg-surface p-8 shadow-ink-lg sm:p-10">
+              <h2 className="text-center font-serif text-4xl font-extrabold leading-tight tracking-tight text-ink sm:text-5xl">
+                {quizQuestion.question}
+              </h2>
+
+              {quizResults ? (
+                <div className="mx-auto mt-6 max-w-3xl rounded-2xl border-2 border-ink bg-action px-6 py-5 text-center text-on-action shadow-ink">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.2em] opacity-90">Correct answer</p>
+                  <p className="mt-2 font-display text-3xl font-black sm:text-4xl">
+                    {quizResults.correctAnswer} · {quizResults.correctAnswerText}
+                  </p>
+                </div>
+              ) : null}
+
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+                {Object.entries(quizQuestion.answers).map(([key, value]: [string, any]) => {
+                  const isCorrect = quizResults && key === quizResults.correctAnswer;
+                  const dimmed = quizResults && key !== quizResults.correctAnswer;
+                  return (
+                    <motion.div
+                      key={key}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.08 * ['A', 'B', 'C', 'D'].indexOf(key), duration: 0.22, ease: 'easeOut' }}
+                      className={[
+                        'flex items-center gap-4 rounded-2xl border-2 border-ink p-5 text-left text-white shadow-ink sm:p-6',
+                        ANSWER_BG_CLASS[key] || 'bg-bg-surface',
+                        isCorrect ? 'ring-4 ring-now' : '',
+                        dimmed ? 'opacity-40' : '',
+                      ].join(' ')}
+                    >
+                      <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-bg-surface font-display text-3xl font-black text-ink shadow-ink-sm">
+                        {key}
+                      </span>
+                      <span className="flex-1 text-2xl font-extrabold leading-tight sm:text-3xl">{value}</span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Bottom: player tracker */}
+            <div className="mt-6 rounded-2xl border-2 border-ink bg-bg-surface p-5 shadow-ink">
+              <div className="mb-3 flex items-end justify-between">
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak">Players</p>
+                <p className="font-display text-base font-black text-ink-muted">
+                  {submittedCount} of {totalConnected}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {players.filter((p) => p.connected).map((p) => (
+                  <span
+                    key={p.id}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-bg-sunken px-2.5 py-1 text-xs font-extrabold text-ink shadow-ink-sm"
+                  >
+                    <span className="h-2 w-2 rounded-full bg-action" aria-hidden="true" />
+                    {p.name}
+                  </span>
+                ))}
+              </div>
+            </div>
           </motion.div>
         </div>
         {displayControl}
