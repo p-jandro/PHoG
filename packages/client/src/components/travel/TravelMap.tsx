@@ -4,6 +4,8 @@ import { geoMercator, geoCentroid } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import worldData from 'world-atlas/countries-110m.json';
+import { GuessPin } from './GuessPin';
+import { GuessArc } from './GuessArc';
 
 // World-atlas uses slightly different names for some countries.
 const NAME_OVERRIDES: Record<string, string> = {
@@ -32,6 +34,12 @@ export interface MapChainEntry {
   color?: Color;
 }
 
+export interface MapGuess {
+  guess: string;          // country name the player typed
+  answer: string;         // the correct country (for arcs)
+  color: 'green' | 'orange' | 'red';
+}
+
 interface TravelMapProps {
   startName: string;
   endName: string;
@@ -41,22 +49,23 @@ interface TravelMapProps {
   solved?: boolean;
   width?: number;
   height?: number;
+  guesses?: MapGuess[];
 }
 
 const FILL = {
-  unvisited: '#1e293b',    // dim slate — in viewport but not in chain
-  outside: 'transparent',  // far away — hide entirely
-  start: '#facc15',
-  end: '#facc15',
-  green: '#16a34a',
-  orange: '#f97316',
-  red: '#dc2626'
-};
+  unvisited: 'var(--bg-sunken)',   // in-viewport but un-guessed
+  outside:   'transparent',        // hidden entirely (out-of-viewport)
+  start:     'var(--now)',         // sun yellow
+  end:       'var(--now)',
+  green:     'var(--action)',
+  orange:    'var(--warn)',
+  red:       'var(--danger)',      // unused on map (reds are excluded) but kept for completeness
+} as const;
 
 const STROKE = {
-  chain: '#f8fafc',        // bright stroke for chain countries
-  none: 'transparent'      // unvisited get no border
-};
+  chain: 'var(--ink)',
+  none:  'transparent',
+} as const;
 
 export const TravelMap = ({
   startName,
@@ -66,7 +75,8 @@ export const TravelMap = ({
   backChain,
   solved: _solved,
   width = 600,
-  height = 360
+  height = 360,
+  guesses,
 }: TravelMapProps) => {
   // Convert TopoJSON → GeoJSON once.
   const featureCollection = useMemo(() => {
@@ -137,8 +147,32 @@ export const TravelMap = ({
     return p;
   }, [relevantFeatures, width, height]);
 
+  // Compute screen-space points for guess pins and arcs
+  const guessPoints = useMemo(() => {
+    if (!guesses || guesses.length === 0) return [];
+    const featureByName = new Map<string, any>();
+    for (const f of featureCollection.features) featureByName.set(canonicalName(f), f);
+
+    const project = (name: string) => {
+      const f = featureByName.get(name);
+      if (!f) return null;
+      const centroid = geoCentroid(f);
+      const p = projection(centroid);
+      return p ? { x: p[0], y: p[1] } : null;
+    };
+
+    return guesses
+      .map((g, i) => {
+        const from = project(g.guess);
+        const to = project(g.answer);
+        if (!from || !to) return null;
+        return { ...g, from, to, idx: i };
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null);
+  }, [guesses, featureCollection, projection]);
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+    <div className="overflow-hidden rounded-2xl border-2 border-ink bg-bg-sunken shadow-ink">
       <ComposableMap projection={projection} width={width} height={height} style={{ width: '100%', height: 'auto' }}>
         <Geographies geography={featureCollection}>
           {({ geographies }: { geographies: any[] }) =>
@@ -169,6 +203,31 @@ export const TravelMap = ({
             })
           }
         </Geographies>
+        {guessPoints.length > 0 && (
+          <>
+            <g>
+              {guessPoints.map((p) => (
+                <GuessArc
+                  key={`arc-${p.idx}`}
+                  x1={p.from.x} y1={p.from.y}
+                  x2={p.to.x}   y2={p.to.y}
+                  color={p.color}
+                  delaySec={p.idx * 0.12}
+                />
+              ))}
+            </g>
+            <g>
+              {guessPoints.map((p) => (
+                <GuessPin
+                  key={`pin-${p.idx}`}
+                  cx={p.from.x} cy={p.from.y}
+                  color={p.color}
+                  delaySec={p.idx * 0.12}
+                />
+              ))}
+            </g>
+          </>
+        )}
       </ComposableMap>
     </div>
   );
