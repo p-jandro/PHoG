@@ -74,14 +74,18 @@ export const TravelMap = ({
     return feature(topology, topology.objects.countries) as any;
   }, []);
 
-  // Compute name lookups
+  // Compute name lookups.
+  // Red entries are intentionally excluded from the chain set and color map:
+  // they're "dead ends" — geographic detours that don't lead to the goal —
+  // and we hide them from the map (still kept in the history list and
+  // still consume a guess).
   const relevantSet = useMemo(() => new Set(relevantNames), [relevantNames]);
   const chainNames = useMemo(() => {
     const s = new Set<string>();
     if (startName) s.add(startName);
     if (endName) s.add(endName);
-    for (const e of frontChain) if (e.color) s.add(e.name);
-    for (const e of backChain) if (e.color) s.add(e.name);
+    for (const e of frontChain) if (e.color && e.color !== 'red') s.add(e.name);
+    for (const e of backChain) if (e.color && e.color !== 'red') s.add(e.name);
     return s;
   }, [startName, endName, frontChain, backChain]);
 
@@ -90,10 +94,10 @@ export const TravelMap = ({
     if (startName) m[startName] = FILL.start;
     if (endName) m[endName] = FILL.end;
     for (const e of backChain) {
-      if (e.name && e.color && !m[e.name]) m[e.name] = FILL[e.color];
+      if (e.name && e.color && e.color !== 'red' && !m[e.name]) m[e.name] = FILL[e.color];
     }
     for (const e of frontChain) {
-      if (e.name && e.color) m[e.name] = FILL[e.color];
+      if (e.name && e.color && e.color !== 'red') m[e.name] = FILL[e.color];
     }
     if (startName) m[startName] = FILL.start;
     if (endName) m[endName] = FILL.end;

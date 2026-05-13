@@ -101,18 +101,49 @@ export const Travel = ({ socket }: TravelProps) => {
 
   if (phase === 'results' && resultsData) {
     const me = resultsData.results.find((r: any) => r.playerId === playerId);
+    type Color = 'green' | 'orange' | 'red';
+    const colorEmoji: Record<Color, string> = { green: '🟢', orange: '🟠', red: '🔴' };
+    const colorLabel: Record<Color, string> = { green: 'on optimal path', orange: 'reaches goal', red: 'dead end' };
+    const history: Array<{ name: string; color: Color; side: 'front' | 'back' }> = me?.history || [];
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="screen-frame max-w-2xl space-y-4 text-center">
-          <p className="eyebrow">Travel — Reveal</p>
-          <p className="text-2xl text-ui-textMuted">A shortest path</p>
-          <p className="break-words text-2xl font-bold text-game-leader">{(resultsData.optimalChain || []).join(' → ')}</p>
-          <p className="text-sm text-ui-textMuted">{resultsData.optimalDistance} hops · your budget was {resultsData.optimalDistance + 2}</p>
-          <div className="rounded-2xl border border-white/10 bg-black/30 p-5 text-center">
-            <p className="eyebrow mb-2">Your result</p>
+      <div className="screen-shell flex flex-col items-center justify-center overflow-y-auto py-4">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="screen-frame max-w-2xl space-y-4">
+          <div className="text-center">
+            <p className="eyebrow">Travel — Reveal</p>
+          </div>
+
+          <div className="rounded-2xl border border-game-leader/40 bg-game-leader/10 p-4 text-center">
+            <p className="eyebrow mb-2">Shortest path</p>
+            <p className="break-words text-xl font-bold text-game-leader">{(resultsData.optimalChain || []).join(' → ')}</p>
+            <p className="mt-1 text-sm text-ui-textMuted">{resultsData.optimalDistance} hops · your budget was {resultsData.optimalDistance + 2}</p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+            <p className="eyebrow mb-2 text-center">Your guesses</p>
+            {history.length === 0 ? (
+              <p className="text-center text-sm italic text-ui-textMuted">No submissions this round.</p>
+            ) : (
+              <ol className="space-y-1.5 text-base">
+                {history.map((h, i) => (
+                  <li key={i} className="flex items-baseline justify-between gap-3 rounded-lg bg-white/5 px-3 py-1.5">
+                    <span>
+                      <span className="mr-2">{colorEmoji[h.color]}</span>
+                      <span className="font-bold">{h.name}</span>
+                    </span>
+                    <span className="text-xs text-ui-textMuted">
+                      {h.side === 'front' ? 'from start' : 'from goal'} · {colorLabel[h.color]}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-center">
+            <p className="eyebrow mb-1">Your result</p>
             {me ? (
               <>
-                <p className="text-xl">{me.solved ? '✓ solved' : '✗ not solved'}</p>
+                <p className="text-lg">{me.solved ? '✓ solved' : '✗ not solved'}</p>
                 <p className="mt-1 text-3xl font-bold text-game-leader">+{me.score} pts{me.firstSolver && ' (first!)'}</p>
               </>
             ) : (

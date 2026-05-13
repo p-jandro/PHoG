@@ -69,6 +69,9 @@ export const HostTravelMap = ({
     return s;
   }, [relevantNames, optimalChainNames]);
 
+  // Reds are intentionally hidden — they're "dead-end" detours that don't lead
+  // to the goal. Players still see them in the history list, but the map skips
+  // them (no fill, no border — same as never-visited).
   const fillFor = (name: string): { fill: string; isVisited: boolean } => {
     if (optimalChainNames?.includes(name) && name !== startName && name !== endName) {
       return { fill: FILL.optimal, isVisited: true };
@@ -77,7 +80,6 @@ export const HostTravelMap = ({
     if (name === endName) return { fill: FILL.end, isVisited: true };
     if (visitedNamesByColor.green.has(name)) return { fill: FILL.green, isVisited: true };
     if (visitedNamesByColor.orange.has(name)) return { fill: FILL.orange, isVisited: true };
-    if (visitedNamesByColor.red.has(name)) return { fill: FILL.red, isVisited: true };
     return { fill: FILL.unvisited, isVisited: false };
   };
 
