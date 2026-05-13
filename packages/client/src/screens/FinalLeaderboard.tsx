@@ -1,8 +1,20 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useGameStore } from '../stores/gameStore';
+import { Card, Chip } from '../ui';
+import { screenEnter, reducedFade } from '../lib/motion';
 
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | 'travel';
+type GameKey =
+  | 'quiz'
+  | 'trueFalse'
+  | 'countdown'
+  | 'pointless'
+  | 'pokedle'
+  | 'hpdle'
+  | 'numbers'
+  | 'wordle'
+  | 'travel';
+
 const CHAMPIONSHIP_PREVIEW_DELAY = 5000;
 
 const GAME_LABELS: Record<GameKey, string> = {
@@ -14,14 +26,11 @@ const GAME_LABELS: Record<GameKey, string> = {
   hpdle: 'HP-dle',
   numbers: 'Numbers',
   wordle: 'Wordle',
-  travel: 'Travel'
+  travel: 'Travel',
 };
 
 const getOrdinalLabel = (value: number | null | undefined) => {
-  if (!value || value <= 0) {
-    return '-';
-  }
-
+  if (!value || value <= 0) return '-';
   if (value % 10 === 1 && value % 100 !== 11) return `${value}st`;
   if (value % 10 === 2 && value % 100 !== 12) return `${value}nd`;
   if (value % 10 === 3 && value % 100 !== 13) return `${value}rd`;
@@ -31,6 +40,9 @@ const getOrdinalLabel = (value: number | null | undefined) => {
 export const FinalLeaderboard = () => {
   const { players, playerId, phase, currentGame } = useGameStore();
   const activeGame = currentGame as GameKey | null;
+  const reduced = useReducedMotion();
+  const enterVariants = reduced ? reducedFade : screenEnter;
+
   const [showChampionshipPreview, setShowChampionshipPreview] = useState(false);
 
   useEffect(() => {
@@ -38,21 +50,16 @@ export const FinalLeaderboard = () => {
       setShowChampionshipPreview(true);
       return;
     }
-
     if (phase !== 'leaderboard') {
       setShowChampionshipPreview(false);
       return;
     }
-
     setShowChampionshipPreview(false);
-    const timeoutId = setTimeout(() => {
-      setShowChampionshipPreview(true);
-    }, CHAMPIONSHIP_PREVIEW_DELAY);
-
-    return () => clearTimeout(timeoutId);
+    const t = setTimeout(() => setShowChampionshipPreview(true), CHAMPIONSHIP_PREVIEW_DELAY);
+    return () => clearTimeout(t);
   }, [phase, currentGame]);
 
-  const currentPlayer = players.find((player) => player.id === playerId) || null;
+  const currentPlayer = players.find((p) => p.id === playerId) || null;
   const showTotalPlacement = phase === 'finished' || showChampionshipPreview;
   const activeGameLabel = activeGame ? GAME_LABELS[activeGame] : 'Current Game';
 
@@ -62,11 +69,13 @@ export const FinalLeaderboard = () => {
     return a.totalPlacementScore - b.totalPlacementScore;
   });
   const championshipRank = currentPlayer
-    ? championshipSortedPlayers.findIndex((player) => player.id === playerId) + 1
+    ? championshipSortedPlayers.findIndex((p) => p.id === playerId) + 1
     : null;
-  const currentGamePlacement = activeGame ? currentPlayer?.gamePlacements?.[activeGame] ?? null : null;
+  const currentGamePlacement = activeGame
+    ? currentPlayer?.gamePlacements?.[activeGame] ?? null
+    : null;
 
-  const placementSummary = [
+  const placementSummary: { label: string; value: number | null }[] = [
     { label: 'Quiz', value: currentPlayer?.gamePlacements?.quiz ?? null },
     { label: 'True/False', value: currentPlayer?.gamePlacements?.trueFalse ?? null },
     { label: 'Pointless', value: currentPlayer?.gamePlacements?.pointless ?? null },
@@ -75,75 +84,81 @@ export const FinalLeaderboard = () => {
     { label: 'Numbers', value: currentPlayer?.gamePlacements?.numbers ?? null },
     { label: 'Wordle', value: currentPlayer?.gamePlacements?.wordle ?? null },
     { label: 'Travel', value: currentPlayer?.gamePlacements?.travel ?? null },
-    { label: 'Overall', value: championshipRank || null }
+    { label: 'Overall', value: championshipRank || null },
   ];
+
+  const eyebrow =
+    phase === 'finished'
+      ? 'Session Complete'
+      : showTotalPlacement
+        ? 'Championship Snapshot'
+        : 'Game Complete';
+  const headline = showTotalPlacement
+    ? 'Your Championship Standing'
+    : `Your ${activeGameLabel} Result`;
 
   return (
     <div className="screen-shell overflow-y-auto">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        variants={enterVariants}
+        initial="hidden"
+        animate="visible"
         className="screen-frame max-w-4xl space-y-5 py-6"
       >
-        <motion.div
-          initial={{ y: -24, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="card p-7 sm:p-9"
-        >
-          <div className="max-w-2xl">
-              <p className="eyebrow mb-3">
-                {phase === 'finished' ? 'Session Complete' : showTotalPlacement ? 'Championship Snapshot' : 'Game Complete'}
-              </p>
-              <h1 className="text-4xl font-bold sm:text-5xl">
-                {showTotalPlacement ? 'Your Championship Standing' : `Your ${activeGameLabel} Result`}
-              </h1>
-              <p className="mt-3 text-base leading-relaxed text-ui-textMuted sm:text-lg">
-                The full table is on the house display.
-              </p>
+        <Card eyebrow={eyebrow} title={<span className="font-serif text-4xl sm:text-5xl">{headline}</span>}>
+          <div className="flex flex-col gap-3">
+            <p className="text-base leading-relaxed text-ink-muted sm:text-lg">
+              The full table is on the house display.
+            </p>
+            <Chip variant="info">
+              {phase === 'finished' ? 'Championship over' : 'Live results'}
+            </Chip>
           </div>
-        </motion.div>
+        </Card>
 
         {showTotalPlacement ? (
-          <motion.div
-            initial={{ y: 24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="card p-7 sm:p-8"
-          >
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {placementSummary.map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-[1.35rem] border border-ui-border/80 bg-black/20 p-5 text-center"
-                >
-                  <p className="section-label mb-2">{item.label}</p>
-                  <p className="text-4xl font-semibold tabular-nums text-white sm:text-5xl">
-                    {item.value ? getOrdinalLabel(item.value) : '-'}
-                  </p>
-                </div>
-              ))}
+          <Card title="Placements by game">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {placementSummary.map((item) => {
+                const isOverall = item.label === 'Overall';
+                const isTopThree =
+                  typeof item.value === 'number' && item.value > 0 && item.value <= 3;
+                return (
+                  <div
+                    key={item.label}
+                    className={[
+                      'rounded-2xl border-2 border-ink p-5 text-center shadow-ink',
+                      isOverall
+                        ? 'bg-premium text-on-premium'
+                        : isTopThree
+                          ? 'bg-now text-on-now'
+                          : 'bg-bg-surface text-ink',
+                    ].join(' ')}
+                  >
+                    <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em]">
+                      {item.label}
+                    </p>
+                    <p className="font-display text-4xl font-black leading-none tracking-tighter tabular-nums sm:text-5xl">
+                      {item.value ? getOrdinalLabel(item.value) : '-'}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
-          </motion.div>
+          </Card>
         ) : (
-          <motion.div
-            initial={{ y: 24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="grid gap-4 sm:grid-cols-2"
-          >
-            <div className="card p-7 text-center sm:p-8">
-              <p className="section-label mb-2">Place</p>
-              <p className="text-5xl font-bold text-white sm:text-6xl">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card title="Place">
+              <p className="text-center font-display text-5xl font-black leading-none tracking-tighter text-ink sm:text-6xl">
                 {currentGamePlacement ? getOrdinalLabel(currentGamePlacement) : '-'}
               </p>
-            </div>
-            <div className="card p-7 text-center sm:p-8">
-              <p className="section-label mb-2">Score</p>
-              <p className="text-5xl font-bold text-white sm:text-6xl tabular-nums">
+            </Card>
+            <Card title="Score">
+              <p className="text-center font-display text-5xl font-black leading-none tracking-tighter tabular-nums text-ink sm:text-6xl">
                 {currentPlayer?.currentGameScore ?? '-'}
               </p>
-            </div>
-          </motion.div>
+            </Card>
+          </div>
         )}
       </motion.div>
     </div>
