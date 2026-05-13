@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Input } from '../../ui';
 
 export interface RosterEntry {
   name: string;
@@ -43,7 +44,7 @@ export const AutocompletePicker = ({
 
   return (
     <div className="relative w-full">
-      <input
+      <Input
         type="text"
         value={query}
         onChange={(e) => { setQuery(e.target.value); setActive(0); }}
@@ -68,16 +69,20 @@ export const AutocompletePicker = ({
         }}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-lg text-white placeholder:text-ui-textMuted focus:border-game-leader focus:outline-none disabled:opacity-50"
       />
       {suggestions.length > 0 && !disabled && (
-        <ul className="absolute z-30 mt-1 max-h-72 w-full overflow-y-auto rounded-2xl border border-white/10 bg-ui-card shadow-xl">
+        <ul className="absolute z-30 mt-2 max-h-72 w-full overflow-y-auto rounded-2xl border-2 border-ink bg-bg-surface shadow-ink">
           {suggestions.map((entry, idx) => (
             <li
               key={entry.name}
               onMouseDown={(e) => { e.preventDefault(); submit(entry.name); }}
               onMouseEnter={() => setActive(idx)}
-              className={`cursor-pointer px-4 py-3 text-lg ${idx === active ? 'bg-game-leader text-black' : 'text-white hover:bg-white/10'}`}
+              className={[
+                'cursor-pointer px-4 py-3 text-base font-semibold',
+                idx === active
+                  ? 'bg-now text-on-now'
+                  : 'text-ink hover:bg-bg-sunken',
+              ].join(' ')}
             >
               {entry.name}
             </li>
