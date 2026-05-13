@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import type { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { joinGame } from '../hooks/useSocket';
-import { Button, Input, Card, Pill, ThemeToggle } from '../ui';
-import { screenEnter } from '../lib/motion';
+import { Avatar, Button, Card, Chip, Input, Pill, ThemeToggle } from '../ui';
+import { screenEnter, popIn, stagger } from '../lib/motion';
 
 interface LobbyProps {
   socket: Socket | null;
@@ -13,7 +13,7 @@ interface LobbyProps {
 export const Lobby = ({ socket }: LobbyProps) => {
   const [name, setName] = useState('');
   const [isJoining, setIsJoining] = useState(false);
-  const { connected, connectionError, playerId, playerName } = useGameStore();
+  const { connected, connectionError, playerId, playerName, players } = useGameStore();
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,38 +24,6 @@ export const Lobby = ({ socket }: LobbyProps) => {
     }
   };
 
-  // Post-join branch — still uses legacy classes; migrated in Task 2.
-  if (playerId && playerName) {
-    return (
-      <div className="screen-shell flex items-center">
-        <div className="screen-frame max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="card flex flex-col justify-between gap-8 p-8 text-center sm:p-10"
-          >
-            <div className="space-y-5">
-              <span className="eyebrow">Checked In</span>
-              <div className="space-y-3">
-                <h1 className="text-4xl font-bold sm:text-5xl">
-                  You are in, {playerName}.
-                </h1>
-                <p className="mx-auto max-w-xl text-lg leading-relaxed text-ui-textMuted">
-                  Keep this screen open. The host will move everyone from the lounge into each round automatically.
-                </p>
-              </div>
-            </div>
-            <div className="rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-5">
-              <p className="text-lg font-semibold text-game-correct">Ready</p>
-              <p className="mt-2 text-sm text-ui-textMuted">Waiting for the host.</p>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
-  // Pre-join branch — new design.
   const status: 'connected' | 'connecting' | 'offline' = connected
     ? 'connected'
     : connectionError
@@ -67,6 +35,69 @@ export const Lobby = ({ socket }: LobbyProps) => {
       ? 'Offline'
       : 'Connecting to game server';
 
+  const connectedPlayers = (players ?? []).filter((p) => p.connected);
+
+  // ---------- Post-join (waiting room) ----------
+  if (playerId && playerName) {
+    return (
+      <div className="min-h-screen bg-bg-base text-ink">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pt-4 sm:px-6">
+          <header className="flex items-center justify-between">
+            <Pill status={status}>{statusLabel}</Pill>
+            <ThemeToggle />
+          </header>
+
+          <motion.div variants={screenEnter} initial="hidden" animate="visible">
+            <Card eyebrow="Checked In">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <Avatar name={playerName} size="lg" />
+                <h1 className="font-display text-4xl font-black tracking-tight sm:text-5xl">
+                  You are in, {playerName}.
+                </h1>
+                <p className="max-w-xl text-base leading-relaxed text-ink-muted">
+                  Keep this screen open. The host will move everyone from the lounge into each round automatically.
+                </p>
+                <div className="mt-2">
+                  <Chip variant="now">Ready · waiting for the host</Chip>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          {connectedPlayers.length > 0 && (
+            <Card
+              eyebrow={`In the room · ${connectedPlayers.length} ${connectedPlayers.length === 1 ? 'player' : 'players'}`}
+            >
+              <motion.div
+                className="flex flex-wrap gap-3"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: { transition: { staggerChildren: stagger.short } },
+                }}
+              >
+                {connectedPlayers.map((p) => (
+                  <motion.div
+                    key={p.id}
+                    variants={popIn}
+                    className="flex flex-col items-center gap-1"
+                  >
+                    <Avatar name={p.name} size="md" />
+                    <span className="max-w-[5rem] truncate text-xs font-bold text-ink-muted">
+                      {p.id === playerId ? 'You' : p.name}
+                    </span>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </Card>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ---------- Pre-join (join form) — already migrated in Task 1 ----------
   return (
     <div className="min-h-screen bg-bg-base text-ink">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pt-4 sm:px-6">
@@ -74,11 +105,7 @@ export const Lobby = ({ socket }: LobbyProps) => {
           <ThemeToggle />
         </header>
 
-        <motion.div
-          variants={screenEnter}
-          initial="hidden"
-          animate="visible"
-        >
+        <motion.div variants={screenEnter} initial="hidden" animate="visible">
           <Card eyebrow="Player Entry" title="Join the Room">
             <div className="mt-2 mb-5 flex flex-wrap items-center gap-2">
               <Pill status={status}>{statusLabel}</Pill>
