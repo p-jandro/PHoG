@@ -60,24 +60,84 @@ export const WordleDisplay = ({ socket, players }: WordleDisplayProps) => {
   }
 
   if (phase === 'results' && resultsData) {
-    const sorted = [...(resultsData.results || [])].sort((a: any, b: any) => b.score - a.score);
-    const top = sorted.slice(0, 5);
+    const answer = String(resultsData.answer || '').toUpperCase().padEnd(5, ' ').slice(0, 5);
+    const byPlayer = new Map<string, any>();
+    for (const r of resultsData.results || []) byPlayer.set(r.playerId, r);
+
     return (
-      <div className="flex h-screen w-screen flex-col items-center justify-center gap-8 px-16 py-12 text-center">
-        <p className="eyebrow text-2xl">Wordle — Reveal</p>
-        <p className="text-3xl text-ui-textMuted">The word was</p>
-        <p className="text-9xl font-bold uppercase tracking-widest text-game-leader">{resultsData.answer}</p>
-        <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-black/40 p-6">
-          <p className="eyebrow mb-3">Top scorers</p>
-          <ul className="space-y-2 text-2xl">
-            {top.map((r: any, i: number) => (
-              <li key={r.playerId} className="flex items-baseline justify-between gap-4">
-                <span className="font-bold">#{i + 1} · {r.playerName} {r.firstSolver && '⭐'}</span>
-                <span className="text-game-leader">{r.score} pts{r.solved ? ` (${r.guessesUsed} guesses)` : ' (didn\'t solve)'}</span>
-              </li>
+      <div className="flex h-screen w-screen flex-col bg-bg-base px-10 py-8 text-ink">
+        {/* Top row: location top-left, time dimmed top-right (results phase) */}
+        <header className="flex items-start justify-between">
+          <div className="font-display text-2xl font-extrabold tracking-tight">
+            Wordle — Reveal
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">
+              Time left
+            </p>
+            <p className="font-display text-5xl font-extrabold tabular-nums text-ink-muted">
+              —:—
+            </p>
+          </div>
+        </header>
+
+        {/* Centre: TV-sized word reveal */}
+        <section className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
+          <Chip variant="streak">The word was</Chip>
+          <div className="flex gap-3">
+            {answer.split('').map((ch, i) => (
+              <Tile
+                key={i}
+                state="correct"
+                flipping
+                flipDelaySec={i * 0.18}
+                className="aspect-square w-32 text-7xl"
+              >
+                {ch.trim()}
+              </Tile>
             ))}
-          </ul>
-        </div>
+          </div>
+        </section>
+
+        {/* Bottom: player tracker — per-player guess counts (spec §7.3) */}
+        <footer className="w-full">
+          {players.length === 0 ? (
+            <p className="text-center text-ink-muted">No players this round.</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {players.map((p) => {
+                const r = byPlayer.get(p.id);
+                const solved = r?.solved ?? false;
+                const guessesUsed = r?.guessesUsed ?? 0;
+                let label = 'No submission';
+                if (r) {
+                  label = solved
+                    ? `Solved in ${guessesUsed} guess${guessesUsed === 1 ? '' : 'es'}`
+                    : `Did not solve (${guessesUsed} guesses)`;
+                }
+                const tone = solved
+                  ? 'border-action bg-action text-on-action'
+                  : r
+                    ? 'border-danger bg-danger text-on-danger'
+                    : 'border-ink bg-bg-surface text-ink';
+                return (
+                  <div
+                    key={p.id}
+                    className={`rounded-2xl border-2 px-4 py-3 shadow-ink-sm ${tone}`}
+                  >
+                    <p className="truncate font-display text-xl font-extrabold">
+                      {p.name}
+                      {r?.firstSolver && (
+                        <span className="ml-2 align-middle text-sm">⭐ first</span>
+                      )}
+                    </p>
+                    <p className="mt-1 text-sm font-semibold">{label}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </footer>
       </div>
     );
   }
