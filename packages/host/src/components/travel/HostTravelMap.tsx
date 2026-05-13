@@ -36,7 +36,7 @@ export interface HostChainEntry {
 
 export interface HostMapGuess {
   guess: string;
-  answer: string;            // start or end, per the heuristic in Travel.tsx
+  answer: string;            // intent.target (next hop on shortest path) or start/end fallback
   color: 'green' | 'orange' | 'red';
   playerId: string;          // for unique React keys
 }

@@ -100,7 +100,9 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
         .map((h: any) => ({
           playerId: r.playerId,
           guess: h.name,
-          answer: h.side === 'front' ? resultsData.start : resultsData.end,
+          // Use intent.target (next hop on shortest path toward the other end) when
+          // available; fall back to the generic start/end heuristic for older servers.
+          answer: h.intent?.target ?? (h.side === 'front' ? resultsData.start : resultsData.end),
           color: h.color,
         }))
     );
