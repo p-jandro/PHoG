@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Dashboard } from './screens/Dashboard';
 import { Display } from './screens/Display';
-import { UiShowcase } from './ui';
+
+const UiShowcase = lazy(() => import('./ui/UiShowcase').then(m => ({ default: m.UiShowcase })));
 
 function App() {
   const [view, setView] = useState<'dashboard' | 'display'>('dashboard');
@@ -19,7 +20,11 @@ function App() {
   }, []);
 
   if (typeof window !== 'undefined' && window.location.search.includes('showcase')) {
-    return <UiShowcase />;
+    return (
+      <Suspense fallback={null}>
+        <UiShowcase />
+      </Suspense>
+    );
   }
 
   return (

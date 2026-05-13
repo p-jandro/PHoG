@@ -1,7 +1,9 @@
+import { lazy, Suspense } from 'react';
 import { useSocket } from './hooks/useSocket';
 import { useGameStore } from './stores/gameStore';
-import { UiShowcase } from './ui';
 import { Lobby } from './screens/Lobby';
+
+const UiShowcase = lazy(() => import('./ui/UiShowcase').then(m => ({ default: m.UiShowcase })));
 import { Quiz } from './screens/Quiz';
 import { TrueFalse } from './screens/TrueFalse';
 import { Countdown } from './screens/Countdown';
@@ -19,7 +21,11 @@ function App() {
   const { phase, currentGame } = useGameStore();
 
   if (typeof window !== 'undefined' && window.location.search.includes('showcase')) {
-    return <UiShowcase />;
+    return (
+      <Suspense fallback={null}>
+        <UiShowcase />
+      </Suspense>
+    );
   }
 
   // Determine which screen to show based on phase and current game
