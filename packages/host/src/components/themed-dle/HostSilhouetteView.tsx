@@ -14,7 +14,12 @@ export const HostSilhouetteView = ({ spriteUrl, stage }: HostSilhouetteViewProps
           alt="silhouette"
           style={{
             transform: `scale(${ZOOM[idx]})`,
-            filter: `brightness(${BRIGHTNESS[idx]})`,
+            // Invert so a brightness=0 silhouette renders white on the dark background
+            // (classic "Who's That Pokémon" look). Once brightness > 0, drop invert and
+            // let the real sprite fade in.
+            filter: BRIGHTNESS[idx] === 0
+              ? 'brightness(0) invert(1)'
+              : `brightness(${BRIGHTNESS[idx]}) saturate(${Math.min(1, BRIGHTNESS[idx] + 0.2)})`,
             width: '100%',
             height: '100%',
             objectFit: 'contain',

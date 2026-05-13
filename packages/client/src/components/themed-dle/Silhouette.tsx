@@ -41,7 +41,12 @@ export const Silhouette = ({ data, guesses, onGuess }: SilhouetteProps) => {
           animate={{ scale: zoom }}
           transition={{ duration: 0.6 }}
           style={{
-            filter: `brightness(${brightness}) contrast(${brightness === 0 ? 100 : 1})`,
+            // brightness 0 → fully obscured silhouette. Invert so it renders WHITE on the
+            // dark container background (classic "Who's That Pokémon" look); once brightness
+            // climbs above 0 we drop invert and let the real colours fade in.
+            filter: brightness === 0
+              ? 'brightness(0) invert(1)'
+              : `brightness(${brightness}) saturate(${Math.min(1, brightness + 0.2)})`,
             width: '100%',
             height: '100%',
             objectFit: 'contain'
