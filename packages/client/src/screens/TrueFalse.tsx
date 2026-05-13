@@ -188,41 +188,33 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
     const progress = introData.duration ? ((introData.duration - timeRemaining) / introData.duration) * 100 : 0;
 
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="screen-frame max-w-4xl text-center space-y-6"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="mx-auto flex max-w-4xl flex-col items-center justify-center gap-6 text-center"
         >
-          <p className="eyebrow">True or False</p>
-          <motion.h1
-            initial={{ y: -20 }}
-            animate={{ y: 0 }}
-            className="text-5xl sm:text-6xl font-bold text-game-correct mb-4"
-          >
+          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+            True or False
+          </p>
+          <h1 className="font-serif text-5xl font-extrabold leading-tight tracking-tight text-action sm:text-6xl">
             {introData.title}
-          </motion.h1>
+          </h1>
+          <p className="text-xl font-semibold text-ink-muted sm:text-2xl">Starting shortly</p>
 
-          <p className="text-xl text-ui-textMuted sm:text-2xl">Starting shortly</p>
-
-          {/* Progress bar */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-full max-w-md mx-auto"
-          >
-            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div className="w-full max-w-md">
+            <div className="h-3 overflow-hidden rounded-full border-2 border-ink bg-bg-sunken shadow-ink-sm">
               <motion.div
-                className="h-full bg-game-accent"
+                className="h-full bg-action"
                 style={{ width: `${progress}%` }}
                 transition={{ duration: 0.1 }}
               />
             </div>
-            <p className="text-sm text-ui-textMuted mt-2">
-              Starting in {Math.ceil(timeRemaining / 1000)}s...
+            <p className="mt-2 text-sm font-bold text-ink-muted">
+              Starting in {Math.ceil(timeRemaining / 1000)}s…
             </p>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     );
