@@ -97,11 +97,23 @@ export class WordleGame {
 
     console.log(`[WORDLE] Answer: ${this.gameState.wordle.answer}`);
 
+    // Broadcast round-start to ALL sockets (host + players) — target intentionally omitted
+    // so players never see the answer here.
     this.io.emit('wordle:round:start', {
       duration: PLAY_DURATION,
       endsAt,
       maxGuesses: MAX_GUESSES
     });
+
+    // Send target exclusively to the host socket so it can prepare reveal infrastructure.
+    // Players must NOT receive this event — it is emitted only to the host socket.
+    const hostSocketId = this.gameState.meta?.hostSocketId;
+    const hostSocket = hostSocketId ? this.io.sockets.sockets.get(hostSocketId) : null;
+    if (hostSocket) {
+      hostSocket.emit('wordle:round:start:host', {
+        target: this.gameState.wordle.answer
+      });
+    }
 
     this.timer = new Timer(PLAY_DURATION, null, () => this._endRound());
     this.timer.start();
