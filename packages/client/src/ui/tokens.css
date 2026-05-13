@@ -83,11 +83,16 @@
 }
 
 /* Smooth theme flip — colors/borders/shadows only, NOT transforms or opacity.
- * §5.5 in the spec: avoid laggy mid-animation flips. */
+ * Gated by a `data-theme-transitioning` attribute on <html> so the transition
+ * fires only during theme switches, not on every hover/focus/state change.
+ * §5.5 in the spec: avoid laggy mid-animation flips.
+ * The ThemeProvider (Task 6) sets this attribute for ~220ms on toggle. */
 :root {
   color-scheme: light dark;
 }
-*, *::before, *::after {
+:root[data-theme-transitioning] *,
+:root[data-theme-transitioning] *::before,
+:root[data-theme-transitioning] *::after {
   transition:
     background-color 180ms ease-out,
     border-color 180ms ease-out,
@@ -97,5 +102,7 @@
     stroke 180ms ease-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none; }
+  :root[data-theme-transitioning] *,
+  :root[data-theme-transitioning] *::before,
+  :root[data-theme-transitioning] *::after { transition: none; }
 }
