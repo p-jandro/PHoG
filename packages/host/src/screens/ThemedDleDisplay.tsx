@@ -20,6 +20,14 @@ interface ThemedDleDisplayProps {
 type Phase = 'intro' | 'playing' | 'results';
 type Mode = 'classic' | 'emoji' | 'silhouette' | 'spell' | 'grid';
 
+const MODE_LABELS: Record<Mode, string> = {
+  classic: 'Classic',
+  emoji: 'Emoji',
+  silhouette: 'Silhouette',
+  spell: 'Spell',
+  grid: '3×3 Grid'
+};
+
 export const ThemedDleDisplay = ({ socket, currentGame, players }: ThemedDleDisplayProps) => {
   const theme: 'pokemon' | 'hp' = currentGame === 'pokedle' ? 'pokemon' : 'hp';
   const [phase, setPhase] = useState<Phase>('intro');
@@ -77,7 +85,7 @@ export const ThemedDleDisplay = ({ socket, currentGame, players }: ThemedDleDisp
     <div className="flex h-screen w-screen gap-8 px-12 py-10">
       <main className="flex flex-1 flex-col">
         <header className="mb-6">
-          <p className="eyebrow">{theme === 'pokemon' ? 'Pokédle' : 'HP-dle'} · {mode}</p>
+          <p className="eyebrow">{theme === 'pokemon' ? 'Pokédle' : 'HP-dle'} · {MODE_LABELS[mode]}</p>
         </header>
         <div className="flex-1 rounded-3xl border border-white/10 bg-black/30 p-8">
           {mode === 'classic' && <HostClassicView attributes={(introData?.attributes) || []} />}

@@ -24,7 +24,6 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
 
   const [phase, setPhase] = useState<Phase>('intro');
   const [mode, setMode] = useState<Mode>('classic');
-  const [modeIndex, setModeIndex] = useState(0);
   const [introData, setIntroData] = useState<any>(null);
   const [playData, setPlayData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
@@ -80,7 +79,6 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
     const onResults = (d: any) => {
       setPhase('results');
       setResultsData(d);
-      setModeIndex(d.modeIndex);
       const me = d.results.find((r: any) => r.playerId === playerId);
       if (me) setCumulative(me.cumulativeScore);
     };
@@ -127,8 +125,6 @@ export const ThemedDle = ({ socket }: ThemedDleProps) => {
         <CumulativeScoreBar
           theme={theme}
           mode={mode}
-          modeIndex={playData.modeIndex ?? modeIndex}
-          totalModes={playData.totalModes ?? 4}
           cumulative={cumulative}
           timerMs={timerMs}
           totalMs={totalMs}

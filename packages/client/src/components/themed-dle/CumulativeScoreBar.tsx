@@ -1,8 +1,6 @@
 interface CumulativeScoreBarProps {
   theme: 'pokemon' | 'hp';
   mode: 'classic' | 'emoji' | 'silhouette' | 'spell' | 'grid';
-  modeIndex: number;        // 0..3
-  totalModes: number;       // 4
   cumulative: number;
   timerMs?: number;
   totalMs?: number;
@@ -22,7 +20,7 @@ const THEME_LABEL: Record<string, string> = {
 };
 
 export const CumulativeScoreBar = ({
-  theme, mode, modeIndex, totalModes, cumulative, timerMs, totalMs
+  theme, mode, cumulative, timerMs, totalMs
 }: CumulativeScoreBarProps) => {
   const hasTimer = typeof timerMs === 'number' && typeof totalMs === 'number' && totalMs > 0;
   const progress = hasTimer ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : null;
@@ -32,7 +30,7 @@ export const CumulativeScoreBar = ({
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <p className="eyebrow">{THEME_LABEL[theme]}</p>
-          <h2 className="text-2xl font-bold">{MODE_LABELS[mode]} · Mode {modeIndex + 1}/{totalModes}</h2>
+          <h2 className="text-2xl font-bold">{MODE_LABELS[mode]}</h2>
         </div>
         <div className="text-right">
           <p className="eyebrow">Score</p>

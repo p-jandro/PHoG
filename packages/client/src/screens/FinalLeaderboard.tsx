@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '../stores/gameStore';
 
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle';
 const CHAMPIONSHIP_PREVIEW_DELAY = 5000;
 
 const GAME_LABELS: Record<GameKey, string> = {
   quiz: 'Quiz',
   trueFalse: 'True/False',
   countdown: 'Countdown',
-  pointless: 'Pointless'
+  pointless: 'Pointless',
+  pokedle: 'Pokédle',
+  hpdle: 'HP-dle'
 };
 
 const getOrdinalLabel = (value: number | null | undefined) => {
@@ -65,6 +67,8 @@ export const FinalLeaderboard = () => {
     { label: 'Quiz', value: currentPlayer?.gamePlacements?.quiz ?? null },
     { label: 'True/False', value: currentPlayer?.gamePlacements?.trueFalse ?? null },
     { label: 'Pointless', value: currentPlayer?.gamePlacements?.pointless ?? null },
+    { label: 'Pokédle', value: currentPlayer?.gamePlacements?.pokedle ?? null },
+    { label: 'HP-dle', value: currentPlayer?.gamePlacements?.hpdle ?? null },
     { label: 'Overall', value: championshipRank || null }
   ];
 

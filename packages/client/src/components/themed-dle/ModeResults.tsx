@@ -59,7 +59,7 @@ export const ModeResults = ({ data }: ModeResultsProps) => {
   return (
     <div className="screen-shell flex flex-col items-center justify-center">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="screen-frame max-w-3xl text-center space-y-5">
-        <p className="eyebrow">{MODE_LABELS[data.mode]} — Mode {data.modeIndex + 1}/{data.totalModes}</p>
+        <p className="eyebrow">{MODE_LABELS[data.mode]}</p>
         <h1 className="text-3xl font-bold">It was…</h1>
         {renderTarget(data.mode, data.target)}
 
