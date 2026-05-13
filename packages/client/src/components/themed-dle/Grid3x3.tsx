@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
+import { Card, Button, Chip } from '../../ui';
+import { cellScalePop, stagger } from '../../lib/motion';
 
 type GridCellResult = {
   row: number;
@@ -10,11 +12,13 @@ type GridCellResult = {
   cellAnswers: Record<string, string | null>;
 };
 
+type CellEntry = { name: string; valid: boolean; emoji?: string };
+
 interface Grid3x3Props {
   data: {
     rows: string[];
     cols: string[];
-    roster: RosterEntry[];
+    roster: (RosterEntry & { emoji?: string })[];
   };
   cellEvents: GridCellResult[];
   onGuess: (payload: { row: number; col: number; name: string }) => void;
@@ -23,93 +27,115 @@ interface Grid3x3Props {
 export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
   const [activeCell, setActiveCell] = useState<{ row: number; col: number } | null>(null);
 
-  const cellState = useMemo(() => {
-    if (cellEvents.length === 0) return {} as Record<string, { name: string; valid: boolean }>;
+  const cellState = useMemo<Record<string, CellEntry>>(() => {
+    if (cellEvents.length === 0) return {};
     const lastEv = cellEvents[cellEvents.length - 1];
-    const state: Record<string, { name: string; valid: boolean }> = {};
+    const state: Record<string, CellEntry> = {};
     for (const [k, name] of Object.entries(lastEv.cellAnswers)) {
-      if (name) state[k] = { name, valid: true };
+      if (name) {
+        const rosterEntry = data.roster.find((e) => e.name === name) as (RosterEntry & { emoji?: string }) | undefined;
+        state[k] = { name, valid: true, emoji: rosterEntry?.emoji };
+      }
     }
     // Surface the most-recent invalid pick so the player sees their red attempt
     if (!lastEv.valid) {
       const key = `${lastEv.row},${lastEv.col}`;
-      if (!state[key]) state[key] = { name: lastEv.name, valid: false };
+      if (!state[key]) {
+        const rosterEntry = data.roster.find((e) => e.name === lastEv.name) as (RosterEntry & { emoji?: string }) | undefined;
+        state[key] = { name: lastEv.name, valid: false, emoji: rosterEntry?.emoji };
+      }
     }
     return state;
-  }, [cellEvents]);
+  }, [cellEvents, data.roster]);
 
   const filledCount = Object.values(cellState).filter((c) => c.valid).length;
 
   return (
     <div className="space-y-4">
-      <p className="text-center text-sm text-ui-textMuted">{filledCount}/9 filled</p>
+      <div className="flex justify-center">
+        <Chip variant="muted">{filledCount} of 9 cells placed</Chip>
+      </div>
 
-      <div className="overflow-x-auto">
-        <table className="mx-auto table-fixed border-separate border-spacing-1">
-          <thead>
-            <tr>
-              <th />
-              {data.cols.map((c) => (
-                <th key={c} className="px-2 py-2 text-center text-xs font-semibold text-ui-textMuted">{c}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.rows.map((rowLabel, r) => (
-              <tr key={rowLabel}>
-                <th className="pr-2 text-right text-xs font-semibold text-ui-textMuted">{rowLabel}</th>
-                {data.cols.map((_, c) => {
-                  const cell = cellState[`${r},${c}`];
-                  const tone = !cell
-                    ? 'border-dashed border-white/20 text-ui-textMuted'
-                    : cell.valid
-                      ? 'border-game-correct bg-game-correct/15 text-white'
-                      : 'border-game-incorrect bg-game-incorrect/10 text-ui-textMuted';
-                  return (
-                    <td key={c} className="h-24 w-24">
-                      <motion.button
-                        whileTap={{ scale: 0.96 }}
-                        onClick={() => setActiveCell({ row: r, col: c })}
-                        className={`h-full w-full rounded-2xl border-2 px-1 text-center text-xs font-medium leading-tight ${tone}`}
-                      >
-                        {cell?.name ?? '+'}
-                      </motion.button>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid gap-2" style={{ gridTemplateColumns: 'minmax(7rem, 1fr) repeat(3, minmax(0, 1fr))' }}>
+        {/* Row 0: corner + 3 column headers */}
+        <div /> {/* empty corner */}
+        {data.cols.map((c) => (
+          <div
+            key={c}
+            className="rounded-2xl border-2 border-ink bg-ink px-2 py-2 text-center text-xs font-extrabold uppercase tracking-[0.12em] text-bg-surface shadow-[3px_3px_0_var(--streak)]"
+          >
+            {c}
+          </div>
+        ))}
+
+        {/* Rows 1-3: row header + 3 cells */}
+        {data.rows.map((rowLabel, r) => (
+          <Fragment key={rowLabel}>
+            <div
+              className="flex items-center justify-end rounded-2xl border-2 border-ink bg-premium px-3 py-2 text-right text-sm font-extrabold uppercase tracking-[0.10em] text-on-premium shadow-ink-sm"
+            >
+              {rowLabel}
+            </div>
+            {data.cols.map((_, c) => {
+              const cell = cellState[`${r},${c}`];
+              const isPlaced = !!cell?.valid;
+              const isInvalid = !!cell && !cell.valid;
+              const cellIndex = r * 3 + c;
+
+              return (
+                <motion.button
+                  key={c}
+                  onClick={() => setActiveCell({ row: r, col: c })}
+                  variants={cellScalePop}
+                  initial={isPlaced ? 'hidden' : false}
+                  animate={isPlaced ? 'visible' : false}
+                  transition={isPlaced ? { delay: cellIndex * stagger.cell } : undefined}
+                  whileTap={{ scale: 0.96 }}
+                  className={[
+                    'aspect-square w-full rounded-2xl border-2 border-ink p-2 text-center shadow-ink-sm',
+                    isPlaced ? 'bg-action text-on-action' : isInvalid ? 'bg-danger text-on-danger' : 'bg-bg-surface text-ink',
+                  ].join(' ')}
+                >
+                  {isPlaced ? (
+                    <div className="flex h-full flex-col items-center justify-center gap-1">
+                      <span className="text-2xl leading-none">{cell.emoji ?? ''}</span>
+                      <span className="text-[11px] font-extrabold leading-tight">{cell.name}</span>
+                    </div>
+                  ) : isInvalid ? (
+                    <span className="text-[11px] font-extrabold leading-tight">{cell.name}</span>
+                  ) : (
+                    <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">tap to place</span>
+                  )}
+                </motion.button>
+              );
+            })}
+          </Fragment>
+        ))}
       </div>
 
       <AnimatePresence>
         {activeCell && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 flex items-center justify-center bg-black/70"
+            className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 px-4"
             onMouseDown={() => setActiveCell(null)}
           >
             <motion.div
               initial={{ y: 20 }} animate={{ y: 0 }} exit={{ y: 10 }}
               onMouseDown={(e) => e.stopPropagation()}
-              className="w-full max-w-md rounded-3xl border border-white/10 bg-ui-card p-5"
+              className="w-full max-w-md"
             >
-              <p className="eyebrow mb-2">{data.rows[activeCell.row]} × {data.cols[activeCell.col]}</p>
-              <AutocompletePicker
-                roster={data.roster}
-                onSubmit={(name) => {
-                  onGuess({ row: activeCell.row, col: activeCell.col, name });
-                  setActiveCell(null);
-                }}
-                placeholder="Pick a name…"
-              />
-              <button
-                onClick={() => setActiveCell(null)}
-                className="mt-4 w-full rounded-xl border border-white/10 px-3 py-2 text-sm text-ui-textMuted hover:bg-white/5"
-              >
-                Cancel
-              </button>
+              <Card eyebrow={`${data.rows[activeCell.row]} × ${data.cols[activeCell.col]}`}>
+                <AutocompletePicker
+                  roster={data.roster}
+                  onSubmit={(name) => {
+                    onGuess({ row: activeCell.row, col: activeCell.col, name });
+                    setActiveCell(null);
+                  }}
+                  placeholder="Pick a character…"
+                />
+                <Button variant="ghost" size="sm" className="mt-4 w-full" onClick={() => setActiveCell(null)}>Cancel</Button>
+              </Card>
             </motion.div>
           </motion.div>
         )}
