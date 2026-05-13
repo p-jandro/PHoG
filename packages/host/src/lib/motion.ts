@@ -61,6 +61,51 @@ export const reducedFade: Variants = {
   visible: { opacity: 1, transition: { duration: duration.toggle } },
 };
 
+/* ---------- Universal reactive feedback (§4.3) ---------- */
+
+/** Correct: surface pulses green (1.0 → 1.04 → 1.0, 240ms). */
+export const correctPulse: Variants = {
+  rest: { scale: 1 },
+  pulse: {
+    scale: [1, 1.04, 1],
+    transition: { duration: 0.24, times: [0, 0.5, 1], ease: easing.easeOut },
+  },
+};
+
+/** Wrong: horizontal shake (8px × 4, 320ms). */
+export const wrongShake: Variants = {
+  rest: { x: 0 },
+  shake: {
+    x: [0, -8, 8, -8, 8, 0],
+    transition: { duration: 0.32, times: [0, 0.2, 0.4, 0.6, 0.8, 1], ease: 'easeInOut' },
+  },
+};
+
+/** Streak chip pop: scale 0 → 1.15 → 1.0 back-out, 1.2s linger handled by parent. */
+export const streakChipPop: Variants = {
+  hidden:  { scale: 0, opacity: 0 },
+  visible: {
+    scale: [0, 1.15, 1],
+    opacity: 1,
+    transition: { duration: 0.45, times: [0, 0.6, 1], ease: easing.backOut },
+  },
+};
+
+/** Slide-down banner (e.g. "Correct!" callout). */
+export const bannerSlideDown: Variants = {
+  hidden:  { y: -20, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.22, ease: easing.easeOut } },
+  exit:    { y: -20, opacity: 0, transition: { duration: 0.18, ease: easing.easeOut } },
+};
+
+/* ---------- Reduced-motion helper ---------- */
+
+/** Returns true when the user has requested reduced motion. SSR-safe. */
+export function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 /* ---------- Pointless score-drop timing (§3.9) ---------- */
 export const pointlessDrop = {
   baseMs: 4000,
