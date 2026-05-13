@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
 import { Button, Card, Chip, HostScreenShell, Input, Pill, PlayerTracker } from '../ui';
-import type { TrackedPlayer } from '../ui';
+import type { ButtonVariant, TrackedPlayer } from '../ui';
 import { screenEnter } from '../lib/motion';
 import { QRCodeSVG } from 'qrcode.react';
 
@@ -49,6 +49,17 @@ const GAME_LABELS: Record<GameKey, string> = {
   wordle: 'Wordle',
   travel: 'Travel'
 };
+
+const LAUNCH_GAMES: Array<{ id: GameKey; label: string; variant: ButtonVariant }> = [
+  { id: 'quiz',      label: 'Quiz',           variant: 'info'    },
+  { id: 'trueFalse', label: 'True or False',  variant: 'action'  },
+  { id: 'pointless', label: 'Pointless',      variant: 'streak'  },
+  { id: 'pokedle',   label: 'Pokédle',        variant: 'now'     },
+  { id: 'hpdle',     label: 'HP-dle',         variant: 'premium' },
+  { id: 'numbers',   label: 'Numbers Round',  variant: 'action'  },
+  { id: 'wordle',    label: 'Wordle',         variant: 'info'    },
+  { id: 'travel',    label: 'Travel',         variant: 'streak'  },
+];
 
 export const Dashboard = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -456,90 +467,125 @@ export const Dashboard = () => {
             </div>
           </Card>
 
-          {/* MIDDLE: launcher area — REBUILT IN TASK 7. For now, keep the existing legacy JSX so the build keeps working. */}
-          <div className="card lg:col-span-1" data-phase3-legacy-launcher>
-            <p className="eyebrow mb-3">Session Controls</p>
-            <h2 className="text-2xl font-bold mb-4">Game Controls</h2>
+          {/* MIDDLE: launcher area */}
+          <Card eyebrow="Session Controls" title={championshipMode ? 'Pick games for the Championship Sequence' : 'Start a game'}>
+            <div className="flex flex-col gap-5">
 
-            {/* Championship Mode Toggle */}
-            <div className="mb-6 p-4 bg-ui-background rounded-lg border border-ui-border">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-lg">Championship Mode</h3>
-                <button
-                  onClick={() => setChampionshipMode(!championshipMode)}
+              {/* Championship mode toggle */}
+              <div className="flex items-center justify-between gap-3 rounded-2xl border-2 border-ink bg-bg-sunken px-4 py-3">
+                <div className="min-w-0">
+                  <div className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">Mode</div>
+                  <div className="font-display text-lg font-black tracking-tight text-ink">
+                    {championshipMode ? 'Championship Sequence' : 'Single Round'}
+                  </div>
+                </div>
+                <Button
+                  variant={championshipMode ? 'premium' : 'ghost'}
+                  size="sm"
+                  onClick={() => setChampionshipMode((m) => !m)}
                   disabled={gameState?.phase !== 'lobby'}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
-                    championshipMode ? 'bg-primary-blue text-white' : 'bg-ui-card text-ui-textMuted'
-                  }`}
                 >
-                  {championshipMode ? 'Active' : 'Inactive'}
-                </button>
+                  {championshipMode ? 'Switch to Single Round' : 'Switch to Championship'}
+                </Button>
               </div>
 
-              {championshipMode && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {availableGames.map(game => (
-                      <label key={game.id} className="flex items-center space-x-2 p-2 rounded hover:bg-ui-card cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedGames.has(game.id)}
-                          onChange={() => toggleGameSelection(game.id)}
+              {/* Championship view: checkbox grid + start button */}
+              {championshipMode ? (
+                <>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {availableGames.map((game) => {
+                      const selected = selectedGames.has(game.id);
+                      return (
+                        <Button
+                          key={game.id}
+                          variant={selected ? 'info' : 'ghost'}
+                          size="sm"
+                          onClick={() => toggleGameSelection(game.id)}
                           disabled={gameState?.phase !== 'lobby'}
-                          className="form-checkbox h-5 w-5 text-primary-blue rounded border-gray-600 bg-gray-700 focus:ring-offset-gray-800"
-                        />
-                        <span>{game.name}</span>
-                      </label>
-                    ))}
+                          aria-pressed={selected}
+                          className="!justify-start text-left"
+                        >
+                          <span aria-hidden="true" className="mr-2">{selected ? '✓' : '○'}</span>
+                          {game.name}
+                        </Button>
+                      );
+                    })}
                   </div>
-                  <button
+                  <Button
+                    variant="premium"
+                    size="lg"
                     onClick={startChampionship}
                     disabled={gameState?.phase !== 'lobby' || selectedGames.size === 0}
-                    className="btn w-full bg-primary-blue"
+                    className="w-full"
                   >
-                    Start Championship ({selectedGames.size} Games)
-                  </button>
+                    Start Championship · {selectedGames.size} {selectedGames.size === 1 ? 'game' : 'games'}
+                  </Button>
+                </>
+              ) : (
+                /* Single-round view: 4×2 grid of game launches */
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {LAUNCH_GAMES.map((g) => (
+                    <Button
+                      key={g.id}
+                      variant={g.variant}
+                      size="md"
+                      onClick={() => startGame(g.id)}
+                      disabled={gameState?.phase !== 'lobby'}
+                      className="!justify-start text-left"
+                    >
+                      {g.label}
+                    </Button>
+                  ))}
                 </div>
               )}
+
+              {/* Championship continue */}
+              {gameState?.phase === 'leaderboard' && championshipActive && (
+                <div className="rounded-2xl border-2 border-ink bg-now/40 px-4 py-3">
+                  <div className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-ink">
+                    Championship in progress
+                  </div>
+                  <Button variant="now" size="lg" onClick={nextChampionshipGame} className="w-full">
+                    Continue to next round
+                  </Button>
+                </div>
+              )}
+
+              {/* Pointless reveal */}
+              {gameState?.currentGame === 'pointless' && pointlessReadyToReveal && (
+                <Button variant="streak" size="lg" onClick={revealResults} className="w-full">
+                  Reveal Pointless results
+                </Button>
+              )}
+
+              {/* Secondary row: Lobby / Emergency Skip / Reset */}
+              <div className="grid grid-cols-1 gap-2 border-t-2 border-ink/10 pt-4 sm:grid-cols-3">
+                <Button
+                  variant="info"
+                  size="sm"
+                  onClick={returnToLobby}
+                  disabled={gameState?.phase === 'lobby'}
+                >
+                  Return to Lobby
+                </Button>
+                <Button
+                  variant="now"
+                  size="sm"
+                  onClick={emergencySkip}
+                  disabled={gameState?.phase === 'lobby' || gameState?.phase === 'leaderboard'}
+                >
+                  Emergency Skip
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={resetGame}
+                >
+                  Reset Game
+                </Button>
+              </div>
             </div>
-
-            {!championshipMode && (
-              <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <button onClick={() => startGame('quiz')} disabled={gameState?.phase !== 'lobby'} className="btn bg-primary-blue">Start Quiz</button>
-                <button onClick={() => startGame('trueFalse')} disabled={gameState?.phase !== 'lobby'} className="btn bg-primary-teal">Start True/False</button>
-                <button onClick={() => startGame('pointless')} disabled={gameState?.phase !== 'lobby'} className="btn bg-game-incorrect">Start Pointless</button>
-                <button onClick={() => startGame('pokedle')} disabled={gameState?.phase !== 'lobby'} className="btn bg-yellow-500 text-black">Start Pokédle</button>
-                <button onClick={() => startGame('hpdle')} disabled={gameState?.phase !== 'lobby'} className="btn bg-purple-600">Start HP-dle</button>
-                <button onClick={() => startGame('numbers')} disabled={gameState?.phase !== 'lobby'} className="btn bg-emerald-600">Start Numbers Round</button>
-                <button onClick={() => startGame('wordle')} disabled={gameState?.phase !== 'lobby'} className="btn bg-slate-600">Start Wordle</button>
-                <button onClick={() => startGame('travel')} disabled={gameState?.phase !== 'lobby'} className="btn bg-sky-600">Start Travel</button>
-              </div>
-            )}
-
-            {/* Championship Continue Button */}
-            {gameState?.phase === 'leaderboard' && championshipActive && (
-              <div className="mb-6 p-4 border-2 border-game-leader rounded-lg bg-game-leader/10 animate-pulse">
-                <h3 className="font-bold text-center mb-2 text-game-leader">Championship in Progress</h3>
-                <button onClick={nextChampionshipGame} className="btn w-full bg-game-leader text-black font-bold hover:scale-105 transition-transform">
-                  Continue to Next Round
-                </button>
-              </div>
-            )}
-
-            {/* Pointless Controls */}
-            {gameState?.currentGame === 'pointless' && pointlessReadyToReveal && (
-              <div className="mb-6 p-4 border border-ui-border rounded-lg bg-ui-background/50">
-                <h3 className="font-bold mb-2 text-sm text-ui-textMuted uppercase">Pointless Controls</h3>
-                <button onClick={revealResults} className="btn w-full bg-primary-teal animate-pulse">Reveal Results</button>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 gap-4 border-t border-ui-border pt-4 sm:grid-cols-2">
-              <button onClick={returnToLobby} disabled={gameState?.phase === 'lobby'} className="btn bg-game-warning">Return to Lobby</button>
-              <button onClick={emergencySkip} disabled={gameState?.phase === 'lobby' || gameState?.phase === 'leaderboard'} className="btn bg-orange-600 hover:bg-orange-700 text-white">⚠ Emergency Skip</button>
-              <button onClick={resetGame} className="btn bg-game-incorrect sm:col-span-2">Reset Game</button>
-            </div>
-          </div>
+          </Card>
 
           {/* RIGHT: player tracker */}
           <PlayerTracker
