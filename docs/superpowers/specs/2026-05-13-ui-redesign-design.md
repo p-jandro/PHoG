@@ -353,14 +353,18 @@ theme: {
 
 ### 7.3 Host display (6 screens)
 
+**Host-screen skeleton — same on every screen.** Top-left: location, one line, full text (e.g. "Quiz Round · Question 7 of 15"). Top-right: time-left panel, same component, same place, every screen — dimmed to "—:—" on Dashboard and results screens so the layout never shifts. Centre: only the game's actual content. Bottom: the player tracker (with an explicit "X of Y" count) — and nothing competes with it above. No category chips, no extra player-count badges, no auxiliary pills.
+
+**Full-text labels everywhere.** No three-letter abbreviations (no "GRY/HUF/RAV", no "Q 7/15"). Every header, chip, and label is spelled out.
+
 | Screen | Key changes |
 |---|---|
-| **Dashboard** | Chunky game-launch buttons, player tracker, theme toggle top-right |
-| **Display** *(active game shell)* | TV-optimized chrome — bigger type, taller leaderboard, no toggle |
-| **NumbersDisplay** | Big digit-roll reveals; player tracker chips |
-| **ThemedDleDisplay** | Mode banner (Fraunces splash), live player tracker |
-| **TravelDisplay** | Map skinned; results show all pins with arcs |
-| **WordleDisplay** | TV-sized tiles; flip cascade synchronized across players |
+| **Dashboard** | 4 × 2 grid of game-launch buttons; secondary row for Championship Sequence + Reset; QR + URL card on the left for joins; scrollable connected-players list on the right; theme toggle in the top-right (replacing the time-left panel on this screen only) |
+| **Display** *(active game shell)* | Quiz / True or False / Pointless. Prompt + answers centre, player tracker bottom |
+| **NumbersDisplay** | Big target + tile pool centre; player tracker shows "exact / closest so far / in progress / no submission" |
+| **ThemedDleDisplay** | Plum mode banner (Fraunces splash) centre; player tracker shows per-player guess counts |
+| **TravelDisplay** | During play: map hidden, banner only. Results: full map with all chains drawn, start/end pins labelled in full |
+| **WordleDisplay** | End-of-round target reveal centre (TV-sized tiles); player tracker shows per-player guess counts |
 
 ### 7.4 Migration order
 
@@ -411,3 +415,6 @@ Each row is one shippable PR.
 | Chunkiness | Medium — 2px borders, 3–5px hard shadows |
 | Motion personality | Playful but never blocking input; in-mode reactive animations are first-class |
 | Pointless drop timing | 4000ms base + 90ms per point; ~13s for full drop to 0 |
+| Host-screen skeleton | location top-left · time-left top-right · content centre · player tracker bottom (consistent on every host screen) |
+| Label discipline | Full-text everywhere; no abbreviations like "GRY" or "Q 7/15" |
+| Dashboard launcher | 4 × 2 grid for the 8 games + secondary row for Championship + Reset |
