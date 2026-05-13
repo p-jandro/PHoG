@@ -49,12 +49,32 @@ export const WordleDisplay = ({ socket, players }: WordleDisplayProps) => {
 
   if (phase === 'intro' && introData) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center px-16 text-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl space-y-6">
-          <p className="eyebrow text-2xl">Wordle</p>
-          <h1 className="text-8xl font-bold text-game-leader">{introData.title}</h1>
-          <p className="text-3xl text-white">{introData.description}</p>
-        </motion.div>
+      <div className="flex h-screen w-screen flex-col bg-bg-base px-10 py-8 text-ink">
+        <header className="flex items-start justify-between">
+          <div className="font-display text-2xl font-extrabold tracking-tight">
+            Wordle
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">
+              Time left
+            </p>
+            <p className="font-display text-5xl font-extrabold tabular-nums text-ink-muted">
+              —:—
+            </p>
+          </div>
+        </header>
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-1 flex-col items-center justify-center gap-6 text-center"
+        >
+          <Chip variant="info">Game starting</Chip>
+          <h1 className="font-serif text-7xl font-extrabold tracking-tight sm:text-8xl">
+            {introData.title}
+          </h1>
+          <p className="text-2xl text-ink-muted sm:text-3xl">{introData.description}</p>
+        </motion.section>
+        <footer />
       </div>
     );
   }
