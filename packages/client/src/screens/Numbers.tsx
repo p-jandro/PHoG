@@ -6,6 +6,7 @@ import { TilePool, Tile } from '../components/numbers/TilePool';
 import { TargetDisplay } from '../components/numbers/TargetDisplay';
 import { OperationBuilder } from '../components/numbers/OperationBuilder';
 import { RoundResults } from '../components/numbers/RoundResults';
+import { HistoryList, OperationEntry } from '../components/numbers/HistoryList';
 
 type Phase = 'intro' | 'playing' | 'results';
 
@@ -20,6 +21,7 @@ export const Numbers = ({ socket }: NumbersProps) => {
   const [roundData, setRoundData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
   const [pool, setPool] = useState<Tile[]>([]);
+  const [history, setHistory] = useState<OperationEntry[]>([]);
   const [selectedAId, setSelectedAId] = useState<string | null>(null);
   const [op, setOp] = useState<string | null>(null);
   const [solved, setSolved] = useState(false);
@@ -42,6 +44,7 @@ export const Numbers = ({ socket }: NumbersProps) => {
       setPhase('intro');
       setIntroData(d);
       setPool([]);
+      setHistory([]);
       setSelectedAId(null);
       setOp(null);
       setSolved(false);
@@ -50,6 +53,7 @@ export const Numbers = ({ socket }: NumbersProps) => {
       setPhase('playing');
       setRoundData(d);
       setPool(d.tiles || []);
+      setHistory([]);
       setSelectedAId(null);
       setOp(null);
       setSolved(false);
@@ -61,6 +65,14 @@ export const Numbers = ({ socket }: NumbersProps) => {
         return;
       }
       if (Array.isArray(d.pool)) setPool(d.pool);
+      if (Array.isArray(d.history)) {
+        setHistory(d.history.map((h: any) => ({
+          aValue: h.aValue,
+          bValue: h.bValue,
+          op: h.op,
+          result: h.result
+        })));
+      }
       setSelectedAId(null);
       setOp(null);
       if (d.solved) setSolved(true);
@@ -189,6 +201,8 @@ export const Numbers = ({ socket }: NumbersProps) => {
             disabled={solved}
             errorToast={errorToast}
           />
+
+          <HistoryList history={history} />
 
           {solved && (
             <p className="text-center text-2xl font-bold text-game-correct">🎉 reached {target}!</p>

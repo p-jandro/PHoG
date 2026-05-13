@@ -11,7 +11,7 @@ interface TilePoolProps {
 }
 
 export const TilePool = ({ tiles, selectedId, onTileClick, disabled }: TilePoolProps) => (
-  <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+  <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
     <AnimatePresence>
       {tiles.map((t) => {
         const isSelected = selectedId === t.id;
@@ -32,7 +32,7 @@ export const TilePool = ({ tiles, selectedId, onTileClick, disabled }: TilePoolP
             disabled={disabled}
             onClick={() => onTileClick(t.id)}
             whileTap={{ scale: disabled ? 1 : 0.94 }}
-            className={`aspect-square rounded-2xl border-2 text-3xl font-bold transition-all sm:text-4xl ${tone} disabled:opacity-50`}
+            className={`flex h-16 w-16 items-center justify-center rounded-2xl border-2 text-2xl font-bold transition-all sm:h-20 sm:w-20 sm:text-3xl ${tone} disabled:opacity-50`}
           >
             {t.value}
           </motion.button>
