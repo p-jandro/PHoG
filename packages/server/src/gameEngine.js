@@ -208,7 +208,7 @@ export class GameEngine extends EventEmitter {
    * @param {Object} gameModule - Game module instance
    */
   startGame(gameName, gameModule) {
-    const validGames = ['quiz', 'trueFalse', 'countdown', 'pointless', 'pokedle', 'hpdle', 'numbers'];
+    const validGames = ['quiz', 'trueFalse', 'countdown', 'pointless', 'pokedle', 'hpdle', 'numbers', 'wordle'];
 
     if (!validGames.includes(gameName)) {
       throw new Error(`Invalid game: ${gameName}`);
@@ -416,7 +416,8 @@ export class GameEngine extends EventEmitter {
         pointless: null,
         pokedle: null,
         hpdle: null,
-        numbers: null
+        numbers: null,
+        wordle: null
       };
       player.totalPlacement = 0;
     }
@@ -430,6 +431,7 @@ export class GameEngine extends EventEmitter {
     this.gameState.pokedle = null;
     this.gameState.hpdle = null;
     this.gameState.numbers = null;
+    this.gameState.wordle = null;
     this.roundLeaderboardHistory = {};
 
     this.transitionPhase('lobby');

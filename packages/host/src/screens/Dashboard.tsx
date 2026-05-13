@@ -27,11 +27,12 @@ interface Player {
     pokedle: number | null;
     hpdle: number | null;
     numbers: number | null;
+    wordle: number | null;
   };
   connected: boolean;
 }
 
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers';
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle';
 const GAME_LABELS: Record<GameKey, string> = {
   quiz: 'Quiz',
   trueFalse: 'True/False',
@@ -39,7 +40,8 @@ const GAME_LABELS: Record<GameKey, string> = {
   pointless: 'Pointless',
   pokedle: 'Pokédle',
   hpdle: 'HP-dle',
-  numbers: 'Numbers'
+  numbers: 'Numbers',
+  wordle: 'Wordle'
 };
 
 export const Dashboard = () => {
@@ -70,7 +72,8 @@ export const Dashboard = () => {
     { id: 'pointless', name: 'Pointless' },
     { id: 'pokedle', name: 'Pokédle' },
     { id: 'hpdle', name: 'HP-dle' },
-    { id: 'numbers', name: 'Numbers Round' }
+    { id: 'numbers', name: 'Numbers Round' },
+    { id: 'wordle', name: 'Wordle' }
   ];
 
   const activeGame = (gameState?.currentGame || null) as GameKey | null;
@@ -791,7 +794,7 @@ export const Dashboard = () => {
                           Championship total: {player.totalPlacementScore || '-'}
                         </p>
                         <div className="mt-3 flex flex-wrap gap-2">
-                          {(['quiz', 'trueFalse', 'pointless', 'pokedle', 'hpdle', 'numbers'] as GameKey[]).map((game) => (
+                          {(['quiz', 'trueFalse', 'pointless', 'pokedle', 'hpdle', 'numbers', 'wordle'] as GameKey[]).map((game) => (
                             <span
                               key={game}
                               className="rounded-full border border-ui-border/70 bg-black/20 px-3 py-1 text-xs font-semibold text-ui-textMuted"

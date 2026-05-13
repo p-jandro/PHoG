@@ -16,7 +16,7 @@ const PLAYER_URL = import.meta.env.VITE_PLAYER_URL || (
     : 'http://localhost:5173'
 );
 const CHAMPIONSHIP_PREVIEW_DELAY = 5000;
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers';
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle';
 
 interface Player {
   id: string;
@@ -32,6 +32,7 @@ interface Player {
     pokedle: number | null;
     hpdle: number | null;
     numbers: number | null;
+    wordle: number | null;
   };
   connected: boolean;
 }
@@ -47,7 +48,7 @@ interface RoundLeaderboardEntry {
 }
 
 interface RoundLeaderboardState {
-  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers';
+  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle';
   duration: number;
   leaderboard: RoundLeaderboardEntry[];
   roundNumber?: number | null;
@@ -483,7 +484,8 @@ export const Display = () => {
       pointless: 'Pointless',
       pokedle: 'Pokédle',
       hpdle: 'HP-dle',
-      numbers: 'Numbers'
+      numbers: 'Numbers',
+      wordle: 'Wordle'
     }[roundLeaderboard.game];
 
     return (
@@ -657,7 +659,8 @@ export const Display = () => {
                     pointless: 'Pointless',
                     pokedle: 'Pokédle',
                     hpdle: 'HP-dle',
-                    numbers: 'Numbers'
+                    numbers: 'Numbers',
+                    wordle: 'Wordle'
                   }[activeGame]} Placements`}
                 </h1>
                 <p className="mt-3 text-2xl text-ui-textMuted">
@@ -674,7 +677,7 @@ export const Display = () => {
             <div className="overflow-hidden rounded-[1.6rem] border border-ui-border/80">
               {showChampionship ? (
                 <>
-                  <div className="grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-3 border-b border-ui-border/80 bg-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ui-textMuted">
+                  <div className="grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-3 border-b border-ui-border/80 bg-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ui-textMuted">
                     <span>Rank</span>
                     <span>Player</span>
                     <span className="text-right">Quiz</span>
@@ -683,13 +686,14 @@ export const Display = () => {
                     <span className="text-right">PKD</span>
                     <span className="text-right">HP</span>
                     <span className="text-right">NUM</span>
+                    <span className="text-right">WRD</span>
                     <span className="text-right">Total</span>
                   </div>
                   <div className="max-h-[62vh] divide-y divide-ui-border/70 overflow-y-auto">
                     {sortedPlayers.map((player, index) => (
                       <div
                         key={player.id}
-                        className={`grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-3 px-5 py-3 ${
+                        className={`grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-3 px-5 py-3 ${
                           index < 3 ? 'bg-white/[0.05]' : 'bg-black/15'
                         }`}
                       >
@@ -708,6 +712,7 @@ export const Display = () => {
                         <p className="text-right text-lg">{player.gamePlacements?.pokedle || '-'}</p>
                         <p className="text-right text-lg">{player.gamePlacements?.hpdle || '-'}</p>
                         <p className="text-right text-lg">{player.gamePlacements?.numbers || '-'}</p>
+                        <p className="text-right text-lg">{player.gamePlacements?.wordle || '-'}</p>
                         <p className="text-right text-2xl font-bold text-white">{player.totalPlacementScore || '-'}</p>
                       </div>
                     ))}

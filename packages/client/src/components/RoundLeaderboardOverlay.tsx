@@ -8,7 +8,8 @@ const GAME_LABELS = {
   pointless: 'Pointless',
   pokedle: 'Pokédle',
   hpdle: 'HP-dle',
-  numbers: 'Numbers'
+  numbers: 'Numbers',
+  wordle: 'Wordle'
 } as const;
 
 export const RoundLeaderboardOverlay = () => {

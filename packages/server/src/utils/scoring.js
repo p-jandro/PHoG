@@ -270,7 +270,8 @@ export function updatePlayerPlacements(players, gameType) {
             pointless: null,
             pokedle: null,
             hpdle: null,
-            numbers: null
+            numbers: null,
+            wordle: null
         };
       }
 
@@ -284,7 +285,8 @@ export function updatePlayerPlacements(players, gameType) {
         player.placements.pointless,
         player.placements.pokedle,
         player.placements.hpdle,
-        player.placements.numbers
+        player.placements.numbers,
+        player.placements.wordle
       ].filter(p => p !== null && p !== undefined);
 
       player.totalPlacement = completedPlacements.reduce((sum, p) => sum + p, 0);
