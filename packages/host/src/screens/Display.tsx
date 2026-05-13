@@ -1151,40 +1151,77 @@ export const Display = () => {
 
   // True/False View
   if (currentGame === 'trueFalse' && tfReveal) {
+    const totalConnected = players.filter((p) => p.connected).length;
+
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-8">
+        <div className="min-h-screen bg-bg-base text-ink overflow-y-auto py-8 px-6">
           <motion.div
             key={tfReveal.statementId}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto max-w-6xl"
           >
-            <div className="mb-8">
-              <span className="text-xl text-ui-textMuted sm:text-3xl">
-                Statement {tfReveal.statementNumber} of {tfReveal.totalStatements}
-              </span>
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+                  True or False · Statement {tfReveal.statementNumber} of {tfReveal.totalStatements}
+                </p>
+                <p className="mt-1 text-base font-bold text-ink-muted">Reveal</p>
+              </div>
+              <div className="rounded-xl border-2 border-ink bg-bg-surface px-4 py-2 font-display text-2xl font-black text-ink shadow-ink-sm">
+                —:—
+              </div>
             </div>
 
-            <div className="card p-8 sm:p-16">
-              <h2 className="text-4xl font-bold sm:text-6xl">{tfReveal.statement}</h2>
+            <div className="rounded-3xl border-2 border-ink bg-bg-surface p-8 shadow-ink-lg sm:p-10">
+              <h2 className="text-center font-serif text-4xl font-extrabold leading-tight tracking-tight text-ink sm:text-5xl">
+                {tfReveal.statement}
+              </h2>
+
+              <div className="mt-8 grid gap-5 xl:grid-cols-[0.75fr_1.25fr]">
+                <div
+                  className={[
+                    'rounded-2xl border-2 border-ink p-8 shadow-ink sm:p-10',
+                    tfReveal.correctAnswer ? 'bg-action text-on-action' : 'bg-danger text-on-danger',
+                  ].join(' ')}
+                >
+                  <p className="text-base font-extrabold uppercase tracking-[0.22em] opacity-90">Answer</p>
+                  <p className="mt-3 font-display text-5xl font-black sm:text-6xl">
+                    {tfReveal.correctAnswer ? 'TRUE' : 'FALSE'}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-8 text-ink shadow-ink sm:p-10">
+                  <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-streak">
+                    Did You Know?
+                  </p>
+                  <p className="text-xl font-semibold leading-relaxed sm:text-2xl">
+                    {tfReveal.explanation || 'No extra note for this statement.'}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="mt-8 grid gap-5 xl:grid-cols-[0.75fr_1.25fr]">
-              <div className={`rounded-[1.8rem] border border-white/10 p-8 shadow-[0_18px_30px_rgba(0,0,0,0.22)] sm:p-12 ${
-                tfReveal.correctAnswer ? 'bg-game-correct' : 'bg-game-incorrect'
-              }`}>
-                <p className="text-lg font-semibold uppercase tracking-[0.24em] text-white/75">Answer</p>
-                <p className="mt-4 text-5xl font-bold text-white sm:text-6xl">
-                  {tfReveal.correctAnswer ? 'TRUE' : 'FALSE'}
+            {/* Player tracker */}
+            <div className="mt-6 rounded-2xl border-2 border-ink bg-bg-surface p-5 shadow-ink">
+              <div className="mb-3 flex items-end justify-between">
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak">Players</p>
+                <p className="font-display text-base font-black text-ink-muted">
+                  {totalConnected} of {totalConnected}
                 </p>
               </div>
-
-              <div className="rounded-[1.8rem] border border-ui-border/80 bg-black/20 p-8 sm:p-12">
-                <p className="section-label mb-3">Did You Know?</p>
-                <p className="text-2xl leading-relaxed text-white sm:text-3xl">
-                  {tfReveal.explanation || 'No extra note for this statement.'}
-                </p>
+              <div className="flex flex-wrap gap-2">
+                {players.filter((p) => p.connected).map((p) => (
+                  <span
+                    key={p.id}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-bg-sunken px-2.5 py-1 text-xs font-extrabold text-ink shadow-ink-sm"
+                  >
+                    <span className="h-2 w-2 rounded-full bg-action" aria-hidden="true" />
+                    {p.name}
+                  </span>
+                ))}
               </div>
             </div>
           </motion.div>
@@ -1195,33 +1232,65 @@ export const Display = () => {
   }
 
   if (currentGame === 'trueFalse' && tfStatement) {
+    const totalConnected = players.filter((p) => p.connected).length;
+
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-8">
+        <div className="min-h-screen bg-bg-base text-ink overflow-y-auto py-8 px-6">
           <motion.div
             key={tfStatement.statementId}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto max-w-6xl"
           >
-          <div className="mb-8">
-            <span className="text-xl text-ui-textMuted sm:text-3xl">
-              Statement {tfStatement.statementNumber} of {tfStatement.totalStatements}
-            </span>
-          </div>
-
-          <div className="card p-8 sm:p-16">
-            <h2 className="text-4xl font-bold sm:text-6xl">{tfStatement.statement}</h2>
-          </div>
-
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-8">
-            <div className="rounded-[1.8rem] border border-white/10 bg-game-incorrect p-8 shadow-[0_18px_30px_rgba(0,0,0,0.22)] sm:p-12">
-              <p className="text-4xl font-bold text-white sm:text-5xl">FALSE</p>
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+                  True or False · Statement {tfStatement.statementNumber} of {tfStatement.totalStatements}
+                </p>
+                <p className="mt-1 text-base font-bold text-ink-muted">Players are answering</p>
+              </div>
+              <div className="rounded-xl border-2 border-ink bg-bg-surface px-4 py-2 font-display text-2xl font-black text-ink shadow-ink-sm">
+                {tfStatement.endsAt ? `${Math.max(0, Math.ceil((tfStatement.endsAt - now) / 1000))}s` : '—:—'}
+              </div>
             </div>
-            <div className="rounded-[1.8rem] border border-white/10 bg-game-correct p-8 shadow-[0_18px_30px_rgba(0,0,0,0.22)] sm:p-12">
-              <p className="text-4xl font-bold text-white sm:text-5xl">TRUE</p>
+
+            <div className="rounded-3xl border-2 border-ink bg-bg-surface p-8 shadow-ink-lg sm:p-10">
+              <h2 className="text-center font-serif text-4xl font-extrabold leading-tight tracking-tight text-ink sm:text-5xl">
+                {tfStatement.statement}
+              </h2>
+
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+                <div className="rounded-2xl border-2 border-ink bg-danger p-8 text-on-danger shadow-ink sm:p-10">
+                  <p className="font-display text-5xl font-black sm:text-6xl">FALSE</p>
+                </div>
+                <div className="rounded-2xl border-2 border-ink bg-action p-8 text-on-action shadow-ink sm:p-10">
+                  <p className="font-display text-5xl font-black sm:text-6xl">TRUE</p>
+                </div>
+              </div>
             </div>
-          </div>
+
+            {/* Player tracker */}
+            <div className="mt-6 rounded-2xl border-2 border-ink bg-bg-surface p-5 shadow-ink">
+              <div className="mb-3 flex items-end justify-between">
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak">Players</p>
+                <p className="font-display text-base font-black text-ink-muted">
+                  {totalConnected} of {totalConnected}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {players.filter((p) => p.connected).map((p) => (
+                  <span
+                    key={p.id}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-bg-sunken px-2.5 py-1 text-xs font-extrabold text-ink shadow-ink-sm"
+                  >
+                    <span className="h-2 w-2 rounded-full bg-action" aria-hidden="true" />
+                    {p.name}
+                  </span>
+                ))}
+              </div>
+            </div>
           </motion.div>
         </div>
         {displayControl}
