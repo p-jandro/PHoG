@@ -1,5 +1,6 @@
 import { useSocket } from './hooks/useSocket';
 import { useGameStore } from './stores/gameStore';
+import { UiShowcase } from './ui';
 import { Lobby } from './screens/Lobby';
 import { Quiz } from './screens/Quiz';
 import { TrueFalse } from './screens/TrueFalse';
@@ -16,6 +17,10 @@ import { RoundLeaderboardOverlay } from './components/RoundLeaderboardOverlay';
 function App() {
   const socket = useSocket();
   const { phase, currentGame } = useGameStore();
+
+  if (typeof window !== 'undefined' && window.location.search.includes('showcase')) {
+    return <UiShowcase />;
+  }
 
   // Determine which screen to show based on phase and current game
   const renderScreen = () => {
