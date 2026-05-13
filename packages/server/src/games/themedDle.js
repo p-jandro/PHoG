@@ -212,11 +212,13 @@ export class ThemedDleGame {
     this.timer = null;
     this.pendingTimeouts = [];
 
-    // Mode sequence — locked play order per game
+    // Mode sequence — locked play order per game.
+    // Emoji mode is disabled: the emoji puzzles in the data packs proved too inconsistent
+    // to make for fair clues. Keep the engine support for it in case we revisit.
     this.modes = opts.modes || (
       this.theme === 'pokemon'
-        ? ['classic', 'emoji', 'silhouette', 'grid']
-        : ['classic', 'emoji', 'spell', 'grid']
+        ? ['classic', 'silhouette', 'grid']
+        : ['classic', 'spell', 'grid']
     );
     this.currentModeIndex = 0;
     this.mode = this.modes[0];
