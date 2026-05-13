@@ -5,6 +5,8 @@ import { useGameStore } from '../stores/gameStore';
 import { WordleBoard } from '../components/wordle/WordleBoard';
 import { Keyboard } from '../components/wordle/Keyboard';
 import { Chip } from '../ui/Chip';
+import { Card } from '../ui/Card';
+import { Tile } from '../ui/Tile';
 
 type Phase = 'intro' | 'playing' | 'results';
 type Color = 'green' | 'yellow' | 'grey';
@@ -133,15 +135,26 @@ export const Wordle = ({ socket }: WordleProps) => {
 
   if (phase === 'intro' && introData) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="screen-frame max-w-2xl space-y-4 text-center">
-          <p className="eyebrow">Game starting</p>
-          <h1 className="text-5xl font-bold text-game-leader">{introData.title}</h1>
-          <p className="text-xl text-ui-textMuted">{introData.description}</p>
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center"
+        >
+          <Chip variant="info">Game starting</Chip>
+          <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+            {introData.title}
+          </h1>
+          <p className="text-lg text-ink-muted sm:text-xl">{introData.description}</p>
           {Array.isArray(introData.scoringRules) && (
-            <ul className="mx-auto max-w-md space-y-1 text-left text-base">
+            <ul className="mx-auto w-full max-w-md space-y-2 text-left">
               {introData.scoringRules.map((r: string) => (
-                <li key={r} className="rounded-xl border border-white/10 bg-black/20 px-3 py-2">{r}</li>
+                <li
+                  key={r}
+                  className="rounded-xl border-2 border-ink bg-bg-surface px-3 py-2 font-semibold shadow-ink-sm"
+                >
+                  {r}
+                </li>
               ))}
             </ul>
           )}
@@ -152,23 +165,40 @@ export const Wordle = ({ socket }: WordleProps) => {
 
   if (phase === 'results' && resultsData) {
     const me = resultsData.results.find((r: any) => r.playerId === playerId);
+    const answer = String(resultsData.answer || '').toUpperCase().padEnd(5, ' ').slice(0, 5);
+
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="screen-frame max-w-2xl space-y-4 text-center">
-          <p className="eyebrow">Wordle — Reveal</p>
-          <p className="text-2xl text-ui-textMuted">The word was</p>
-          <p className="text-5xl font-bold uppercase tracking-widest text-game-leader">{resultsData.answer}</p>
-          <div className="rounded-2xl border border-white/10 bg-black/30 p-5 text-left">
-            <p className="eyebrow mb-2 text-center">Your result</p>
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center"
+        >
+          <Chip variant="streak">Wordle — Reveal</Chip>
+          <p className="text-lg text-ink-muted">The word was</p>
+          <div className="flex justify-center gap-2">
+            {answer.split('').map((ch, i) => (
+              <Tile key={i} state="correct" className="aspect-square w-14 text-2xl">
+                {ch.trim()}
+              </Tile>
+            ))}
+          </div>
+          <Card eyebrow="Your result" className="w-full max-w-md text-center">
             {me ? (
               <>
-                <p className="text-center text-xl">{me.solved ? `✓ solved in ${me.guessesUsed}` : `✗ not solved (${me.guessesUsed} guesses)`}</p>
-                <p className="mt-2 text-center text-4xl font-bold text-game-leader">+{me.score} pts{me.firstSolver && ' (first!)'}</p>
+                <p className="text-xl font-bold">
+                  {me.solved
+                    ? `Solved in ${me.guessesUsed} guess${me.guessesUsed === 1 ? '' : 'es'}`
+                    : `Not solved (${me.guessesUsed} guesses)`}
+                </p>
+                <p className="mt-2 font-display text-4xl font-extrabold text-action">
+                  +{me.score} pts{me.firstSolver && ' (first!)'}
+                </p>
               </>
             ) : (
-              <p className="text-center text-ui-textMuted">No result.</p>
+              <p className="text-ink-muted">No result.</p>
             )}
-          </div>
+          </Card>
         </motion.div>
       </div>
     );
@@ -176,10 +206,10 @@ export const Wordle = ({ socket }: WordleProps) => {
 
   if (phase !== 'playing' || !roundData) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
-        <div className="screen-frame max-w-md text-center">
-          <p className="eyebrow">Wordle</p>
-          <h1 className="text-3xl font-bold">Loading…</h1>
+      <div className="flex min-h-screen items-center justify-center bg-bg-base text-ink">
+        <div className="text-center">
+          <Chip variant="info">Wordle</Chip>
+          <h1 className="mt-3 font-display text-3xl font-extrabold">Loading…</h1>
         </div>
       </div>
     );
