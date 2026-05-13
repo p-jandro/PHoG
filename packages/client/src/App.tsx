@@ -8,6 +8,7 @@ import { Pointless } from './screens/Pointless';
 import { ThemedDle } from './screens/ThemedDle';
 import { Numbers } from './screens/Numbers';
 import { Wordle } from './screens/Wordle';
+import { Travel } from './screens/Travel';
 import { FinalLeaderboard } from './screens/FinalLeaderboard';
 import { PausedOverlay } from './components/PausedOverlay';
 import { RoundLeaderboardOverlay } from './components/RoundLeaderboardOverlay';
@@ -40,6 +41,8 @@ function App() {
             return <Numbers socket={socket} />;
           case 'wordle':
             return <Wordle socket={socket} />;
+          case 'travel':
+            return <Travel socket={socket} />;
           default:
             return (
               <div className="min-h-screen flex items-center justify-center">
