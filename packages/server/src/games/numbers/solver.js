@@ -90,6 +90,138 @@ export function canHitTarget(tiles, target) {
   return false;
 }
 
+/**
+ * Build a "no-division" DP table — same algorithm as build() but the combine
+ * step never emits division results. Used by classifyDifficulty.
+ */
+function buildNoDiv(tiles) {
+  const n = tiles.length;
+  const total = 1 << n;
+  const table = new Array(total);
+  for (let s = 0; s < total; s++) table[s] = new Set();
+
+  // size 1
+  for (let i = 0; i < n; i++) {
+    table[1 << i].add(tiles[i]);
+  }
+  // sizes 2..n
+  for (let subset = 1; subset < total; subset++) {
+    if (table[subset].size > 0) continue;
+    for (const [a, b] of disjointPairs(subset)) {
+      const sa = table[a];
+      const sb = table[b];
+      if (!sa || !sb || sa.size === 0 || sb.size === 0) continue;
+      for (const va of sa) {
+        for (const vb of sb) {
+          table[subset].add(va + vb);
+          table[subset].add(va * vb);
+          if (va > vb) table[subset].add(va - vb);
+          else if (vb > va) table[subset].add(vb - va);
+        }
+      }
+    }
+  }
+  return table;
+}
+
+/**
+ * Build a full DP table that stores only values (Set), not expressions.
+ * Faster than build() when we only need reachability.
+ */
+function buildFull(tiles) {
+  const n = tiles.length;
+  const total = 1 << n;
+  const table = new Array(total);
+  for (let s = 0; s < total; s++) table[s] = new Set();
+
+  for (let i = 0; i < n; i++) {
+    table[1 << i].add(tiles[i]);
+  }
+  for (let subset = 1; subset < total; subset++) {
+    if (table[subset].size > 0) continue;
+    for (const [a, b] of disjointPairs(subset)) {
+      const sa = table[a];
+      const sb = table[b];
+      if (!sa || !sb || sa.size === 0 || sb.size === 0) continue;
+      for (const va of sa) {
+        for (const vb of sb) {
+          table[subset].add(va + vb);
+          table[subset].add(va * vb);
+          if (va > vb) table[subset].add(va - vb);
+          else if (vb > va) table[subset].add(vb - va);
+          if (vb !== 0 && va % vb === 0 && va / vb > 1) table[subset].add(va / vb);
+          if (va !== 0 && vb % va === 0 && vb / va > 1) table[subset].add(vb / va);
+        }
+      }
+    }
+  }
+  return table;
+}
+
+/**
+ * Popcount — number of set bits (= number of tiles in the subset).
+ */
+function popcount(n) {
+  let c = 0;
+  while (n) { c += n & 1; n >>>= 1; }
+  return c;
+}
+
+/**
+ * classifyDifficulty(tiles, target) → 'easy' | 'medium' | 'difficult'
+ *
+ * Rules (applied in priority order):
+ *   difficult: target >= 850
+ *             OR target is reachable ONLY with all 6 tiles (never in a subset ≤5)
+ *             OR target requires division (reachable in fullTable but NOT in noDivTable)
+ *   easy:     target is reachable in a subset of size ≤ 4
+ *             AND target is reachable somewhere in noDivTable (any subset size)
+ *   medium:   everything else that is reachable
+ *
+ * Returns 'medium' if target is not reachable at all (caller should avoid this).
+ */
+export function classifyDifficulty(tiles, target) {
+  const n = tiles.length;
+  const total = 1 << n;
+
+  const fullTable = buildFull(tiles);
+  const noDivTable = buildNoDiv(tiles);
+
+  // Check reachability in full table
+  let reachable = false;
+  let reachableInSmallSubset = false; // subset of size ≤ 4
+  let reachableInSubsetLessThan6 = false; // subset of size ≤ 5
+  for (let s = 1; s < total; s++) {
+    if (fullTable[s].has(target)) {
+      reachable = true;
+      const sz = popcount(s);
+      if (sz <= 4) reachableInSmallSubset = true;
+      if (sz < n) reachableInSubsetLessThan6 = true;
+    }
+  }
+
+  if (!reachable) return 'medium'; // degenerate — shouldn't happen if canHitTarget pre-filtered
+
+  // Check no-division reachability
+  let reachableWithoutDiv = false;
+  for (let s = 1; s < total; s++) {
+    if (noDivTable[s].has(target)) {
+      reachableWithoutDiv = true;
+      break;
+    }
+  }
+
+  // Difficult conditions
+  if (target >= 850) return 'difficult';
+  if (!reachableInSubsetLessThan6) return 'difficult'; // requires all 6 tiles
+  if (!reachableWithoutDiv) return 'difficult';         // requires division
+
+  // Easy: small subset and no division needed
+  if (reachableInSmallSubset && reachableWithoutDiv) return 'easy';
+
+  return 'medium';
+}
+
 export function findOptimal(tiles, target) {
   // Return { found: boolean, distance: number, expression: string }
   // where 'optimal' means the smallest |reachable - target|.

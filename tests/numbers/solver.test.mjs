@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { canHitTarget, findOptimal } from '../../packages/server/src/games/numbers/solver.js';
+import { canHitTarget, findOptimal, classifyDifficulty } from '../../packages/server/src/games/numbers/solver.js';
 
 // Trivial: target equals a tile
 assert.equal(canHitTarget([7, 3, 1, 1, 50, 25], 50), true);
@@ -22,5 +22,12 @@ const start = Date.now();
 findOptimal([25, 50, 75, 100, 3, 9], 851);
 const elapsed = Date.now() - start;
 assert.ok(elapsed < 500, `solver too slow: ${elapsed}ms`);
+
+// classifyDifficulty tests
+// A simple target like 50 (a tile itself) is easy
+assert.equal(classifyDifficulty([25, 50, 75, 100, 3, 9], 50), 'easy');
+
+// Very high target (>=850) is difficult by definition
+assert.equal(classifyDifficulty([25, 50, 75, 100, 3, 9], 900), 'difficult');
 
 console.log('solver.test.mjs PASS');

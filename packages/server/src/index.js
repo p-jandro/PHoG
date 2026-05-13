@@ -515,23 +515,23 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('numbers:submit', ({ expression, claimedValue }) => {
+  socket.on('numbers:operation', ({ aId, op, bId }) => {
     const playerId = connectionManager.getPlayerId(socket.id);
-    if (!playerId) {
-      socket.emit('error', { message: 'Not registered' });
-      return;
-    }
-    if (gameState.currentGame !== 'numbers') {
-      socket.emit('error', { message: 'Numbers Round not running' });
-      return;
-    }
-    if (gameState.numbers?.phase !== 'playing') {
-      socket.emit('error', { message: 'Not in playing phase' });
-      return;
-    }
+    if (!playerId) { socket.emit('error', { message: 'Not registered' }); return; }
+    if (gameState.currentGame !== 'numbers') { socket.emit('error', { message: 'Numbers Round not running' }); return; }
+    if (gameState.numbers?.phase !== 'playing') { socket.emit('error', { message: 'Not in playing phase' }); return; }
     const currentGame = gameEngine.currentGameModule;
-    if (currentGame && typeof currentGame.handleSubmit === 'function') {
-      currentGame.handleSubmit(playerId, { expression, claimedValue });
+    if (currentGame && typeof currentGame.handleOperation === 'function') {
+      currentGame.handleOperation(playerId, { aId, op, bId });
+    }
+  });
+  socket.on('numbers:reset', () => {
+    const playerId = connectionManager.getPlayerId(socket.id);
+    if (!playerId) return;
+    if (gameState.currentGame !== 'numbers' || gameState.numbers?.phase !== 'playing') return;
+    const currentGame = gameEngine.currentGameModule;
+    if (currentGame && typeof currentGame.handleReset === 'function') {
+      currentGame.handleReset(playerId);
     }
   });
 
