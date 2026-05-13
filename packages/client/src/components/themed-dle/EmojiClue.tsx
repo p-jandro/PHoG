@@ -1,5 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
+import { Card, Chip } from '../../ui';
+import { emojiPop, stagger, easing } from '../../lib/motion';
 
 type EmojiResult = {
   guess: string;
@@ -29,31 +31,30 @@ export const EmojiClue = ({ data, guesses, onGuess }: EmojiClueProps) => {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-3xl border border-white/10 bg-black/40 p-8 text-center">
+      <Card>
         <div className="flex justify-center gap-3 text-6xl sm:text-7xl">
-          <AnimatePresence>
-            {revealed.map((e, i) => (
-              <motion.span
-                key={`${i}-${e}`}
-                initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ delay: i * 0.05 }}
-              >
-                {e}
-              </motion.span>
-            ))}
-          </AnimatePresence>
+          {revealed.map((e, i) => (
+            <motion.span
+              key={`${i}-${e}`}
+              variants={emojiPop}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: i * stagger.emoji, duration: 0.14, times: [0, 0.65, 1], ease: easing.backOut }}
+            >
+              {e}
+            </motion.span>
+          ))}
         </div>
-        <p className="mt-4 text-xs text-ui-textMuted">{revealed.length}/5 emojis revealed</p>
-      </div>
+        <p className="mt-4 text-center">
+          <Chip variant="muted">{revealed.length} of 5 emojis revealed</Chip>
+        </p>
+      </Card>
 
-      <ul className="space-y-1">
+      <ul className="space-y-2">
         {guesses.map((g, idx) => (
-          <li
-            key={idx}
-            className={`rounded-xl px-3 py-2 font-medium ${g.correct ? 'bg-game-correct/30 text-game-correct' : 'bg-game-incorrect/15 text-ui-textMuted'}`}
-          >
-            <span className="mr-2">{g.correct ? '✓' : '✗'}</span>{g.guess}
+          <li key={idx} className="flex items-center gap-2 rounded-xl border-2 border-ink bg-bg-surface px-3 py-2 shadow-ink-sm">
+            <Chip variant={g.correct ? 'streak' : 'muted'}>{g.correct ? 'Correct' : 'Wrong'}</Chip>
+            <span className="font-semibold text-ink">{g.guess}</span>
           </li>
         ))}
       </ul>
@@ -61,8 +62,17 @@ export const EmojiClue = ({ data, guesses, onGuess }: EmojiClueProps) => {
       {!solved && used < data.maxGuesses && (
         <AutocompletePicker roster={data.roster} onSubmit={(name) => onGuess({ name })} placeholder="Guess a name…" />
       )}
-      {solved && <p className="text-center text-game-correct text-lg font-bold">🎉 Solved in {used}</p>}
-      {!solved && used >= data.maxGuesses && <p className="text-center text-game-incorrect text-lg font-bold">Out of guesses</p>}
+
+      {solved && (
+        <div className="flex justify-center">
+          <Chip variant="streak">Solved in {used} {used === 1 ? 'guess' : 'guesses'}</Chip>
+        </div>
+      )}
+      {!solved && used >= data.maxGuesses && (
+        <div className="flex justify-center">
+          <Chip variant="muted">Out of guesses</Chip>
+        </div>
+      )}
     </div>
   );
 };
