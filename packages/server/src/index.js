@@ -26,6 +26,7 @@ import { TrueFalseGame } from './games/trueFalse.js';
 import { CountdownGame } from './games/countdown.js';
 import { PointlessGame, POINTLESS_ROUND_DURATION } from './games/pointless.js';
 import { ThemedDleGame } from './games/themedDle.js';
+import { NumbersGame } from './games/numbers.js';
 
 const app = express();
 const server = createServer(app);
@@ -163,6 +164,10 @@ function startSpecificGame(gameName) {
       const game = new ThemedDleGame(gameState, io, gameEngine, { theme });
       gameEngine.startGame(gameName, game);
       game.start();
+  } else if (gameName === 'numbers') {
+      const numbersGame = new NumbersGame(gameState, io, gameEngine);
+      gameEngine.startGame('numbers', numbersGame);
+      numbersGame.start();
   }
 }
 
@@ -495,6 +500,26 @@ io.on('connection', (socket) => {
     const currentGame = gameEngine.currentGameModule;
     if (currentGame && typeof currentGame.handleGuess === 'function') {
       currentGame.handleGuess(playerId, payload);
+    }
+  });
+
+  socket.on('numbers:submit', ({ expression, claimedValue }) => {
+    const playerId = connectionManager.getPlayerId(socket.id);
+    if (!playerId) {
+      socket.emit('error', { message: 'Not registered' });
+      return;
+    }
+    if (gameState.currentGame !== 'numbers') {
+      socket.emit('error', { message: 'Numbers Round not running' });
+      return;
+    }
+    if (gameState.numbers?.phase !== 'playing') {
+      socket.emit('error', { message: 'Not in playing phase' });
+      return;
+    }
+    const currentGame = gameEngine.currentGameModule;
+    if (currentGame && typeof currentGame.handleSubmit === 'function') {
+      currentGame.handleSubmit(playerId, { expression, claimedValue });
     }
   });
 
