@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Card, Chip } from '../../ui';
+import { screenEnter } from '../../lib/motion';
 
 interface ModeIntroProps {
   data: {
@@ -29,31 +31,36 @@ export const ModeIntro = ({ data }: ModeIntroProps) => {
     : 0;
 
   return (
-    <div className="screen-shell flex flex-col items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-bg-base px-4 py-6">
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="screen-frame max-w-3xl text-center space-y-5"
+        variants={screenEnter}
+        initial="hidden"
+        animate="visible"
+        className="w-full max-w-3xl"
       >
-        <p className="eyebrow">{data.theme === 'pokemon' ? 'Pokédle' : 'HP-dle'}</p>
-        <h1 className="text-5xl font-bold text-game-leader">{data.title}</h1>
-        <p className="text-xl text-ui-textMuted">{data.description}</p>
+        <Card className="text-center space-y-5">
+          <Chip variant="streak">{data.theme === 'pokemon' ? 'Pokédle' : 'HP-dle'}</Chip>
+          <h1 className="font-serif font-bold text-5xl md:text-6xl text-ink tracking-tight">{data.title}</h1>
+          <p className="text-xl text-ink-muted">{data.description}</p>
 
-        {data.attributes && (
-          <div className="flex flex-wrap justify-center gap-2">
-            {data.attributes.map((a) => (
-              <span key={a} className="status-pill">{a}</span>
-            ))}
+          {data.attributes && (
+            <div className="flex flex-wrap justify-center gap-2">
+              {data.attributes.map((a) => (
+                <Chip key={a} variant="info">{a}</Chip>
+              ))}
+            </div>
+          )}
+          {data.maxGuesses !== undefined && (
+            <div className="flex justify-center">
+              <Chip variant="muted">{data.maxGuesses} guesses</Chip>
+            </div>
+          )}
+
+          <div className="mx-auto w-full max-w-md overflow-hidden rounded-full border-2 border-ink bg-bg-sunken shadow-ink-sm" style={{ height: 8 }}>
+            <div className="h-full bg-streak" style={{ width: `${progress}%` }} />
           </div>
-        )}
-        {data.maxGuesses !== undefined && (
-          <p className="text-base text-ui-textMuted">{data.maxGuesses} guesses</p>
-        )}
-
-        <div className="mx-auto h-2 w-full max-w-md overflow-hidden rounded-full bg-gray-700">
-          <motion.div className="h-full bg-game-accent" style={{ width: `${progress}%` }} />
-        </div>
-        <p className="text-sm text-ui-textMuted">Starting in {Math.ceil(remaining / 1000)}s…</p>
+          <p className="text-sm text-ink-muted">Starting in {Math.ceil(remaining / 1000)}s…</p>
+        </Card>
       </motion.div>
     </div>
   );
