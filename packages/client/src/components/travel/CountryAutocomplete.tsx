@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Input } from '../../ui/Input';
 
 export interface Country { name: string; aliases?: string[]; }
 
@@ -11,7 +12,7 @@ interface CountryAutocompleteProps {
 }
 
 export const CountryAutocomplete = ({
-  countries, onSubmit, disabled, placeholder = 'Type a country…', maxResults = 5
+  countries, onSubmit, disabled, placeholder = 'Type a country…', maxResults = 5,
 }: CountryAutocompleteProps) => {
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
@@ -36,8 +37,7 @@ export const CountryAutocomplete = ({
 
   return (
     <div className="relative w-full">
-      <input
-        type="text"
+      <Input
         value={query}
         disabled={disabled}
         placeholder={placeholder}
@@ -58,16 +58,23 @@ export const CountryAutocomplete = ({
           }
           if (e.key === 'Escape') { setQuery(''); setActive(0); }
         }}
-        className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-lg text-white placeholder:text-ui-textMuted focus:border-game-leader focus:outline-none disabled:opacity-50"
       />
       {suggestions.length > 0 && !disabled && (
-        <ul className="absolute z-30 mt-1 max-h-72 w-full overflow-y-auto rounded-2xl border border-white/10 bg-ui-card shadow-xl">
+        <ul
+          className="absolute z-30 mt-1 w-full overflow-hidden rounded-xl border-2 border-ink bg-bg-surface shadow-ink"
+          role="listbox"
+        >
           {suggestions.map((c, idx) => (
             <li
               key={c.name}
               onMouseDown={(e) => { e.preventDefault(); submit(c.name); }}
               onMouseEnter={() => setActive(idx)}
-              className={`cursor-pointer px-4 py-3 text-lg ${idx === active ? 'bg-game-leader text-black' : 'text-white hover:bg-white/10'}`}
+              className={[
+                'cursor-pointer px-4 py-2.5 text-base font-bold',
+                idx === active ? 'bg-info text-on-info' : 'bg-bg-surface text-ink hover:bg-bg-sunken',
+              ].join(' ')}
+              role="option"
+              aria-selected={idx === active}
             >
               {c.name}
             </li>
