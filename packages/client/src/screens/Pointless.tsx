@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ColumnReveal } from './Pointless/ColumnReveal';
+import { ScoreDrop, Card, Chip, Input, Button } from '../ui';
 import { useGameStore } from '../stores/gameStore';
 import { GamePromptHeader } from '../components/GamePromptHeader';
 
@@ -177,55 +177,63 @@ export const Pointless = ({ socket }: PointlessProps) => {
     return 'th';
   };
 
+  // Task 3: Waiting screen
   if (!roundData && phase === 'waiting') {
     return (
-      <div className="screen-shell flex items-center justify-center">
-        <div className="card max-w-2xl text-center">
-          <p className="eyebrow mb-3">Pointless</p>
-          <h1 className="text-3xl font-bold">Waiting for the round to open</h1>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-bg-base p-6">
+        <Card eyebrow="Pointless" className="max-w-xl text-center">
+          <h1 className="font-display text-3xl font-extrabold text-ink sm:text-4xl">
+            Waiting for the round to open
+          </h1>
+          <p className="mt-3 text-base text-ink-muted">
+            Sit tight — the host will start the round any moment.
+          </p>
+        </Card>
       </div>
     );
   }
 
+  // Task 4: Intro screen
   if (phase === 'intro' && introData) {
     const progress = introData.duration ? ((introData.duration - timeRemaining) / introData.duration) * 100 : 0;
 
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-bg-base p-6">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="screen-frame max-w-4xl text-center space-y-6"
+          className="w-full max-w-3xl"
         >
-          <p className="eyebrow">Pointless</p>
-          <motion.h1
-            initial={{ y: -20 }}
-            animate={{ y: 0 }}
-            className="text-5xl sm:text-6xl font-bold text-primary-teal mb-4"
-          >
-            {introData.title}
-          </motion.h1>
+          <Card eyebrow="Pointless" className="text-center">
+            <motion.h1
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.28, ease: [0.34, 1.56, 0.64, 1] }}
+              className="font-serif text-5xl font-extrabold text-streak sm:text-6xl"
+            >
+              {introData.title}
+            </motion.h1>
 
-          <p className="text-xl text-ui-textMuted sm:text-2xl">Starting shortly</p>
+            <p className="mt-4 text-xl text-ink-muted sm:text-2xl">Starting shortly</p>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-full max-w-md mx-auto"
-          >
-            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-primary-teal"
-                style={{ width: `${progress}%` }}
-                transition={{ duration: 0.1 }}
-              />
-            </div>
-            <p className="text-sm text-ui-textMuted mt-2">
-              Starting in {Math.ceil(timeRemaining / 1000)}s...
-            </p>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="mx-auto mt-8 w-full max-w-md"
+            >
+              <div className="h-2 overflow-hidden rounded-full border-2 border-ink bg-bg-sunken">
+                <motion.div
+                  className="h-full bg-action"
+                  style={{ width: `${progress}%` }}
+                  transition={{ duration: 0.1 }}
+                />
+              </div>
+              <p className="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-ink-muted">
+                Starting in {Math.ceil(timeRemaining / 1000)}s
+              </p>
+            </motion.div>
+          </Card>
         </motion.div>
       </div>
     );
@@ -234,202 +242,207 @@ export const Pointless = ({ socket }: PointlessProps) => {
   const isAnsweringPhase = phase === 'playing' || phase === 'submitted';
 
   return (
-      <div className="screen-shell py-8 text-white">
-        <div className="screen-frame max-w-5xl">
-          {isAnsweringPhase ? (
-            <div className="sticky top-3 z-10 mb-4 rounded-[1.6rem] border border-ui-border/80 bg-[#0c0a09]/92 p-4 shadow-[0_18px_40px_rgba(0,0,0,0.3)] backdrop-blur-md sm:mb-6 sm:p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <p className="eyebrow mb-2">Pointless</p>
-                  <p className="text-[0.72rem] uppercase tracking-[0.2em] text-ui-textMuted sm:text-sm sm:tracking-[0.24em]">
-                    Round {roundData ? roundData.roundIndex + 1 : '-'} of {roundData ? roundData.totalRounds : '-'} • {roundData?.category || 'Category'}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="status-pill">
-                    <span className="text-xl font-bold text-primary-teal">{myCurrentScore}</span>
-                    <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ui-textMuted">pts</span>
-                  </span>
-                  {myCurrentPlacement ? (
-                    <span className="status-pill">
-                      {myCurrentPlacement}
-                      {getOrdinalSuffix(myCurrentPlacement)} in Pointless
-                    </span>
-                  ) : null}
-                  {phase === 'playing' ? (
-                    <span className="status-pill text-primary-teal">
-                      {Math.ceil(timeRemaining / 1000)}s
-                    </span>
-                  ) : null}
+    <div className="min-h-screen bg-bg-base py-8 text-ink">
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+        {/* Task 5: Sticky status bar / GamePromptHeader */}
+        {isAnsweringPhase ? (
+          <div className="sticky top-3 z-10 mb-4 rounded-2xl border-2 border-ink bg-bg-surface p-4 shadow-ink sm:mb-6 sm:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-streak">
+                  Pointless
+                </p>
+                <p className="mt-1 text-sm font-semibold uppercase tracking-[0.16em] text-ink-muted">
+                  Round {roundData ? roundData.roundIndex + 1 : '-'} of {roundData ? roundData.totalRounds : '-'} · {roundData?.category || 'Category'}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Chip variant="default">
+                  <span className="font-display text-lg font-extrabold text-ink">{myCurrentScore}</span>
+                  <span className="ml-1 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-ink-muted">pts</span>
+                </Chip>
+                {myCurrentPlacement ? (
+                  <Chip variant="info">
+                    {myCurrentPlacement}{getOrdinalSuffix(myCurrentPlacement)} in Pointless
+                  </Chip>
+                ) : null}
+                {phase === 'playing' ? (
+                  <Chip variant="now">
+                    {Math.ceil(timeRemaining / 1000)}s
+                  </Chip>
+                ) : null}
+              </div>
+            </div>
+            {phase === 'playing' ? (
+              <div className="mt-4">
+                <div className="h-2 overflow-hidden rounded-full border-2 border-ink bg-bg-sunken">
+                  <motion.div
+                    className="h-full bg-action"
+                    animate={{ width: `${Math.max(0, Math.min(100, (timeRemaining / (roundData?.duration || 30000)) * 100))}%` }}
+                    transition={{ duration: 0.1, ease: 'linear' }}
+                  />
                 </div>
               </div>
-              {phase === 'playing' ? (
-                <div className="mt-4">
-                  <div className="h-2 overflow-hidden rounded-full bg-ui-border/90">
-                    <motion.div
-                      className="h-full bg-primary-teal"
-                      animate={{ width: `${Math.max(0, Math.min(100, (timeRemaining / (roundData?.duration || 30000)) * 100))}%` }}
-                      transition={{ duration: 0.1, ease: 'linear' }}
-                    />
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          ) : (
-            <GamePromptHeader
-              eyebrow="Pointless"
-              meta={`Round ${roundData ? roundData.roundIndex + 1 : '-'} of ${roundData ? roundData.totalRounds : '-'} • ${roundData?.category || 'Category'}`}
-              title={roundData?.question || 'Question loading...'}
-              details={(
-                <>
-                  <span className="status-pill">
-                    <span className="text-xl font-bold text-primary-teal">{myCurrentScore}</span>
-                    <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ui-textMuted">pts</span>
-                  </span>
-                  {myCurrentPlacement ? (
-                    <span className="status-pill">
-                      {myCurrentPlacement}
-                      {getOrdinalSuffix(myCurrentPlacement)} in Pointless
-                    </span>
-                  ) : null}
-                </>
-              )}
-              timerBarClassName="bg-primary-teal"
-              timerTextClassName="text-primary-teal"
-            />
+            ) : null}
+          </div>
+        ) : (
+          <GamePromptHeader
+            eyebrow="Pointless"
+            meta={`Round ${roundData ? roundData.roundIndex + 1 : '-'} of ${roundData ? roundData.totalRounds : '-'} • ${roundData?.category || 'Category'}`}
+            title={roundData?.question || 'Question loading...'}
+            details={(
+              <>
+                <Chip variant="default">
+                  <span className="font-display text-lg font-extrabold text-ink">{myCurrentScore}</span>
+                  <span className="ml-1 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-ink-muted">pts</span>
+                </Chip>
+                {myCurrentPlacement ? (
+                  <Chip variant="info">
+                    {myCurrentPlacement}{getOrdinalSuffix(myCurrentPlacement)} in Pointless
+                  </Chip>
+                ) : null}
+              </>
+            )}
+          />
+        )}
+
+        <div className={`${isAnsweringPhase ? 'mx-auto w-full max-w-2xl' : 'flex min-h-[420px] items-center justify-center'}`}>
+          <AnimatePresence mode="wait">
+
+          {/* Task 5: Input Phase */}
+          {phase === 'playing' && (
+            <motion.div
+              key="input"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="w-full"
+            >
+              <Card className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <Input
+                    label="Your Answer"
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type your obscure answer..."
+                    autoFocus
+                    autoComplete="off"
+                    enterKeyHint="done"
+                    error={error || undefined}
+                  />
+                  <Button type="submit" variant="action" size="lg" className="w-full">
+                    Submit Answer
+                  </Button>
+                </form>
+              </Card>
+            </motion.div>
           )}
 
-          <div className={`${isAnsweringPhase ? 'mx-auto w-full max-w-2xl' : 'flex min-h-[420px] items-center justify-center'}`}>
-            <AnimatePresence mode="wait">
-
-            {/* Input Phase */}
-            {phase === 'playing' && (
-              <motion.div
-                key="input"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="w-full"
-              >
-                <form onSubmit={handleSubmit} className="card space-y-5 p-5 sm:p-8">
-                  <div className="space-y-2">
-                    <label className="section-label block">Your Answer</label>
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder="Type your obscure answer..."
-                      className="w-full rounded-[1.4rem] border border-ui-border/80 bg-black/30 px-4 py-4 text-lg focus:border-primary-teal focus:outline-none transition-colors"
-                      autoFocus
-                      autoComplete="off"
-                      enterKeyHint="done"
-                    />
-                    {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full rounded-full bg-primary-teal py-4 text-xl font-bold shadow-[0_18px_30px_rgba(0,0,0,0.25)] transition-transform active:scale-95 hover:bg-primary-teal/85"
-                  >
-                    Submit Answer
-                  </button>
-                </form>
-              </motion.div>
-            )}
-
-            {/* Submitted Phase */}
-            {phase === 'submitted' && (
-              <motion.div
-                key="submitted"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                className="card w-full py-12 text-center"
-              >
-                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl font-bold text-green-400">OK</span>
+          {/* Task 5: Submitted Phase */}
+          {phase === 'submitted' && (
+            <motion.div
+              key="submitted"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.1 }}
+              className="w-full"
+            >
+              <Card className="py-12 text-center">
+                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border-2 border-ink bg-action shadow-ink">
+                  <span className="font-display text-3xl font-black text-white">OK</span>
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Answer Locked!</h3>
-                <p className="text-gray-400">Waiting for the reveal...</p>
-              </motion.div>
-            )}
+                <h3 className="font-display text-2xl font-extrabold text-ink">Answer Locked!</h3>
+                <p className="mt-2 text-base text-ink-muted">Waiting for the reveal...</p>
+              </Card>
+            </motion.div>
+          )}
 
-            {/* Reveal Phase */}
-            {phase === 'reveal' && revealData && (
-              <motion.div
-                key="reveal"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mx-auto w-full max-w-3xl"
-              >
-                <div className="card p-6 sm:p-8">
-                  <p className="eyebrow mb-4">Score Reveal</p>
-
-                  <ColumnReveal
+          {/* Task 6: Reveal Phase */}
+          {phase === 'reveal' && revealData && (
+            <motion.div
+              key="reveal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mx-auto w-full max-w-3xl"
+            >
+              <Card eyebrow="Score Reveal">
+                <div className="flex justify-center py-2 sm:py-4">
+                  <ScoreDrop
                     key={revealData.triggerTime}
-                    score={revealData.score}
-                    triggerTime={revealData.triggerTime}
-                    isCorrect={revealData.isCorrect}
-                    className="h-[320px] sm:h-[400px]"
-                    onSequenceComplete={() => setRevealDetailsVisible(true)}
+                    targetScore={revealData.score}
+                    autoStart
+                    onLanded={() => setRevealDetailsVisible(true)}
                   />
-
-                  <AnimatePresence>
-                    {revealDetailsVisible && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 18 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 12 }}
-                        className="mt-6 rounded-[1.5rem] border border-ui-border/80 bg-black/20 p-5"
-                      >
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                          <div className="min-w-0">
-                            <p className="section-label mb-2">
-                              {revealData.isCorrect ? 'Official Match' : 'Submitted Answer'}
-                            </p>
-                            <h3 className="text-2xl font-bold text-white sm:text-3xl">
-                              {revealData.correctAnswer || revealData.originalInput}
-                            </h3>
-                            {revealData.originalInput.toLowerCase() !== revealData.correctAnswer?.toLowerCase() && revealData.isCorrect && (
-                              <p className="mt-2 text-sm text-ui-textMuted">
-                                Corrected from "{revealData.originalInput}"
-                              </p>
-                            )}
-                            {!revealData.isCorrect && revealData.originalInput && (
-                              <p className="mt-2 text-sm text-ui-textMuted">
-                                Submitted as "{revealData.originalInput}"
-                              </p>
-                            )}
-                          </div>
-
-                          <span className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                            revealData.isCorrect ? 'bg-primary-teal text-white' : 'bg-game-incorrect text-white'
-                          }`}>
-                            {revealData.score} pts
-                          </span>
-                        </div>
-
-                        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                          <div className="rounded-[1.3rem] border border-ui-border/80 bg-black/20 p-4">
-                            <p className="section-label mb-2">Current Standing</p>
-                            <p className="text-2xl font-semibold">
-                              {myCurrentPlacement ? `#${myCurrentPlacement}` : '-'}
-                            </p>
-                          </div>
-                          <div className="rounded-[1.3rem] border border-ui-border/80 bg-black/20 p-4">
-                            <p className="section-label mb-2">Running Total</p>
-                            <p className="text-2xl font-semibold">{myCurrentScore}</p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
-              </motion.div>
-            )}
 
-            </AnimatePresence>
-          </div>
+                <AnimatePresence>
+                  {revealDetailsVisible && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 12 }}
+                      transition={{ duration: 0.28, ease: [0.34, 1.56, 0.64, 1] }}
+                      className="mt-6 rounded-2xl border-2 border-ink bg-bg-sunken p-5 shadow-ink"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0">
+                          <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
+                            {revealData.isCorrect ? 'Official Match' : 'Submitted Answer'}
+                          </p>
+                          <h3 className="mt-2 font-display text-2xl font-extrabold text-ink sm:text-3xl">
+                            {revealData.correctAnswer || revealData.originalInput}
+                          </h3>
+                          {revealData.originalInput.toLowerCase() !== revealData.correctAnswer?.toLowerCase() && revealData.isCorrect && (
+                            <p className="mt-2 text-sm text-ink-muted">
+                              Corrected from "{revealData.originalInput}"
+                            </p>
+                          )}
+                          {!revealData.isCorrect && revealData.originalInput && (
+                            <p className="mt-2 text-sm text-ink-muted">
+                              Submitted as "{revealData.originalInput}"
+                            </p>
+                          )}
+                        </div>
+
+                        <Chip variant={revealData.isCorrect ? 'default' : 'streak'}>
+                          <span className="font-display text-lg font-extrabold">
+                            {revealData.score}
+                          </span>
+                          <span className="ml-1 text-[0.65rem] font-semibold uppercase tracking-[0.22em]">
+                            pts
+                          </span>
+                        </Chip>
+                      </div>
+
+                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-xl border-2 border-ink bg-bg-surface p-4 shadow-ink-sm">
+                          <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
+                            Current Standing
+                          </p>
+                          <p className="mt-2 font-display text-2xl font-extrabold text-ink">
+                            {myCurrentPlacement ? `#${myCurrentPlacement}` : '-'}
+                          </p>
+                        </div>
+                        <div className="rounded-xl border-2 border-ink bg-bg-surface p-4 shadow-ink-sm">
+                          <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
+                            Running Total
+                          </p>
+                          <p className="mt-2 font-display text-2xl font-extrabold text-ink">
+                            {myCurrentScore}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </Card>
+            </motion.div>
+          )}
+
+          </AnimatePresence>
         </div>
       </div>
+    </div>
   );
 };
