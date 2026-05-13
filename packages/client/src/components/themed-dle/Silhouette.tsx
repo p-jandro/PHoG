@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
+import { Card, Chip } from '../../ui';
+import { silhouetteReveal, shake } from '../../lib/motion';
 
 type SilhouetteResult = {
   guess: string;
@@ -17,6 +20,7 @@ interface SilhouetteProps {
     revealStage: number;
     roster: RosterEntry[];
     maxGuesses: number;
+    theme?: 'pokemon' | 'hp';
   };
   guesses: SilhouetteResult[];
   onGuess: (payload: { name: string }) => void;
@@ -31,43 +35,72 @@ export const Silhouette = ({ data, guesses, onGuess }: SilhouetteProps) => {
   const zoom = ZOOM[Math.min(stage, ZOOM.length - 1)];
   const brightness = solved ? 1.0 : BRIGHTNESS[Math.min(stage, BRIGHTNESS.length - 1)];
 
+  const wasJustSolved = solved && guesses.length > 0 && guesses[guesses.length - 1].solved;
+  const wasJustWrong  = !solved && guesses.length > 0 && !guesses[guesses.length - 1].correct;
+
+  const [shaking, setShaking] = useState(false);
+  const used = guesses.length;
+
+  useEffect(() => {
+    if (!wasJustWrong) return;
+    setShaking(true);
+    const t = setTimeout(() => setShaking(false), 350);
+    return () => clearTimeout(t);
+  }, [guesses.length, wasJustWrong]);
+
+  const placeholder = data.theme === 'pokemon' ? 'Guess the Pokémon…' : 'Guess the character…';
+
   return (
     <div className="space-y-5">
-      <div className="mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-black/40">
-        <motion.img
-          src={data.spriteUrl}
-          alt="silhouette"
-          initial={false}
-          animate={{ scale: zoom }}
-          transition={{ duration: 0.6 }}
-          style={{
-            // brightness 0 → fully obscured silhouette. Invert so it renders WHITE on the
-            // dark container background (classic "Who's That Pokémon" look); once brightness
-            // climbs above 0 we drop invert and let the real colours fade in.
-            filter: brightness === 0
-              ? 'brightness(0) invert(1)'
-              : `brightness(${brightness}) saturate(${Math.min(1, brightness + 0.2)})`,
-            width: '100%',
-            height: '100%',
-            objectFit: 'contain'
-          }}
-        />
-      </div>
+      <motion.div variants={shake} animate={shaking ? 'shaking' : 'rest'}>
+        <Card className={shaking ? 'border-danger' : ''}>
+          <motion.div
+            key={solved ? 'solved' : 'obscured'}
+            variants={silhouetteReveal}
+            initial={false}
+            animate={wasJustSolved ? 'revealed' : 'obscured'}
+            className="mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-2xl border-2 border-ink bg-bg-sunken shadow-ink-sm"
+          >
+            <motion.img
+              src={data.spriteUrl}
+              alt="silhouette"
+              animate={{ scale: zoom }}
+              transition={{ duration: 0.6 }}
+              style={{
+                filter: brightness === 0
+                  ? 'brightness(0) invert(1)'
+                  : `brightness(${brightness}) saturate(${Math.min(1, brightness + 0.2)})`,
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                transition: 'filter 350ms ease-out',
+              }}
+            />
+          </motion.div>
+        </Card>
+      </motion.div>
 
-      <ul className="space-y-1">
+      <ul className="space-y-2">
         {guesses.map((g, i) => (
-          <li key={i} className={`rounded-xl px-3 py-2 ${g.correct ? 'bg-game-correct/30 text-game-correct' : 'bg-game-incorrect/15 text-ui-textMuted'}`}>
-            <span className="mr-2">{g.correct ? '✓' : '✗'}</span>{g.guess}
+          <li key={i} className="flex items-center gap-2 rounded-xl border-2 border-ink bg-bg-surface px-3 py-2 shadow-ink-sm">
+            <Chip variant={g.correct ? 'streak' : 'muted'}>{g.correct ? 'Correct' : 'Wrong'}</Chip>
+            <span className="font-semibold text-ink">{g.guess}</span>
           </li>
         ))}
       </ul>
 
-      {!solved && guesses.length < data.maxGuesses && (
-        <AutocompletePicker roster={data.roster} onSubmit={(name) => onGuess({ name })} placeholder="Guess the Pokémon…" />
+      {!solved && used < data.maxGuesses && (
+        <AutocompletePicker roster={data.roster} onSubmit={(name) => onGuess({ name })} placeholder={placeholder} />
       )}
-      {solved && <p className="text-center text-game-correct text-lg font-bold">🎉 Solved!</p>}
-      {!solved && guesses.length >= data.maxGuesses && (
-        <p className="text-center text-game-incorrect text-lg font-bold">Out of guesses</p>
+      {solved && (
+        <div className="flex justify-center">
+          <Chip variant="streak">Solved in {used} {used === 1 ? 'guess' : 'guesses'}</Chip>
+        </div>
+      )}
+      {!solved && used >= data.maxGuesses && (
+        <div className="flex justify-center">
+          <Chip variant="muted">Out of guesses</Chip>
+        </div>
       )}
     </div>
   );
