@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { GamePromptHeader } from '../components/GamePromptHeader';
+import { Chip } from '../ui/Chip';
+import { AnswerFeedback } from '../ui/AnswerFeedback';
+import { streakChipPop } from '../lib/motion';
 
 interface TrueFalseProps {
   socket: Socket | null;
@@ -222,24 +225,18 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
 
   // Playing Phase
   if (phase === 'playing' && currentStatement) {
-    const timePercent = (timeRemaining / currentStatement.duration) * 100;
     const showingAnswer = correctAnswer !== null;
-    const timerToneClass =
-      timePercent > 50 ? 'bg-game-correct' :
-      timePercent > 25 ? 'bg-game-warning' :
-      'bg-game-incorrect';
-    const timerTextClass =
-      timePercent > 50 ? 'text-game-correct' :
-      timePercent > 25 ? 'text-game-warning' :
-      'text-game-incorrect';
+    const wasCorrect = correctAnswer === selectedAnswer;
+    const hadAnswer = selectedAnswer !== null;
 
     return (
-      <div className="screen-shell py-8 text-white">
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
         <motion.div
           key={currentStatement.statementId}
-          initial={{ opacity: 0, x: 100 }}
+          initial={{ opacity: 0, x: 80 }}
           animate={{ opacity: 1, x: 0 }}
-          className="screen-frame max-w-5xl"
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="mx-auto max-w-5xl"
         >
           <GamePromptHeader
             eyebrow="True or False"
@@ -247,77 +244,85 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
             title={currentStatement.statement}
             details={(
               <>
-                <span className="status-pill">
-                  <span className="text-xl font-bold text-game-correct">{currentScore}</span>
-                  <span className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ui-textMuted">pts</span>
-                </span>
+                <Chip variant="info">
+                  <span className="font-display text-base font-black">{currentScore}</span>
+                  <span className="text-[0.65rem] tracking-[0.18em] uppercase">pts</span>
+                </Chip>
                 {currentPlacement ? (
-                  <span className="status-pill">
-                    {currentPlacement}
-                    {getOrdinalSuffix(currentPlacement)} in T/F
-                  </span>
+                  <Chip>
+                    <span className="font-display text-base font-black">
+                      {currentPlacement}{getOrdinalSuffix(currentPlacement)}
+                    </span>
+                    <span className="text-[0.65rem] tracking-[0.18em] uppercase">in True/False</span>
+                  </Chip>
                 ) : null}
-                {currentStreak > 0 ? (
-                  <span className="status-pill text-game-warning">
-                    {currentStreak}x streak
-                  </span>
+                {currentStreak >= 2 ? (
+                  <motion.div
+                    key={currentStreak}
+                    variants={streakChipPop}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <Chip variant="streak">
+                      <span aria-hidden="true">🔥</span>
+                      <span className="font-display text-base font-black">{currentStreak}×</span>
+                      <span className="text-[0.65rem] tracking-[0.18em] uppercase">streak</span>
+                    </Chip>
+                  </motion.div>
                 ) : null}
               </>
             )}
             timerMs={!showingAnswer ? timeRemaining : undefined}
             totalMs={!showingAnswer ? currentStatement.duration : undefined}
-            timerBarClassName={timerToneClass}
-            timerTextClassName={timerTextClass}
           />
 
           <div className="mx-auto max-w-4xl">
-            {showingAnswer && (
-              <motion.div
-                className="card mb-8"
-                animate={{
-                  backgroundColor: correctAnswer === selectedAnswer ? '#00D4AA20' : '#FF475720'
-                }}
-              >
+            {showingAnswer ? (
+              <AnswerFeedback state={wasCorrect ? 'correct' : hadAnswer ? 'wrong' : 'idle'}>
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center"
+                  transition={{ duration: 0.22, ease: 'easeOut' }}
+                  className={[
+                    'mb-6 rounded-2xl border-2 border-ink p-6 text-center shadow-ink',
+                    wasCorrect ? 'bg-action text-on-action' : hadAnswer ? 'bg-danger text-on-danger' : 'bg-bg-sunken text-ink',
+                  ].join(' ')}
                 >
-                  <p className={`text-2xl font-bold ${
-                    correctAnswer === selectedAnswer ? 'text-game-correct' : 'text-game-incorrect'
-                  }`}>
-                    {correctAnswer === selectedAnswer ? 'Correct' : 'Wrong'}
+                  <p className="font-display text-3xl font-black">
+                    {wasCorrect ? 'Correct!' : hadAnswer ? 'Wrong' : 'No answer'}
                   </p>
-                  <p className="mt-2 text-ui-textMuted">
+                  <p className="mt-2 text-base font-bold uppercase tracking-[0.18em] opacity-90">
                     Answer: {correctAnswer ? 'TRUE' : 'FALSE'}
                   </p>
 
                   {explanation && (
                     <motion.div
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.25 }}
-                      className="mt-6 rounded-[1.5rem] bg-ui-background p-5 text-left"
+                      transition={{ delay: 0.25, duration: 0.22, ease: 'easeOut' }}
+                      className="mt-6 rounded-xl border-2 border-ink bg-bg-surface p-5 text-left text-ink shadow-ink-sm"
                     >
-                      <h3 className="text-lg font-bold text-primary-teal mb-2">Did you know?</h3>
-                      <p className="text-ui-textMuted">{explanation}</p>
+                      <h3 className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-streak">
+                        Did you know?
+                      </h3>
+                      <p className="text-base font-semibold text-ink-muted">{explanation}</p>
                     </motion.div>
                   )}
                 </motion.div>
-              </motion.div>
-            )}
-
-            {!showingAnswer && (
+              </AnswerFeedback>
+            ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
                 <motion.button
                   onClick={() => handleAnswer(false)}
                   disabled={selectedAnswer !== null}
-                  whileTap={{ scale: selectedAnswer !== null ? 1 : 0.95 }}
-                  className={`btn-answer min-h-[100px] text-3xl font-bold sm:text-2xl ${
-                    selectedAnswer === false ? 'ring-4 ring-white' : ''
-                  } ${selectedAnswer !== null && selectedAnswer !== false ? 'opacity-50' : ''} 
-                  active:scale-95 transition-all touch-manipulation`}
-                  style={{ backgroundColor: '#bf5c43' }}
+                  whileHover={selectedAnswer === null ? { x: -1, y: -1 } : undefined}
+                  whileTap={selectedAnswer === null ? { x: 4, y: 4 } : undefined}
+                  transition={{ duration: 0.08, ease: [0, 0, 0.2, 1] }}
+                  className={[
+                    'min-h-[120px] rounded-2xl border-2 border-ink bg-danger text-on-danger font-display text-4xl font-black tracking-tight shadow-ink touch-manipulation sm:text-5xl',
+                    selectedAnswer === false ? 'ring-4 ring-now' : '',
+                    selectedAnswer === true ? 'opacity-40' : '',
+                  ].join(' ')}
                 >
                   FALSE
                 </motion.button>
@@ -325,12 +330,14 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
                 <motion.button
                   onClick={() => handleAnswer(true)}
                   disabled={selectedAnswer !== null}
-                  whileTap={{ scale: selectedAnswer !== null ? 1 : 0.95 }}
-                  className={`btn-answer min-h-[100px] text-3xl font-bold sm:text-2xl ${
-                    selectedAnswer === true ? 'ring-4 ring-white' : ''
-                  } ${selectedAnswer !== null && selectedAnswer !== true ? 'opacity-50' : ''} 
-                  active:scale-95 transition-all touch-manipulation`}
-                  style={{ backgroundColor: '#6f9a79' }}
+                  whileHover={selectedAnswer === null ? { x: -1, y: -1 } : undefined}
+                  whileTap={selectedAnswer === null ? { x: 4, y: 4 } : undefined}
+                  transition={{ duration: 0.08, ease: [0, 0, 0.2, 1] }}
+                  className={[
+                    'min-h-[120px] rounded-2xl border-2 border-ink bg-action text-on-action font-display text-4xl font-black tracking-tight shadow-ink touch-manipulation sm:text-5xl',
+                    selectedAnswer === true ? 'ring-4 ring-now' : '',
+                    selectedAnswer === false ? 'opacity-40' : '',
+                  ].join(' ')}
                 >
                   TRUE
                 </motion.button>
