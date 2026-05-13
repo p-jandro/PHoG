@@ -6,6 +6,7 @@ import { TrueFalse } from './screens/TrueFalse';
 import { Countdown } from './screens/Countdown';
 import { Pointless } from './screens/Pointless';
 import { ThemedDle } from './screens/ThemedDle';
+import { Numbers } from './screens/Numbers';
 import { FinalLeaderboard } from './screens/FinalLeaderboard';
 import { PausedOverlay } from './components/PausedOverlay';
 import { RoundLeaderboardOverlay } from './components/RoundLeaderboardOverlay';
@@ -34,6 +35,8 @@ function App() {
           case 'pokedle':
           case 'hpdle':
             return <ThemedDle socket={socket} />;
+          case 'numbers':
+            return <Numbers socket={socket} />;
           default:
             return (
               <div className="min-h-screen flex items-center justify-center">
