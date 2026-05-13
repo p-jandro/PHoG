@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
-import { geoMercator } from 'd3-geo';
+import { geoMercator, geoCentroid } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import worldData from 'world-atlas/countries-110m.json';
@@ -113,7 +113,19 @@ export const TravelMap = ({
     const padding = 24;
     const p = geoMercator();
     if (relevantFeatures.features.length > 0) {
-      p.fitExtent([[padding, padding], [width - padding, height - padding]], relevantFeatures);
+      // Fit to centroids, not full geometries. Countries with overseas territories
+      // (e.g. France's French Guiana, Netherlands' Caribbean, etc.) would otherwise
+      // pull the bounding box across continents. Centroid-based fit keeps the
+      // projection focused on the mainland; outlier polygons render off-canvas
+      // and are clipped by the SVG viewbox.
+      const points = {
+        type: 'FeatureCollection',
+        features: relevantFeatures.features.map((f: any) => ({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: geoCentroid(f) }
+        }))
+      };
+      p.fitExtent([[padding, padding], [width - padding, height - padding]], points as any);
     } else {
       // Fallback to a sensible world view
       p.scale(140).center([10, 20]).translate([width / 2, height / 2]);
