@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
 import { ThemedDleDisplay } from './ThemedDleDisplay';
+import { NumbersDisplay } from './NumbersDisplay';
 import { QRCodeSVG } from 'qrcode.react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
@@ -580,6 +581,15 @@ export const Display = () => {
           currentGame={currentGame as 'pokedle' | 'hpdle'}
           players={players}
         />
+        {displayControl}
+      </>
+    );
+  }
+
+  if (currentGame === 'numbers' && phase === 'playing') {
+    return (
+      <>
+        <NumbersDisplay socket={socket} players={players} />
         {displayControl}
       </>
     );
