@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { ThemedDleDisplay } from './ThemedDleDisplay';
 import { NumbersDisplay } from './NumbersDisplay';
 import { WordleDisplay } from './WordleDisplay';
+import { TravelDisplay } from './TravelDisplay';
 import { QRCodeSVG } from 'qrcode.react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
@@ -604,6 +605,15 @@ export const Display = () => {
     return (
       <>
         <WordleDisplay socket={socket} players={players} />
+        {displayControl}
+      </>
+    );
+  }
+
+  if (currentGame === 'travel' && phase === 'playing') {
+    return (
+      <>
+        <TravelDisplay socket={socket} players={players} />
         {displayControl}
       </>
     );
