@@ -7,6 +7,8 @@ import { TargetDisplay } from '../components/numbers/TargetDisplay';
 import { OperationBuilder } from '../components/numbers/OperationBuilder';
 import { RoundResults } from '../components/numbers/RoundResults';
 import { HistoryList, OperationEntry } from '../components/numbers/HistoryList';
+import { Card } from '../ui/Card';
+import { Chip } from '../ui/Chip';
 
 type Phase = 'intro' | 'playing' | 'results';
 
@@ -21,6 +23,7 @@ export const Numbers = ({ socket }: NumbersProps) => {
   const [roundData, setRoundData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
   const [pool, setPool] = useState<Tile[]>([]);
+  const [originalTiles, setOriginalTiles] = useState<Tile[]>([]);
   const [history, setHistory] = useState<OperationEntry[]>([]);
   const [selectedAId, setSelectedAId] = useState<string | null>(null);
   const [op, setOp] = useState<string | null>(null);
@@ -28,7 +31,6 @@ export const Numbers = ({ socket }: NumbersProps) => {
   const [errorToast, setErrorToast] = useState<string | null>(null);
   const [timerMs, setTimerMs] = useState(0);
 
-  // Playing-phase timer
   useEffect(() => {
     if (phase !== 'playing' || !roundData?.endsAt) return;
     const tick = () => setTimerMs(Math.max(0, roundData.endsAt - Date.now()));
@@ -37,13 +39,13 @@ export const Numbers = ({ socket }: NumbersProps) => {
     return () => clearInterval(i);
   }, [phase, roundData]);
 
-  // Socket subscriptions
   useEffect(() => {
     if (!socket) return;
     const onIntro = (d: any) => {
       setPhase('intro');
       setIntroData(d);
       setPool([]);
+      setOriginalTiles([]);
       setHistory([]);
       setSelectedAId(null);
       setOp(null);
@@ -52,7 +54,9 @@ export const Numbers = ({ socket }: NumbersProps) => {
     const onStart = (d: any) => {
       setPhase('playing');
       setRoundData(d);
-      setPool(d.tiles || []);
+      const tiles = d.tiles || [];
+      setPool(tiles);
+      setOriginalTiles(tiles);
       setHistory([]);
       setSelectedAId(null);
       setOp(null);
@@ -65,12 +69,11 @@ export const Numbers = ({ socket }: NumbersProps) => {
         return;
       }
       if (Array.isArray(d.pool)) setPool(d.pool);
+      // Reset event from server: restore original tile pool.
+      if (d.reset && Array.isArray(d.pool)) setOriginalTiles(d.pool);
       if (Array.isArray(d.history)) {
         setHistory(d.history.map((h: any) => ({
-          aValue: h.aValue,
-          bValue: h.bValue,
-          op: h.op,
-          result: h.result
+          aValue: h.aValue, bValue: h.bValue, op: h.op, result: h.result,
         })));
       }
       setSelectedAId(null);
@@ -96,32 +99,14 @@ export const Numbers = ({ socket }: NumbersProps) => {
   const target = roundData?.target;
   const totalMs = roundData?.duration || 60000;
   const progress = totalMs > 0 ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : 0;
-
   const aTile = pool.find((t) => t.id === selectedAId) || null;
 
   const handleTileClick = (id: string) => {
     if (solved) return;
-    if (!selectedAId) {
-      // First selection: pick A
-      setSelectedAId(id);
-      setOp(null);
-      return;
-    }
-    if (selectedAId === id) {
-      // Tapping the same tile again deselects
-      setSelectedAId(null);
-      setOp(null);
-      return;
-    }
-    if (!op) {
-      // A is selected but no op yet — treat as "switch A"
-      setSelectedAId(id);
-      return;
-    }
-    // We have A + op; this tile is B → execute
+    if (!selectedAId) { setSelectedAId(id); setOp(null); return; }
+    if (selectedAId === id) { setSelectedAId(null); setOp(null); return; }
+    if (!op) { setSelectedAId(id); return; }
     socket?.emit('numbers:operation', { aId: selectedAId, op, bId: id });
-    // Optimistic clear; will be overwritten by ack
-    // (We don't clear selectedAId here — the ack will. Keeps the highlight visible during the round-trip.)
   };
 
   const handleOperator = (newOp: string) => {
@@ -129,11 +114,7 @@ export const Numbers = ({ socket }: NumbersProps) => {
     setOp(newOp);
   };
 
-  const handleCancel = () => {
-    setSelectedAId(null);
-    setOp(null);
-  };
-
+  const handleCancel = () => { setSelectedAId(null); setOp(null); };
   const handleReset = () => {
     socket?.emit('numbers:reset', {});
     setSelectedAId(null);
@@ -144,19 +125,25 @@ export const Numbers = ({ socket }: NumbersProps) => {
   // Intro splash
   if (phase === 'intro' && introData) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="screen-frame max-w-2xl space-y-4 text-center">
-          <p className="eyebrow">Game starting</p>
-          <h1 className="text-5xl font-bold text-game-leader">{introData.title}</h1>
-          <p className="text-xl text-ui-textMuted">{introData.description}</p>
+      <div className="min-h-screen bg-bg-base px-4 py-6 flex flex-col items-center justify-center sm:px-6 sm:py-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mx-auto w-full max-w-2xl space-y-4 text-center"
+        >
+          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-streak">Game starting</p>
+          <h1 className="font-serif text-5xl font-extrabold text-ink">{introData.title}</h1>
+          <p className="text-xl text-ink-muted">{introData.description}</p>
           {Array.isArray(introData.scoringRules) && (
             <ul className="mx-auto max-w-md space-y-1 text-left text-base">
               {introData.scoringRules.map((r: string) => (
-                <li key={r} className="rounded-xl border border-white/10 bg-black/20 px-3 py-2">{r}</li>
+                <li key={r} className="rounded-xl border-2 border-ink bg-bg-surface px-3 py-2 text-ink shadow-ink-sm">
+                  {r}
+                </li>
               ))}
             </ul>
           )}
-          <p className="text-sm text-ui-textMuted">{introData.totalRounds} rounds · easy → medium → difficult</p>
+          <p className="text-sm text-ink-muted">{introData.totalRounds} rounds · easy → medium → difficult</p>
         </motion.div>
       </div>
     );
@@ -165,7 +152,7 @@ export const Numbers = ({ socket }: NumbersProps) => {
   // Results splash
   if (phase === 'results' && resultsData) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-bg-base px-4 py-6 flex flex-col items-center justify-center sm:px-6 sm:py-8">
         <RoundResults data={resultsData} />
       </div>
     );
@@ -174,22 +161,32 @@ export const Numbers = ({ socket }: NumbersProps) => {
   // Playing
   if (phase === 'playing' && roundData) {
     return (
-      <div className="screen-shell py-4">
-        <div className="screen-frame max-w-2xl space-y-4">
-          <div className="flex items-baseline justify-between">
-            <div>
-              <p className="eyebrow">Numbers · Round {roundData.roundNumber}/{roundData.totalRounds}</p>
-              <p className="text-xs uppercase tracking-wider text-game-leader">{roundData.difficulty}</p>
+      <div className="min-h-screen bg-bg-base px-4 py-4 sm:px-6">
+        <div className="mx-auto w-full max-w-2xl space-y-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Chip variant="muted">Numbers · Round {roundData.roundNumber}/{roundData.totalRounds}</Chip>
+              <Chip variant="streak">{roundData.difficulty}</Chip>
             </div>
-            <p className="tabular-nums text-2xl font-bold text-white">{Math.ceil(timerMs / 1000)}s</p>
+            <p className="font-display text-3xl font-extrabold tabular-nums text-ink">
+              {Math.ceil(timerMs / 1000)}s
+            </p>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-            <div className="h-full bg-game-leader" style={{ width: `${progress}%` }} />
+          <div className="h-2 w-full overflow-hidden rounded-full border-2 border-ink bg-bg-sunken">
+            <div className="h-full bg-action transition-[width] duration-100" style={{ width: `${progress}%` }} />
           </div>
 
           <TargetDisplay target={target} />
 
-          <TilePool tiles={pool} selectedId={selectedAId} onTileClick={handleTileClick} disabled={solved} />
+          <Card eyebrow="Tiles" className="p-4">
+            <TilePool
+              tiles={pool}
+              originalTiles={originalTiles}
+              selectedId={selectedAId}
+              onTileClick={handleTileClick}
+              disabled={solved}
+            />
+          </Card>
 
           <OperationBuilder
             aValue={aTile?.value ?? null}
@@ -205,7 +202,9 @@ export const Numbers = ({ socket }: NumbersProps) => {
           <HistoryList history={history} />
 
           {solved && (
-            <p className="text-center text-2xl font-bold text-game-correct">🎉 reached {target}!</p>
+            <p className="text-center font-display text-3xl font-extrabold text-action">
+              reached {target}!
+            </p>
           )}
         </div>
       </div>
@@ -214,11 +213,11 @@ export const Numbers = ({ socket }: NumbersProps) => {
 
   // Loading fallback
   return (
-    <div className="screen-shell flex flex-col items-center justify-center">
-      <div className="screen-frame max-w-md text-center">
-        <p className="eyebrow">Numbers Round</p>
-        <h1 className="text-3xl font-bold">Loading…</h1>
-      </div>
+    <div className="min-h-screen bg-bg-base flex flex-col items-center justify-center">
+      <Card className="max-w-md text-center">
+        <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-streak">Numbers Round</p>
+        <h1 className="mt-2 font-display text-3xl font-extrabold text-ink">Loading…</h1>
+      </Card>
     </div>
   );
 };
