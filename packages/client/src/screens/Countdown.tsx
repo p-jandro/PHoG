@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { useAudio } from '../hooks/useAudio';
+import { Card, Chip, Countdown as CountdownTimer, LeaderboardRow } from '../ui';
+import { screenEnter, reducedFade } from '../lib/motion';
 
 interface CountdownProps {
   socket: Socket | null;
@@ -28,6 +30,8 @@ export const Countdown = ({ socket }: CountdownProps) => {
   const [gameResults, setGameResults] = useState<any>(null);
 
   const { playerId } = useGameStore();
+  const reduced = useReducedMotion();
+  const enterVariants = reduced ? reducedFade : screenEnter;
 
   // Audio player for countdown theme
   // To use: Place audio file at packages/client/public/audio/countdown-theme.mp3
@@ -100,7 +104,7 @@ export const Countdown = ({ socket }: CountdownProps) => {
       console.log('[Countdown] Game ended', data);
       setPhase('gameEnd');
       setGameResults(data);
-      
+
       // Stop music
       audio.stop();
     });
@@ -127,7 +131,7 @@ export const Countdown = ({ socket }: CountdownProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!socket || submitted || !word || !currentRound) return;
-    
+
     socket.emit('countdown:submit', { word });
     setSubmitted(true);
 
@@ -140,10 +144,10 @@ export const Countdown = ({ socket }: CountdownProps) => {
 
   const isLetterUsed = (letter: string, index: number) => {
     if (!word || !shuffledLetters) return false;
-    
+
     // Count total occurrences of this letter in the word
     const letterUsageInWord = word.split('').filter(l => l === letter).length;
-    
+
     // If the word doesn't use this letter at all, it's not used
     if (letterUsageInWord === 0) return false;
 
@@ -151,10 +155,10 @@ export const Countdown = ({ socket }: CountdownProps) => {
     const letterIndices = shuffledLetters
       .map((l, i) => l === letter ? i : -1)
       .filter(i => i !== -1);
-    
+
     // This specific instance's position among duplicates
     const instanceRank = letterIndices.indexOf(index);
-    
+
     // If this instance is one of the first N occurrences (where N is usage count), mark it used
     return instanceRank < letterUsageInWord;
   };
@@ -171,88 +175,50 @@ export const Countdown = ({ socket }: CountdownProps) => {
 
   // Intro Phase
   if (phase === 'intro' && introData) {
-    const progress = introData.duration ? ((introData.duration - timeRemaining) / introData.duration) * 100 : 0;
-
     return (
       <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="screen-frame max-w-4xl text-center space-y-6"
+          variants={enterVariants}
+          initial="hidden"
+          animate="visible"
+          className="screen-frame max-w-4xl space-y-6 text-center"
         >
-          <p className="eyebrow">Countdown Briefing</p>
-          <motion.h1
-            initial={{ y: -20 }}
-            animate={{ y: 0 }}
-            className="text-5xl sm:text-6xl font-bold text-white mb-4"
+          <Card
+            eyebrow="Countdown Briefing"
+            title={introData.title}
+            className="text-left"
           >
-            {introData.title}
-          </motion.h1>
+            <p className="text-lg text-ink-muted">{introData.description}</p>
+          </Card>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-2xl sm:text-3xl text-ui-textMuted mb-8"
-          >
-            {introData.description}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-ui-card rounded-xl p-6 sm:p-8 text-left"
-          >
-            <h2 className="text-2xl font-bold text-game-accent mb-4">Scoring Rules</h2>
+          <Card title="Scoring Rules" className="text-left">
             <ul className="space-y-2 text-lg">
               {introData.scoringRules?.map((rule: string, index: number) => (
                 <motion.li
                   key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  className="flex items-start"
+                  initial={reduced ? { opacity: 0 } : { opacity: 0, x: -20 }}
+                  animate={reduced ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + index * 0.08, duration: 0.22 }}
+                  className="flex items-start gap-2 text-ink"
                 >
-                  <span className="text-game-accent mr-2">•</span>
-                  <span className="text-ui-textMuted">{rule}</span>
+                  <span aria-hidden="true" className="text-streak">•</span>
+                  <span>{rule}</span>
                 </motion.li>
               ))}
             </ul>
-          </motion.div>
+          </Card>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="space-y-2"
-          >
-            <p className="text-xl text-game-warning">
-              {introData.placementInfo}
-            </p>
-            <p className="text-lg text-ui-textMuted">
-              {introData.shuffleInfo}
-            </p>
-          </motion.div>
-
-          {/* Progress bar */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            className="w-full max-w-md mx-auto"
-          >
-            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-game-accent"
-                style={{ width: `${progress}%` }}
-                transition={{ duration: 0.1 }}
-              />
-            </div>
-            <p className="text-sm text-ui-textMuted mt-2">
-              Starting in {Math.ceil(timeRemaining / 1000)}s...
-            </p>
-          </motion.div>
+          <div className="flex flex-col items-center gap-3">
+            {introData.placementInfo && (
+              <Chip variant="info">{introData.placementInfo}</Chip>
+            )}
+            {introData.shuffleInfo && (
+              <p className="text-sm text-ink-muted">{introData.shuffleInfo}</p>
+            )}
+            <Chip variant="now">
+              Starting in {Math.ceil(timeRemaining / 1000)}s
+            </Chip>
+          </div>
         </motion.div>
       </div>
     );
@@ -260,89 +226,76 @@ export const Countdown = ({ socket }: CountdownProps) => {
 
   // Playing Phase
   if (phase === 'playing' && currentRound) {
-    const timePercent = (timeRemaining / currentRound.duration) * 100;
-    const timeSeconds = Math.ceil(timeRemaining / 1000);
+    const timeSeconds = Math.max(0, Math.ceil(timeRemaining / 1000));
+    const totalSeconds = Math.max(1, Math.ceil(currentRound.duration / 1000));
 
     return (
       <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="screen-frame max-w-5xl"
+          variants={enterVariants}
+          initial="hidden"
+          animate="visible"
+          className="screen-frame max-w-5xl space-y-6"
         >
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <span className="text-ui-textMuted">
-              Round {currentRound.roundNumber} / {currentRound.totalRounds}
-            </span>
-            <div className="flex items-center gap-4">
-              {/* Volume control */}
+          <div className="flex items-center justify-between gap-4">
+            <Chip variant="info">
+              Round {currentRound.roundNumber} of {currentRound.totalRounds}
+            </Chip>
+            <div className="flex items-center gap-3">
               <button
-                onClick={() => audio.isPlaying ? audio.pause() : audio.play()}
-                className="btn-secondary text-sm"
-                aria-label={audio.isPlaying ? "Mute music" : "Play music"}
+                type="button"
+                onClick={() => (audio.isPlaying ? audio.pause() : audio.play())}
+                aria-label={audio.isPlaying ? 'Mute music' : 'Play music'}
+                className="rounded-lg border-2 border-ink bg-bg-surface px-3 py-1.5 text-sm font-extrabold text-ink shadow-ink-sm"
               >
                 {audio.isPlaying ? 'Sound On' : 'Sound Off'}
               </button>
-              <div className="text-3xl font-bold text-primary-purple">
-                {timeSeconds}s
-              </div>
+              <CountdownTimer
+                seconds={timeSeconds}
+                total={totalSeconds}
+                size={96}
+              />
             </div>
           </div>
 
-          {/* Timer bar */}
-          <div className="w-full h-2 bg-ui-border rounded-full overflow-hidden mb-8">
-            <motion.div
-              className={`h-full ${
-                timePercent > 50 ? 'bg-game-correct' :
-                timePercent > 25 ? 'bg-game-warning' :
-                'bg-game-incorrect'
-              }`}
-              style={{ width: `${timePercent}%` }}
-              transition={{ duration: 0.1 }}
-            />
-          </div>
-
-          {/* Letters - optimized for mobile */}
-          <div className="card mb-6 sm:mb-8">
-            <div className="flex justify-between items-center mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold">Available Letters</h2>
+          <Card title="Available Letters">
+            <div className="mb-4 flex justify-end">
               <button
+                type="button"
                 onClick={handleShuffle}
-                className="btn-secondary bg-primary-teal hover:bg-primary-teal/80 px-4 py-2 rounded-lg font-bold transition-all active:scale-95 touch-manipulation"
+                className="rounded-lg border-2 border-ink bg-info px-4 py-2 text-sm font-extrabold text-on-info shadow-ink-sm active:translate-x-[2px] active:translate-y-[2px]"
               >
                 Shuffle
               </button>
             </div>
-            <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
               {shuffledLetters.map((letter, index) => (
                 <motion.div
                   key={`${letter}-${index}`}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center text-2xl sm:text-3xl font-bold rounded-lg ${
+                  initial={reduced ? { opacity: 0 } : { scale: 0, rotate: -180 }}
+                  animate={reduced ? { opacity: 1 } : { scale: 1, rotate: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.22 }}
+                  className={[
+                    'flex h-14 w-14 items-center justify-center rounded-lg border-2 border-ink text-2xl font-extrabold uppercase shadow-ink-sm sm:h-16 sm:w-16 sm:text-3xl',
                     isLetterUsed(letter, index)
-                      ? 'bg-primary-purple text-white'
-                      : 'bg-ui-border text-ui-text'
-                  } transition-all`}
+                      ? 'bg-premium text-on-premium'
+                      : 'bg-bg-surface text-ink',
+                  ].join(' ')}
                 >
                   {letter}
                 </motion.div>
               ))}
             </div>
-          </div>
+          </Card>
 
-          {/* Word input - optimized for mobile */}
-          <form onSubmit={handleSubmit} className="card">
-            <h3 className="text-lg sm:text-xl font-bold mb-4">Your Word</h3>
-            <div className="space-y-4">
+          <Card title="Your Word">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
                 value={word}
                 onChange={handleWordChange}
                 placeholder="Enter your word..."
-                className="input-field text-xl sm:text-2xl text-center font-bold min-h-[60px] touch-manipulation"
+                className="w-full rounded-lg border-2 border-ink bg-bg-sunken px-4 py-3 text-center text-xl font-extrabold uppercase text-ink shadow-ink-sm placeholder:text-ink-muted focus:outline-none focus:ring-4 focus:ring-info/40 disabled:opacity-60 sm:text-2xl"
                 maxLength={15}
                 disabled={submitted}
                 autoFocus
@@ -350,18 +303,17 @@ export const Countdown = ({ socket }: CountdownProps) => {
               <button
                 type="submit"
                 disabled={!word || submitted}
-                className="btn-primary w-full bg-primary-purple hover:bg-primary-purple/85 min-h-[64px] text-lg sm:text-base touch-manipulation active:scale-95 transition-transform"
+                className="w-full rounded-lg border-2 border-ink bg-action px-4 py-3 text-lg font-extrabold text-on-action shadow-ink active:translate-x-[3px] active:translate-y-[3px] active:shadow-ink-sm disabled:opacity-50"
               >
-                {submitted ? '✓ Submitted!' : 'Submit Word'}
+                {submitted ? 'Submitted' : 'Submit Word'}
               </button>
-            </div>
-
-            {word && (
-              <p className="text-center mt-4 text-ui-textMuted text-base sm:text-sm">
-                {word.length} letter{word.length !== 1 ? 's' : ''}
-              </p>
-            )}
-          </form>
+              {word && (
+                <p className="text-center text-sm text-ink-muted">
+                  {word.length} letter{word.length !== 1 ? 's' : ''}
+                </p>
+              )}
+            </form>
+          </Card>
         </motion.div>
       </div>
     );
@@ -370,76 +322,60 @@ export const Countdown = ({ socket }: CountdownProps) => {
   // Round End Phase
   if (phase === 'roundEnd' && roundResults) {
     const mySubmission = roundResults.submissions.find((s: any) => s.playerId === playerId);
+    const sorted = [...roundResults.submissions].sort((a: any, b: any) => {
+      if (a.valid && !b.valid) return -1;
+      if (b.valid && !a.valid) return 1;
+      return (b.length || 0) - (a.length || 0);
+    });
 
     return (
       <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="card max-w-4xl w-full"
+          variants={enterVariants}
+          initial="hidden"
+          animate="visible"
+          className="screen-frame max-w-4xl space-y-5"
         >
-          <h2 className="text-3xl font-bold text-center mb-6">Round Complete!</h2>
-
-          {mySubmission && (
-            <div className="text-center mb-8">
-              <p className="text-5xl font-bold mb-2" style={{
-                color: mySubmission.valid ? '#00D4AA' : '#FF4757'
-              }}>
-                {mySubmission.word || '(No word)'}
-              </p>
-              <p className="text-2xl text-ui-textMuted mb-4">
-                {mySubmission.valid ? (
+          <Card eyebrow="Round Complete" title={mySubmission?.word || '(No word)'}>
+            {mySubmission && (
+              <div className="space-y-2 text-lg">
+                <p className="text-ink">
+                  {mySubmission.valid
+                    ? `${mySubmission.isLongest ? 'Longest Word — ' : ''}${mySubmission.length} letters`
+                    : 'Invalid word'}
+                </p>
+                {mySubmission.valid && (
                   <>
-                    {mySubmission.isLongest ? 'Longest Word!' : 'Valid!'}
-                    <br />
-                    {mySubmission.length} letters
+                    <p>
+                      You earned{' '}
+                      <span className="font-extrabold text-action">
+                        {mySubmission.points}
+                      </span>{' '}
+                      points
+                    </p>
+                    <p className="text-ink-muted">
+                      Current game score: {mySubmission.newScore ?? 0}
+                    </p>
                   </>
-                ) : (
-                  'Invalid word'
                 )}
-              </p>
-              {mySubmission.valid && (
-                <div className="space-y-2">
-                    <p className="text-xl">
-                      You earned <span className="text-game-leader font-bold">{mySubmission.points}</span> points!
-                    </p>
-                    <p className="text-lg text-ui-textMuted">
-                        Current Game Score: {mySubmission.newScore || 0}
-                    </p>
-                </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </Card>
 
-          <div className="border-t border-ui-border pt-6">
-            <h3 className="font-bold mb-4 text-center">All Submissions</h3>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {roundResults.submissions.map((submission: any, index: number) => (
-                <motion.div
+          <Card title="All Submissions">
+            <div className="space-y-2">
+              {sorted.map((submission: any, index: number) => (
+                <LeaderboardRow
                   key={submission.playerId}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`p-3 rounded-lg ${
-                    submission.playerId === playerId
-                      ? 'bg-primary-purple bg-opacity-20 border-2 border-primary-purple'
-                      : 'bg-ui-background'
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">
-                      {submission.playerName}: {submission.word || '(No word)'}
-                    </span>
-                    <span className={`font-bold ${
-                      submission.valid ? 'text-game-correct' : 'text-game-incorrect'
-                    }`}>
-                      {submission.valid ? `${submission.length} (${submission.points} pts)` : 'Invalid'}
-                    </span>
-                  </div>
-                </motion.div>
+                  rank={index + 1}
+                  name={`${submission.playerName}: ${submission.word || '(No word)'}`}
+                  score={submission.valid ? submission.length : 0}
+                  delta={submission.valid ? submission.points : undefined}
+                  isYou={submission.playerId === playerId}
+                />
               ))}
             </div>
-          </div>
+          </Card>
         </motion.div>
       </div>
     );
@@ -450,14 +386,16 @@ export const Countdown = ({ socket }: CountdownProps) => {
     return (
       <div className="screen-shell flex flex-col items-center justify-center">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="card max-w-3xl w-full text-center"
+          variants={enterVariants}
+          initial="hidden"
+          animate="visible"
+          className="screen-frame max-w-3xl"
         >
-          <h2 className="text-4xl font-bold mb-8">Countdown Complete!</h2>
-          <p className="text-ui-textMuted text-lg">
-            Well done to all players!
-          </p>
+          <Card eyebrow="Countdown Complete" title="Well done to all players!">
+            <p className="text-lg text-ink-muted">
+              Final placements on the next screen.
+            </p>
+          </Card>
         </motion.div>
       </div>
     );
