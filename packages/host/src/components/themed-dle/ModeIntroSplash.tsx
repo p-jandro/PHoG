@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Chip } from '../../ui';
 
 interface ModeIntroSplashProps {
   data: {
@@ -14,20 +15,24 @@ interface ModeIntroSplashProps {
 }
 
 export const ModeIntroSplash = ({ data }: ModeIntroSplashProps) => (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-    className="flex h-full flex-col items-center justify-center text-center">
-    <p className="eyebrow text-2xl">{data.theme === 'pokemon' ? 'Pokédle' : 'HP-dle'}</p>
-    <h1 className="mt-3 text-8xl font-bold text-game-leader">{data.title}</h1>
-    <p className="mt-5 max-w-3xl text-3xl text-white">{data.description}</p>
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.28, ease: [0.34, 1.56, 0.64, 1] }}
+    className="flex h-full w-full flex-col items-center justify-center gap-6 rounded-3xl border-2 border-ink bg-premium px-12 py-16 text-center shadow-ink-lg"
+  >
+    <Chip variant="streak">{data.theme === 'pokemon' ? 'Pokédle' : 'HP-dle'}</Chip>
+    <h1 className="font-serif text-8xl font-bold tracking-tight text-on-premium">{data.title}</h1>
+    <p className="max-w-3xl text-3xl text-on-premium/85">{data.description}</p>
     {data.attributes && (
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         {data.attributes.map((a) => (
-          <span key={a} className="rounded-full bg-white/10 px-4 py-2 text-lg">{a}</span>
+          <Chip key={a} variant="now">{a}</Chip>
         ))}
       </div>
     )}
     {data.maxGuesses !== undefined && (
-      <p className="mt-5 text-xl text-ui-textMuted">{data.maxGuesses} guesses each</p>
+      <Chip variant="muted">{data.maxGuesses} guesses each</Chip>
     )}
   </motion.div>
 );
