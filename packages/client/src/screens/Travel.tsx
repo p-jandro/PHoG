@@ -105,15 +105,16 @@ export const Travel = ({ socket }: TravelProps) => {
   if (phase === 'results' && resultsData) {
     const me = resultsData.results.find((r: any) => r.playerId === playerId);
     type Color = 'green' | 'orange' | 'red';
-    const history: Array<{ name: string; color: Color; side: 'front' | 'back' }> = me?.history || [];
+    const history: Array<{ name: string; color: Color; side: 'front' | 'back'; intent?: { side: string; target: string } }> = me?.history || [];
 
     // Map history → MapGuess[] for the reveal animation.
-    // Front-side guesses arc toward start, back-side guesses arc toward end.
+    // Use intent.target (next hop on shortest path toward the other end) when available;
+    // fall back to the generic start/end heuristic for older servers.
     const guesses: MapGuess[] = history
       .filter((h) => h.color !== 'red')  // reds are deliberately hidden on the map
       .map((h) => ({
         guess: h.name,
-        answer: h.side === 'front' ? resultsData.start : resultsData.end,
+        answer: h.intent?.target ?? (h.side === 'front' ? resultsData.start : resultsData.end),
         color: h.color,
       }));
 
