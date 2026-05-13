@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface LeaderboardRowProps {
   rank: number;
@@ -24,10 +24,11 @@ export function LeaderboardRow({
   isYou = false,
   className = '',
 }: LeaderboardRowProps) {
+  const reduce = useReducedMotion();
   return (
     <motion.div
-      layout
-      transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+      layout={!reduce}
+      transition={reduce ? { duration: 0.18 } : { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
       className={[
         'grid grid-cols-[44px_1fr_auto_auto] items-center gap-3 rounded-2xl border-2 border-ink px-4 py-2.5 shadow-ink font-extrabold',
         isYou ? 'bg-now text-on-now' : 'bg-bg-surface text-ink',

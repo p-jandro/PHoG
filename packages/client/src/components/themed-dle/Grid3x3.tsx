@@ -1,8 +1,8 @@
 import { Fragment, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
 import { Card, Button, Chip } from '../../ui';
-import { cellScalePop, stagger } from '../../lib/motion';
+import { cellScalePop, reducedFade, stagger } from '../../lib/motion';
 
 type GridCellResult = {
   row: number;
@@ -26,6 +26,7 @@ interface Grid3x3Props {
 
 export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
   const [activeCell, setActiveCell] = useState<{ row: number; col: number } | null>(null);
+  const reduce = useReducedMotion();
 
   const cellState = useMemo<Record<string, CellEntry>>(() => {
     if (cellEvents.length === 0) return {};
@@ -86,7 +87,7 @@ export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
                 <motion.button
                   key={c}
                   onClick={() => setActiveCell({ row: r, col: c })}
-                  variants={cellScalePop}
+                  variants={reduce ? reducedFade : cellScalePop}
                   initial={isPlaced ? 'hidden' : false}
                   animate={isPlaced ? 'visible' : false}
                   transition={isPlaced ? { delay: cellIndex * stagger.cell } : undefined}
@@ -121,7 +122,9 @@ export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
             onMouseDown={() => setActiveCell(null)}
           >
             <motion.div
-              initial={{ y: 20 }} animate={{ y: 0 }} exit={{ y: 10 }}
+              initial={reduce ? { opacity: 0 } : { y: 20 }}
+              animate={reduce ? { opacity: 1 } : { y: 0 }}
+              exit={reduce ? { opacity: 0 } : { y: 10 }}
               onMouseDown={(e) => e.stopPropagation()}
               className="w-full max-w-md"
             >

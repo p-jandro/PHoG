@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
 import { Card, Chip } from '../../ui';
 import { silhouetteReveal, shake } from '../../lib/motion';
@@ -48,23 +48,24 @@ export const Silhouette = ({ data, guesses, onGuess }: SilhouetteProps) => {
     return () => clearTimeout(t);
   }, [guesses.length, wasJustWrong]);
 
+  const reduce = useReducedMotion();
   const placeholder = data.theme === 'pokemon' ? 'Guess the Pokémon…' : 'Guess the character…';
 
   return (
     <div className="space-y-5">
-      <motion.div variants={shake} animate={shaking ? 'shaking' : 'rest'}>
+      <motion.div variants={reduce ? undefined : shake} animate={!reduce && shaking ? 'shaking' : 'rest'}>
         <Card className={shaking ? 'border-danger' : ''}>
           <motion.div
             key={solved ? 'solved' : 'obscured'}
-            variants={silhouetteReveal}
+            variants={reduce ? undefined : silhouetteReveal}
             initial={false}
-            animate={wasJustSolved ? 'revealed' : 'obscured'}
+            animate={!reduce && wasJustSolved ? 'revealed' : 'obscured'}
             className="mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-2xl border-2 border-ink bg-bg-sunken shadow-ink-sm"
           >
             <motion.img
               src={data.spriteUrl}
               alt="silhouette"
-              animate={{ scale: zoom }}
+              animate={reduce ? undefined : { scale: zoom }}
               transition={{ duration: 0.6 }}
               style={{
                 filter: brightness === 0

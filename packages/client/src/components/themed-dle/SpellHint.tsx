@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { AutocompletePicker } from './AutocompletePicker';
 import { Card, Chip } from '../../ui';
-import { letterDrop, popIn, easing } from '../../lib/motion';
+import { letterDrop, popIn, reducedFade, easing } from '../../lib/motion';
 
 type SpellResult = {
   guess: string;
@@ -31,6 +31,7 @@ const HINT_TITLES: Record<string, string> = {
 };
 
 export const SpellHint = ({ data, guesses, onGuess }: SpellHintProps) => {
+  const reduce = useReducedMotion();
   const solved = guesses.some((g) => g.solved);
   const used = guesses.length;
   const revealedHints = guesses.map((g) => g.hint).filter(Boolean) as Exclude<SpellResult['hint'], null>[];
@@ -44,7 +45,7 @@ export const SpellHint = ({ data, guesses, onGuess }: SpellHintProps) => {
           {Array.from({ length: data.incantationLength }).map((_, i) => (
             <motion.span
               key={i}
-              variants={letterDrop}
+              variants={reduce ? reducedFade : letterDrop}
               initial="hidden"
               animate="visible"
               transition={{ delay: i * 0.09, duration: 0.28, ease: easing.easeOut }}
@@ -64,7 +65,7 @@ export const SpellHint = ({ data, guesses, onGuess }: SpellHintProps) => {
           {revealedHints.map((h, i) => (
             <motion.div
               key={i}
-              variants={popIn}
+              variants={reduce ? reducedFade : popIn}
               initial="hidden"
               animate="visible"
               transition={{ delay: i * 0.1 }}

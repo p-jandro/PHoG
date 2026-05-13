@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
 import { Card, Chip } from '../../ui';
-import { emojiPop, stagger, easing } from '../../lib/motion';
+import { emojiPop, reducedFade, stagger, easing } from '../../lib/motion';
 
 type EmojiResult = {
   guess: string;
@@ -28,6 +28,7 @@ export const EmojiClue = ({ data, guesses, onGuess }: EmojiClueProps) => {
   const revealed = guesses.length > 0 ? guesses[guesses.length - 1].emojisRevealed : data.emojis;
   const solved = guesses.some((g) => g.solved);
   const used = guesses.length;
+  const reduce = useReducedMotion();
 
   return (
     <div className="space-y-5">
@@ -36,7 +37,7 @@ export const EmojiClue = ({ data, guesses, onGuess }: EmojiClueProps) => {
           {revealed.map((e, i) => (
             <motion.span
               key={`${i}-${e}`}
-              variants={emojiPop}
+              variants={reduce ? reducedFade : emojiPop}
               initial="hidden"
               animate="visible"
               transition={{ delay: i * stagger.emoji, duration: 0.14, times: [0, 0.65, 1], ease: easing.backOut }}

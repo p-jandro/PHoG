@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { pointlessDrop, pointlessDropDurationMs } from '../lib/motion';
+import { pointlessDrop, pointlessDropDurationMs, prefersReducedMotion } from '../lib/motion';
 
 interface ScoreDropProps {
   /** The final score the bar should land on (0–100). */
@@ -27,6 +27,16 @@ export function ScoreDrop({
     setDisplayScore(100);
     setDropPct(0);
     setShowPointless(false);
+
+    // Under reduced-motion: jump directly to final state.
+    if (prefersReducedMotion()) {
+      const fullDrop = 100 - targetScore;
+      setDropPct(fullDrop);
+      setDisplayScore(targetScore);
+      if (targetScore === 0) setShowPointless(true);
+      setTimeout(() => onLanded?.(), 400);
+      return;
+    }
 
     const startTime = performance.now();
     const fullDrop = 100 - targetScore;

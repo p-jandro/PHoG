@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Card, Chip } from '../../ui';
-import { screenEnter } from '../../lib/motion';
+import { screenEnter, reducedFade } from '../../lib/motion';
 
 interface ModeIntroProps {
   data: {
@@ -26,6 +26,7 @@ export const ModeIntro = ({ data }: ModeIntroProps) => {
     return () => clearInterval(i);
   }, [data.endsAt]);
 
+  const reduce = useReducedMotion();
   const progress = data.duration
     ? Math.max(0, Math.min(100, ((data.duration - remaining) / data.duration) * 100))
     : 0;
@@ -33,7 +34,7 @@ export const ModeIntro = ({ data }: ModeIntroProps) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-bg-base px-4 py-6">
       <motion.div
-        variants={screenEnter}
+        variants={reduce ? reducedFade : screenEnter}
         initial="hidden"
         animate="visible"
         className="w-full max-w-3xl"

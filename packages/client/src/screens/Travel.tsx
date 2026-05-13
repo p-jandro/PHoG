@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { CountryAutocomplete, Country } from '../components/travel/CountryAutocomplete';
@@ -7,13 +7,14 @@ import { ChainStrip } from '../components/travel/ChainStrip';
 import { ChainPill } from '../components/travel/ChainPill';
 import { TravelMap, MapGuess } from '../components/travel/TravelMap';
 import { Card, Chip, Countdown } from '../ui';
-import { screenEnter } from '../lib/motion';
+import { screenEnter, reducedFade } from '../lib/motion';
 
 type Phase = 'intro' | 'playing' | 'results';
 
 interface TravelProps { socket: Socket | null; }
 
 export const Travel = ({ socket }: TravelProps) => {
+  const reduce = useReducedMotion();
   const { playerId } = useGameStore();
   const [phase, setPhase] = useState<Phase>('intro');
   const [introData, setIntroData] = useState<any>(null);
@@ -82,7 +83,7 @@ export const Travel = ({ socket }: TravelProps) => {
   if (phase === 'intro' && introData) {
     return (
       <div className="min-h-screen px-4 py-6 sm:py-8 flex flex-col items-center justify-center">
-        <motion.div variants={screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl">
+        <motion.div variants={reduce ? reducedFade : screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl">
           <Card>
             <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-streak">Game starting</p>
             <h1 className="mt-2 font-serif text-5xl font-extrabold text-ink">{introData.title}</h1>
@@ -121,7 +122,7 @@ export const Travel = ({ socket }: TravelProps) => {
 
     return (
       <div className="min-h-screen flex flex-col items-center overflow-y-auto px-4 py-4">
-        <motion.div variants={screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl space-y-4">
+        <motion.div variants={reduce ? reducedFade : screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl space-y-4">
           <Card>
             <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-streak">Travel — Reveal</p>
             <p className="mt-2 text-2xl font-extrabold text-ink">
@@ -202,7 +203,7 @@ export const Travel = ({ socket }: TravelProps) => {
 
   return (
     <div className="min-h-screen flex flex-col items-center px-4 py-4">
-      <motion.div variants={screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl space-y-4">
+      <motion.div variants={reduce ? reducedFade : screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl space-y-4">
         {/* Challenge banner */}
         <Card>
           <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-streak">Travel</p>

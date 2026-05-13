@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 export type TileState = 'idle' | 'correct' | 'partial' | 'wrong';
@@ -25,14 +25,15 @@ export function Tile({
   children,
   className = '',
 }: TileProps) {
+  const reduce = useReducedMotion();
   return (
     <motion.div
       role="img"
       aria-label={`Tile ${state}`}
       initial={false}
-      animate={flipping ? { rotateX: [0, 90, 0] } : { rotateX: 0 }}
+      animate={flipping && !reduce ? { rotateX: [0, 90, 0] } : { rotateX: 0 }}
       transition={
-        flipping
+        flipping && !reduce
           ? { duration: 0.25, times: [0, 0.5, 1], ease: 'easeInOut', delay: flipDelaySec }
           : { duration: 0.18 }
       }
