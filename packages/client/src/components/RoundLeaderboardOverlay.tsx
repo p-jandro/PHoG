@@ -7,7 +7,8 @@ const GAME_LABELS = {
   countdown: 'Countdown',
   pointless: 'Pointless',
   pokedle: 'Pokédle',
-  hpdle: 'HP-dle'
+  hpdle: 'HP-dle',
+  numbers: 'Numbers'
 } as const;
 
 export const RoundLeaderboardOverlay = () => {

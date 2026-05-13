@@ -26,18 +26,20 @@ interface Player {
     pointless: number | null;
     pokedle: number | null;
     hpdle: number | null;
+    numbers: number | null;
   };
   connected: boolean;
 }
 
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle';
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers';
 const GAME_LABELS: Record<GameKey, string> = {
   quiz: 'Quiz',
   trueFalse: 'True/False',
   countdown: 'Countdown',
   pointless: 'Pointless',
   pokedle: 'Pokédle',
-  hpdle: 'HP-dle'
+  hpdle: 'HP-dle',
+  numbers: 'Numbers'
 };
 
 export const Dashboard = () => {
@@ -781,7 +783,7 @@ export const Dashboard = () => {
                           Championship total: {player.totalPlacementScore || '-'}
                         </p>
                         <div className="mt-3 flex flex-wrap gap-2">
-                          {(['quiz', 'trueFalse', 'pointless', 'pokedle', 'hpdle'] as GameKey[]).map((game) => (
+                          {(['quiz', 'trueFalse', 'pointless', 'pokedle', 'hpdle', 'numbers'] as GameKey[]).map((game) => (
                             <span
                               key={game}
                               className="rounded-full border border-ui-border/70 bg-black/20 px-3 py-1 text-xs font-semibold text-ui-textMuted"

@@ -226,7 +226,8 @@ io.on('connection', (socket) => {
             countdown: null,
             pointless: null,
             pokedle: null,
-            hpdle: null
+            hpdle: null,
+            numbers: null
           }, // Rank for each game
           totalPlacement: 0, // Sum of all placements (lower is better)
           joinedAt: Date.now(),
