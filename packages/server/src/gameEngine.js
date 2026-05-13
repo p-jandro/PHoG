@@ -204,7 +204,7 @@ export class GameEngine extends EventEmitter {
 
   /**
    * Start a game
-   * @param {string} gameName - quiz | trueFalse | countdown | pointless
+   * @param {string} gameName - quiz | trueFalse | countdown | pointless | pokedle | hpdle | numbers
    * @param {Object} gameModule - Game module instance
    */
   startGame(gameName, gameModule) {

@@ -69,7 +69,8 @@ export const Dashboard = () => {
     { id: 'trueFalse', name: 'True or False' },
     { id: 'pointless', name: 'Pointless' },
     { id: 'pokedle', name: 'Pokédle' },
-    { id: 'hpdle', name: 'HP-dle' }
+    { id: 'hpdle', name: 'HP-dle' },
+    { id: 'numbers', name: 'Numbers Round' }
   ];
 
   const activeGame = (gameState?.currentGame || null) as GameKey | null;
