@@ -77,6 +77,16 @@ interface PointlessRevealState {
   frequentAnswers: PointlessRevealAnswer[];
 }
 
+interface PointlessPlayerReveal {
+  playerId: string;
+  playerName: string;
+  score: number;
+  originalInput: string;
+  isCorrect: boolean;
+  correctAnswer: string;
+  triggerTime: number;
+}
+
 interface IntroState {
   title: string;
   description: string;
@@ -149,6 +159,8 @@ export const Display = () => {
   const [pointlessIntro, setPointlessIntro] = useState<IntroState | null>(null);
   const [pointlessRound, setPointlessRound] = useState<any>(null);
   const [pointlessReveal, setPointlessReveal] = useState<PointlessRevealState | null>(null);
+  const [_pointlessPlayerReveals, setPointlessPlayerReveals] = useState<PointlessPlayerReveal[]>([]);
+  const [_pointlessRevealIndex, setPointlessRevealIndex] = useState(0);
   const [roundLeaderboard, setRoundLeaderboard] = useState<RoundLeaderboardState | null>(null);
 
   useEffect(() => {
@@ -253,6 +265,8 @@ export const Display = () => {
       setPointlessIntro(null);
       setPointlessRound(null);
       setPointlessReveal(null);
+      setPointlessPlayerReveals([]);
+      setPointlessRevealIndex(0);
       setPointlessReadyToReveal(false);
     });
 
@@ -354,6 +368,11 @@ export const Display = () => {
       setPointlessReveal(data);
       setPointlessRound(null);
       setPointlessReadyToReveal(false);
+    });
+
+    newSocket.on('pointless:reveal:players', (data: { players: PointlessPlayerReveal[] }) => {
+      setPointlessPlayerReveals(data.players || []);
+      setPointlessRevealIndex(0);
     });
 
     setSocket(newSocket);
@@ -1373,96 +1392,183 @@ export const Display = () => {
   }
 
   if (currentGame === 'pointless' && pointlessReveal) {
+    const hasPlayerReveals = pointlessPlayerReveals.length > 0;
+    const allRevealed = pointlessRevealIndex >= pointlessPlayerReveals.length;
+    const currentPlayerReveal = hasPlayerReveals && !allRevealed
+      ? pointlessPlayerReveals[pointlessRevealIndex]
+      : null;
+
     return (
       <>
-        <div className="min-h-screen bg-bg-base py-8 text-ink">
+        <div className="min-h-screen bg-bg-base py-8 text-ink overflow-y-auto">
           <motion.div
             initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
             className="mx-auto w-full max-w-6xl px-4 sm:px-6"
           >
-            <Card eyebrow="Pointless Reveal">
-              <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <h1 className="font-display text-4xl font-extrabold text-ink sm:text-6xl">
-                    {pointlessReveal.category}
-                  </h1>
-                  <p className="mt-3 max-w-4xl text-xl text-ink-muted sm:text-2xl">
-                    {pointlessReveal.question}
-                  </p>
-                </div>
-                <Chip variant="info">
-                  Round {pointlessReveal.roundIndex + 1} of {pointlessReveal.totalRounds}
-                </Chip>
+            {/* Header */}
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-streak">Pointless Reveal</p>
+                <h1 className="mt-1 font-display text-3xl font-extrabold text-ink sm:text-5xl">
+                  {pointlessReveal.category}
+                </h1>
+                <p className="mt-2 max-w-4xl text-lg text-ink-muted sm:text-xl">
+                  {pointlessReveal.question}
+                </p>
               </div>
+              <Chip variant="info">
+                Round {pointlessReveal.roundIndex + 1} of {pointlessReveal.totalRounds}
+              </Chip>
+            </div>
 
-              <div className="grid gap-5 xl:grid-cols-2">
-                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink">
-                  <div className="mb-5 flex items-end justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
-                        Most Obscure
-                      </p>
-                      <h2 className="mt-2 font-display text-2xl font-extrabold text-ink sm:text-3xl">
-                        Top 3 Lowest Answers
-                      </h2>
-                    </div>
-                    <Chip variant="default">Lower is better</Chip>
+            {/* Sequential per-player ScoreDrop — shown while players remain */}
+            {hasPlayerReveals && !allRevealed && currentPlayerReveal && (
+              <motion.div
+                key={`player-drop-${pointlessRevealIndex}`}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className="mb-6 rounded-3xl border-2 border-ink bg-bg-surface p-6 shadow-ink-lg sm:p-8"
+              >
+                <div className="mb-4 flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-streak">
+                      Player {pointlessRevealIndex + 1} of {pointlessPlayerReveals.length}
+                    </p>
+                    <h2 className="mt-1 font-display text-3xl font-extrabold text-ink sm:text-4xl">
+                      {currentPlayerReveal.playerName}
+                    </h2>
+                    <p className="mt-1 text-base text-ink-muted">
+                      {currentPlayerReveal.isCorrect ? (
+                        <>Answered: <span className="font-semibold text-ink">{currentPlayerReveal.originalInput}</span>{' '}
+                        {currentPlayerReveal.originalInput !== currentPlayerReveal.correctAnswer && (
+                          <>→ <span className="font-semibold text-action">{currentPlayerReveal.correctAnswer}</span></>
+                        )}</>
+                      ) : (
+                        <><span className="font-semibold text-danger">No valid answer</span>
+                        {currentPlayerReveal.originalInput ? <> · guessed: {currentPlayerReveal.originalInput}</> : null}</>
+                      )}
+                    </p>
                   </div>
-                  <div className="space-y-3">
-                    {pointlessReveal.obscureAnswers.map((answer, index) => (
+                  <Chip variant={currentPlayerReveal.score === 0 ? 'streak' : currentPlayerReveal.isCorrect ? 'info' : 'default'}>
+                    {currentPlayerReveal.score === 0 ? 'Pointless!' : currentPlayerReveal.isCorrect ? 'Correct' : 'Wrong'}
+                  </Chip>
+                </div>
+                <ScoreDrop
+                  targetScore={currentPlayerReveal.score}
+                  autoStart={true}
+                  onLanded={() => setPointlessRevealIndex((i) => i + 1)}
+                />
+              </motion.div>
+            )}
+
+            {/* All dropped: summary of all players sorted by score */}
+            {hasPlayerReveals && allRevealed && (
+              <motion.div
+                key="all-revealed"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.28, ease: 'easeOut' }}
+                className="mb-6 rounded-3xl border-2 border-ink bg-bg-surface p-6 shadow-ink-lg sm:p-8"
+              >
+                <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.22em] text-streak">All Players Revealed</p>
+                <div className="space-y-3">
+                  {[...pointlessPlayerReveals]
+                    .sort((a, b) => a.score - b.score)
+                    .map((pr, idx) => (
                       <div
-                        key={`${answer.answer}-${answer.score}-obscure`}
-                        className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-4 rounded-xl border-2 border-ink bg-bg-surface px-4 py-3 shadow-ink-sm"
+                        key={pr.playerId}
+                        className="grid grid-cols-[3rem_minmax(0,1fr)_auto_5rem] items-center gap-4 rounded-xl border-2 border-ink bg-bg-sunken px-4 py-3 shadow-ink-sm"
                       >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-action font-display text-lg font-extrabold text-white shadow-ink-sm">
-                          {index + 1}
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-bg-surface font-display text-lg font-extrabold text-ink shadow-ink-sm">
+                          {idx + 1}
                         </div>
-                        <p className="truncate font-display text-xl font-extrabold text-ink">
-                          {answer.answer}
-                        </p>
-                        <p className="text-right font-display text-2xl font-extrabold text-action">
-                          {answer.score}
+                        <div className="min-w-0">
+                          <p className="truncate font-display text-xl font-extrabold text-ink">{pr.playerName}</p>
+                          <p className="truncate text-sm text-ink-muted">
+                            {pr.isCorrect ? pr.correctAnswer : 'No answer'}
+                          </p>
+                        </div>
+                        <Chip variant={pr.score === 0 ? 'streak' : pr.isCorrect ? 'info' : 'default'}>
+                          {pr.score === 0 ? 'Pointless!' : pr.isCorrect ? 'Correct' : 'Wrong'}
+                        </Chip>
+                        <p className={`text-right font-display text-2xl font-extrabold ${pr.score === 0 ? 'text-streak' : pr.score >= 80 ? 'text-danger' : 'text-action'}`}>
+                          {pr.score}
                         </p>
                       </div>
                     ))}
-                  </div>
                 </div>
+              </motion.div>
+            )}
 
-                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink">
-                  <div className="mb-5 flex items-end justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
-                        Most Frequent
-                      </p>
-                      <h2 className="mt-2 font-display text-2xl font-extrabold text-ink sm:text-3xl">
-                        Top 3 Highest Answers
-                      </h2>
-                    </div>
-                    <Chip variant="streak">Higher is common</Chip>
+            {/* Aggregate top-3 (always shown as reference / fallback when no player reveals) */}
+            <div className="grid gap-5 xl:grid-cols-2">
+              <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink">
+                <div className="mb-5 flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
+                      Most Obscure
+                    </p>
+                    <h2 className="mt-2 font-display text-2xl font-extrabold text-ink sm:text-3xl">
+                      Top 3 Lowest Answers
+                    </h2>
                   </div>
-                  <div className="space-y-3">
-                    {pointlessReveal.frequentAnswers.map((answer, index) => (
-                      <div
-                        key={`${answer.answer}-${answer.score}-frequent`}
-                        className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-4 rounded-xl border-2 border-ink bg-bg-surface px-4 py-3 shadow-ink-sm"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-streak font-display text-lg font-extrabold text-white shadow-ink-sm">
-                          {index + 1}
-                        </div>
-                        <p className="truncate font-display text-xl font-extrabold text-ink">
-                          {answer.answer}
-                        </p>
-                        <p className="text-right font-display text-2xl font-extrabold text-streak">
-                          {answer.score}
-                        </p>
+                  <Chip variant="default">Lower is better</Chip>
+                </div>
+                <div className="space-y-3">
+                  {pointlessReveal.obscureAnswers.map((answer, index) => (
+                    <div
+                      key={`${answer.answer}-${answer.score}-obscure`}
+                      className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-4 rounded-xl border-2 border-ink bg-bg-surface px-4 py-3 shadow-ink-sm"
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-action font-display text-lg font-extrabold text-white shadow-ink-sm">
+                        {index + 1}
                       </div>
-                    ))}
-                  </div>
+                      <p className="truncate font-display text-xl font-extrabold text-ink">
+                        {answer.answer}
+                      </p>
+                      <p className="text-right font-display text-2xl font-extrabold text-action">
+                        {answer.score}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </Card>
+
+              <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink">
+                <div className="mb-5 flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
+                      Most Frequent
+                    </p>
+                    <h2 className="mt-2 font-display text-2xl font-extrabold text-ink sm:text-3xl">
+                      Top 3 Highest Answers
+                    </h2>
+                  </div>
+                  <Chip variant="streak">Higher is common</Chip>
+                </div>
+                <div className="space-y-3">
+                  {pointlessReveal.frequentAnswers.map((answer, index) => (
+                    <div
+                      key={`${answer.answer}-${answer.score}-frequent`}
+                      className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-4 rounded-xl border-2 border-ink bg-bg-surface px-4 py-3 shadow-ink-sm"
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-streak font-display text-lg font-extrabold text-white shadow-ink-sm">
+                        {index + 1}
+                      </div>
+                      <p className="truncate font-display text-xl font-extrabold text-ink">
+                        {answer.answer}
+                      </p>
+                      <p className="text-right font-display text-2xl font-extrabold text-streak">
+                        {answer.score}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
         {displayControl}

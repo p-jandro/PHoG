@@ -20,20 +20,28 @@ export const WordleDisplay = ({ socket, players }: WordleDisplayProps) => {
   const [resultsData, setResultsData] = useState<any>(null);
   const [progress, setProgress] = useState<Record<string, any>>({});
   const [timerMs, setTimerMs] = useState(0);
+  // Target received early from the host-only event; used to pre-layout reveal tiles.
+  // NEVER rendered until the 'results' phase — purely infrastructure.
+  const [pendingTarget, setPendingTarget] = useState<string | null>(null);
 
   useEffect(() => {
     if (!socket) return;
-    const onIntro = (d: any) => { setPhase('intro'); setIntroData(d); setProgress({}); };
+    const onIntro = (d: any) => { setPhase('intro'); setIntroData(d); setProgress({}); setPendingTarget(null); };
     const onStart = (d: any) => { setPhase('playing'); setRoundData(d); };
+    // Host-only event: server sends the target early so the host can prepare reveal
+    // infrastructure. This event is NEVER emitted to player sockets.
+    const onStartHost = (d: any) => { setPendingTarget(d.target ?? null); };
     const onProgress = (d: any) => setProgress(d.playerProgress || {});
     const onResults = (d: any) => { setPhase('results'); setResultsData(d); };
     socket.on('wordle:intro', onIntro);
     socket.on('wordle:round:start', onStart);
+    socket.on('wordle:round:start:host', onStartHost);
     socket.on('wordle:progress', onProgress);
     socket.on('wordle:round:results', onResults);
     return () => {
       socket.off('wordle:intro', onIntro);
       socket.off('wordle:round:start', onStart);
+      socket.off('wordle:round:start:host', onStartHost);
       socket.off('wordle:progress', onProgress);
       socket.off('wordle:round:results', onResults);
     };
@@ -80,7 +88,10 @@ export const WordleDisplay = ({ socket, players }: WordleDisplayProps) => {
   }
 
   if (phase === 'results' && resultsData) {
-    const answer = String(resultsData.answer || '').toUpperCase().padEnd(5, ' ').slice(0, 5);
+    // Prefer pendingTarget (received early from wordle:round:start:host) so the host
+    // already had the word in state before results arrived — avoids any flash of
+    // empty tiles.  Falls back to resultsData.answer for safety.
+    const answer = String(pendingTarget ?? resultsData.answer ?? '').toUpperCase().padEnd(5, ' ').slice(0, 5);
     const byPlayer = new Map<string, any>();
     for (const r of resultsData.results || []) byPlayer.set(r.playerId, r);
 

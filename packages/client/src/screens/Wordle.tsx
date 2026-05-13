@@ -63,6 +63,12 @@ export const Wordle = ({ socket }: WordleProps) => {
       setSolved(false);
     };
     const onStart = (d: any) => {
+      // AUDIT: the server emits `wordle:round:start` to all sockets (host + players).
+      // The payload intentionally contains NO `target` field — that would leak the
+      // answer to players before the round ends.  The target is only delivered via
+      // the host-only `wordle:round:start:host` event, which the server emits
+      // directly to the host socket and NEVER broadcasts here.
+      // DO NOT add `target` handling here; players must not see the word before results.
       setPhase('playing');
       setRoundData(d);
     };
