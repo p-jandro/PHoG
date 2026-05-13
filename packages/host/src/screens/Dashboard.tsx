@@ -649,6 +649,13 @@ export const Dashboard = () => {
                 >
                   Start Wordle
                 </button>
+                <button
+                  onClick={() => startGame('travel')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-sky-600"
+                >
+                  Start Travel
+                </button>
               </div>
             )}
 
