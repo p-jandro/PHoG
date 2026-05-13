@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { WordleBoard } from '../components/wordle/WordleBoard';
 import { Keyboard } from '../components/wordle/Keyboard';
+import { Chip } from '../ui/Chip';
 
 type Phase = 'intro' | 'playing' | 'results';
 type Color = 'green' | 'yellow' | 'grey';
@@ -188,14 +189,21 @@ export const Wordle = ({ socket }: WordleProps) => {
   const progress = totalMs > 0 ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : 0;
 
   return (
-    <div className="screen-shell py-4">
-      <div className="screen-frame max-w-md space-y-4">
-        <div className="flex items-center justify-between">
-          <p className="eyebrow">Wordle</p>
-          <p className="tabular-nums text-2xl font-bold text-white">{Math.ceil(timerMs / 1000)}s</p>
-        </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-          <div className="h-full bg-game-leader" style={{ width: `${progress}%` }} />
+    <div className="min-h-screen bg-bg-base px-4 py-4 text-ink">
+      <div className="mx-auto flex max-w-md flex-col gap-4">
+        <header className="flex items-center justify-between">
+          <Chip variant="info">Wordle</Chip>
+          <span className="font-display text-2xl font-extrabold tabular-nums text-ink">
+            {Math.ceil(timerMs / 1000)}s
+          </span>
+        </header>
+
+        <div className="h-2 w-full overflow-hidden rounded-full border-2 border-ink bg-bg-sunken">
+          <motion.div
+            className="h-full bg-action"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.1, ease: 'linear' }}
+          />
         </div>
 
         <WordleBoard
@@ -205,11 +213,22 @@ export const Wordle = ({ socket }: WordleProps) => {
           flippingRowIndex={flippingRowIndex}
         />
 
-        {invalidToast && (
-          <div className="rounded-xl border border-game-incorrect/40 bg-game-incorrect/10 px-3 py-2 text-center text-sm text-game-incorrect">
-            {invalidToast}
-          </div>
-        )}
+        <AnimatePresence>
+          {invalidToast && (
+            <motion.div
+              key="invalid-toast"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.16 }}
+              className="flex justify-center"
+            >
+              <span className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-danger px-2.5 py-1 text-xs font-extrabold uppercase text-on-danger shadow-ink-sm">
+                {invalidToast}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <Keyboard
           states={keyboardStates}
@@ -219,9 +238,13 @@ export const Wordle = ({ socket }: WordleProps) => {
           disabled={solved || rows.length >= MAX}
         />
 
-        {solved && <p className="text-center text-lg font-bold text-game-correct">🎉 solved!</p>}
+        {solved && (
+          <p className="text-center font-display text-xl font-extrabold text-action">Solved!</p>
+        )}
         {!solved && rows.length >= MAX && (
-          <p className="text-center text-lg font-bold text-game-incorrect">Out of guesses — waiting for round to end…</p>
+          <p className="text-center font-display text-lg font-extrabold text-danger">
+            Out of guesses — waiting for round to end…
+          </p>
         )}
       </div>
     </div>
