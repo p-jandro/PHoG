@@ -348,6 +348,25 @@ export class PointlessGame {
 
     this.io.emit('pointless:reveal:display', this.getDisplayRevealPayload(triggerTime));
 
+    // Emit per-player array to host for sequential ScoreDrop reveals
+    const playerReveals = [];
+    for (const [playerId, answerData] of this.gameState.pointless.answers) {
+      const player = this.gameState.players.get(playerId);
+      if (!player) continue;
+      playerReveals.push({
+        playerId,
+        playerName: player.name,
+        score: answerData.score,
+        originalInput: answerData.originalInput,
+        isCorrect: answerData.isCorrect,
+        correctAnswer: answerData.displayText,
+        triggerTime
+      });
+    }
+    // Sort by score ascending so lowest (best) reveals last — most dramatic
+    playerReveals.sort((a, b) => b.score - a.score);
+    this.io.emit('pointless:reveal:players', { players: playerReveals });
+
     // Update scores for ALL players, emit results only to connected ones
     for (const [playerId, answerData] of this.gameState.pointless.answers) {
       const player = this.gameState.players.get(playerId);
