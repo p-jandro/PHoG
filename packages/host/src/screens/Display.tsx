@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
 import { ThemedDleDisplay } from './ThemedDleDisplay';
 import { NumbersDisplay } from './NumbersDisplay';
+import { WordleDisplay } from './WordleDisplay';
 import { QRCodeSVG } from 'qrcode.react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
@@ -592,6 +593,15 @@ export const Display = () => {
     return (
       <>
         <NumbersDisplay socket={socket} players={players} />
+        {displayControl}
+      </>
+    );
+  }
+
+  if (currentGame === 'wordle' && phase === 'playing') {
+    return (
+      <>
+        <WordleDisplay socket={socket} players={players} />
         {displayControl}
       </>
     );
