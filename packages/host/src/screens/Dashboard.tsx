@@ -639,6 +639,13 @@ export const Dashboard = () => {
                 >
                   Start Numbers Round
                 </button>
+                <button
+                  onClick={() => startGame('wordle')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-slate-600"
+                >
+                  Start Wordle
+                </button>
               </div>
             )}
 
