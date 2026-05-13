@@ -174,9 +174,15 @@ function popcount(n) {
  *   difficult: target >= 850
  *             OR target is reachable ONLY with all 6 tiles (never in a subset ≤5)
  *             OR target requires division (reachable in fullTable but NOT in noDivTable)
- *   easy:     target is reachable in a subset of size ≤ 4
+ *   easy:     target ≤ 500
+ *             AND target is reachable in a subset of size ≤ 3 (i.e. one or two ops)
  *             AND target is reachable somewhere in noDivTable (any subset size)
  *   medium:   everything else that is reachable
+ *
+ * "Easy" is intentionally tight: a human should be able to solve it with one
+ * or two mental operations on modest numbers. Anything that needs three or
+ * more ops or a target above 500 falls to medium even if it's technically
+ * solvable without division.
  *
  * Returns 'medium' if target is not reachable at all (caller should avoid this).
  */
@@ -189,13 +195,13 @@ export function classifyDifficulty(tiles, target) {
 
   // Check reachability in full table
   let reachable = false;
-  let reachableInSmallSubset = false; // subset of size ≤ 4
+  let reachableInTinySubset = false; // subset of size ≤ 3 (≤ 2 ops)
   let reachableInSubsetLessThan6 = false; // subset of size ≤ 5
   for (let s = 1; s < total; s++) {
     if (fullTable[s].has(target)) {
       reachable = true;
       const sz = popcount(s);
-      if (sz <= 4) reachableInSmallSubset = true;
+      if (sz <= 3) reachableInTinySubset = true;
       if (sz < n) reachableInSubsetLessThan6 = true;
     }
   }
@@ -216,8 +222,8 @@ export function classifyDifficulty(tiles, target) {
   if (!reachableInSubsetLessThan6) return 'difficult'; // requires all 6 tiles
   if (!reachableWithoutDiv) return 'difficult';         // requires division
 
-  // Easy: small subset and no division needed
-  if (reachableInSmallSubset && reachableWithoutDiv) return 'easy';
+  // Easy: small target, small subset, no division needed
+  if (target <= 500 && reachableInTinySubset && reachableWithoutDiv) return 'easy';
 
   return 'medium';
 }

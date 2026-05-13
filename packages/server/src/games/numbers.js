@@ -113,11 +113,13 @@ export class NumbersGame {
     this.gameState.numbers.target = target;
     this._firstSolverId = null;
 
-    // Seed every player's pool with a fresh copy (new ids per player so they're independent)
+    // Seed every player's pool with the canonical tile ids so client clicks
+    // resolve correctly from the moment :round:start arrives. New tile ids
+    // generated for operation results are independent per player.
     this.gameState.numbers.playerStates = {};
     for (const [pid] of this.gameState.players) {
       this.gameState.numbers.playerStates[pid] = {
-        pool: tilesWithIds.map((t) => ({ id: this._nextTileId(), value: t.value })),
+        pool: tilesWithIds.map((t) => ({ id: t.id, value: t.value })),
         history: [],
         solved: false,
         solvedAtMs: null
