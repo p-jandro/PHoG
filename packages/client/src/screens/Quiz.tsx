@@ -288,48 +288,54 @@ export const Quiz = ({ socket }: QuizProps) => {
   // Voting Phase
   if (phase === 'voting') {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="screen-frame max-w-4xl"
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="mx-auto max-w-4xl"
         >
-          <p className="eyebrow mb-3 text-center">Round Vote</p>
-          <h1 className="text-4xl font-bold text-center mb-2">Vote for Category</h1>
-          <p className="text-ui-textMuted text-center mb-8">
-            The leader's vote counts 2x!
+          <p className="mb-3 text-center text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+            Round Vote
+          </p>
+          <h1 className="text-center text-4xl font-extrabold tracking-tight text-ink">
+            Vote for Category
+          </h1>
+          <p className="mt-2 text-center text-base font-semibold text-ink-muted">
+            The leader's vote counts 2×.
           </p>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {categories.map((category) => (
-              <motion.button
-                key={category.id}
-                onClick={() => handleVote(category.id)}
-                disabled={!!selectedCategory}
-                whileHover={{ scale: selectedCategory ? 1 : 1.05 }}
-                whileTap={{ scale: selectedCategory ? 1 : 0.95 }}
-                className={`rounded-[1.8rem] border border-white/10 p-6 text-xl font-bold transition-all shadow-[0_18px_30px_rgba(0,0,0,0.22)] sm:p-8 sm:text-2xl ${
-                  selectedCategory === category.id
-                    ? 'ring-4 ring-white'
-                    : selectedCategory
-                    ? 'opacity-50'
-                    : ''
-                }`}
-                style={{
-                  backgroundColor: category.color,
-                  color: 'white'
-                }}
-              >
-                {(category as any).label || category.name}
-              </motion.button>
-            ))}
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {categories.map((category) => {
+              const isPicked = selectedCategory === category.id;
+              const dimmed = selectedCategory && !isPicked;
+              return (
+                <motion.button
+                  key={category.id}
+                  onClick={() => handleVote(category.id)}
+                  disabled={!!selectedCategory}
+                  whileHover={!selectedCategory ? { x: -1, y: -1 } : undefined}
+                  whileTap={!selectedCategory ? { x: 4, y: 4 } : undefined}
+                  transition={{ duration: 0.08, ease: [0, 0, 0.2, 1] }}
+                  className={[
+                    'rounded-2xl border-2 border-ink p-6 text-xl font-extrabold text-white shadow-ink sm:p-8 sm:text-2xl',
+                    isPicked ? 'ring-4 ring-now' : '',
+                    dimmed ? 'opacity-40' : '',
+                  ].join(' ')}
+                  style={{ backgroundColor: category.color }}
+                >
+                  {(category as any).label || category.name}
+                </motion.button>
+              );
+            })}
           </div>
 
           {selectedCategory && (
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center mt-6 text-game-correct font-medium"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="mt-6 text-center text-base font-extrabold text-action"
             >
               ✓ Vote submitted!
             </motion.p>
@@ -342,44 +348,47 @@ export const Quiz = ({ socket }: QuizProps) => {
   // Voting Results Phase
   if (phase === 'votingResults' && votingResults) {
     return (
-      <div className="screen-shell flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="screen-frame max-w-4xl"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="mx-auto max-w-4xl"
         >
-          <p className="eyebrow mb-3 text-center">Vote Locked</p>
-          <h1 className="text-4xl font-bold text-center mb-2">Voting Results</h1>
-          <p className="text-ui-textMuted text-center mb-8">
+          <p className="mb-3 text-center text-xs font-extrabold uppercase tracking-[0.2em] text-streak sm:text-sm">
+            Vote Locked
+          </p>
+          <h1 className="text-center text-4xl font-extrabold tracking-tight text-ink">
+            Voting Results
+          </h1>
+          <p className="mt-2 text-center text-base font-semibold text-ink-muted">
             The votes are in!
           </p>
 
-          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {categories.map((category) => {
               const voteCount = votingResults.voteCounts[category.id] || 0;
               const isWinner = votingResults.winningOptionId === category.id;
-              
               return (
                 <motion.div
                   key={category.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`rounded-xl p-5 transition-all sm:p-6 ${
-                    isWinner ? 'ring-4 ring-game-leader scale-105' : ''
-                  }`}
-                  style={{
-                    backgroundColor: category.color,
-                    color: 'white'
-                  }}
+                  transition={{ duration: 0.22, ease: 'easeOut' }}
+                  className={[
+                    'rounded-2xl border-2 border-ink p-5 text-center text-white shadow-ink sm:p-6',
+                    isWinner ? 'ring-4 ring-now scale-[1.03]' : '',
+                  ].join(' ')}
+                  style={{ backgroundColor: category.color }}
                 >
-                  <div className="text-center">
-                      <div className="mb-2 text-xl font-bold sm:text-2xl">{category.label || category.name}</div>
-                    <div className="text-3xl font-bold sm:text-4xl">{voteCount}</div>
-                    <div className="text-sm opacity-75">vote{voteCount !== 1 ? 's' : ''}</div>
-                    {isWinner && (
-                      <div className="mt-2 text-xl font-bold uppercase tracking-wide">Winner!</div>
-                    )}
+                  <div className="text-xl font-extrabold sm:text-2xl">{(category as any).label || category.name}</div>
+                  <div className="mt-2 font-display text-3xl font-black leading-none sm:text-4xl">{voteCount}</div>
+                  <div className="mt-1 text-xs font-bold uppercase tracking-[0.18em] opacity-80">
+                    vote{voteCount !== 1 ? 's' : ''}
                   </div>
+                  {isWinner && (
+                    <div className="mt-2 text-base font-extrabold uppercase tracking-[0.18em]">Winner!</div>
+                  )}
                 </motion.div>
               );
             })}
@@ -388,9 +397,9 @@ export const Quiz = ({ socket }: QuizProps) => {
           <motion.p
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="text-center text-ui-textMuted"
+            className="mt-6 text-center text-base font-bold text-ink-muted"
           >
-            Next question coming up...
+            Next question coming up…
           </motion.p>
         </motion.div>
       </div>
