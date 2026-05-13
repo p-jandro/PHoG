@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
-import { Button, Card, Chip } from '../ui';
+import { Button, Card, Chip, ScoreDrop } from '../ui';
 import { ThemedDleDisplay } from './ThemedDleDisplay';
 import { NumbersDisplay } from './NumbersDisplay';
 import { WordleDisplay } from './WordleDisplay';
@@ -159,8 +159,8 @@ export const Display = () => {
   const [pointlessIntro, setPointlessIntro] = useState<IntroState | null>(null);
   const [pointlessRound, setPointlessRound] = useState<any>(null);
   const [pointlessReveal, setPointlessReveal] = useState<PointlessRevealState | null>(null);
-  const [_pointlessPlayerReveals, setPointlessPlayerReveals] = useState<PointlessPlayerReveal[]>([]);
-  const [_pointlessRevealIndex, setPointlessRevealIndex] = useState(0);
+  const [pointlessPlayerReveals, setPointlessPlayerReveals] = useState<PointlessPlayerReveal[]>([]);
+  const [pointlessRevealIndex, setPointlessRevealIndex] = useState(0);
   const [roundLeaderboard, setRoundLeaderboard] = useState<RoundLeaderboardState | null>(null);
 
   useEffect(() => {
