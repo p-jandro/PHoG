@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Socket } from 'socket.io-client';
 import { HostChainCard } from '../components/travel/HostChainCard';
+import { HostTravelMap, HostChainEntry } from '../components/travel/HostTravelMap';
 
 interface Player { id: string; name: string; connected: boolean; }
 
@@ -58,27 +59,68 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
     );
   }
 
+  // Aggregate all player chain entries for the map coloring during playing phase
+  const allChainEntries = useMemo<HostChainEntry[]>(() => {
+    const entries: HostChainEntry[] = [];
+    for (const s of Object.values(progress) as any[]) {
+      if (Array.isArray(s.frontChain)) {
+        for (const e of s.frontChain) entries.push(e);
+      }
+      if (Array.isArray(s.backChain)) {
+        for (const e of s.backChain) entries.push(e);
+      }
+    }
+    return entries;
+  }, [progress]);
+
+  // Aggregate all player chains from results for the map (also used in results phase)
+  const resultsChainEntries = useMemo<HostChainEntry[]>(() => {
+    if (!resultsData) return [];
+    const entries: HostChainEntry[] = [];
+    for (const r of (resultsData.results || []) as any[]) {
+      if (Array.isArray(r.frontChain)) for (const e of r.frontChain) entries.push(e);
+      if (Array.isArray(r.backChain)) for (const e of r.backChain) entries.push(e);
+    }
+    return entries;
+  }, [resultsData]);
+
   if (phase === 'results' && resultsData) {
     const sorted = [...(resultsData.results || [])].sort((a: any, b: any) => b.score - a.score);
     const top = sorted.slice(0, 5);
+
     return (
-      <div className="flex h-screen w-screen flex-col items-center justify-center gap-8 px-16 py-12 text-center">
-        <p className="eyebrow text-2xl">Travel — Reveal</p>
-        <div>
-          <p className="text-3xl text-ui-textMuted">A shortest path:</p>
-          <p className="mt-2 max-w-5xl break-words text-4xl font-bold text-game-leader">{(resultsData.optimalChain || []).join(' → ')}</p>
-          <p className="mt-2 text-xl text-ui-textMuted">{resultsData.optimalDistance} hops</p>
+      <div className="flex h-screen w-screen gap-8 px-12 py-10">
+        {/* Map — left, takes most of the width */}
+        <div className="flex flex-1 flex-col gap-4">
+          <div>
+            <p className="eyebrow text-xl">Travel — Reveal</p>
+            <p className="mt-1 text-3xl font-bold">{resultsData.start} <span className="text-ui-textMuted">→</span> {resultsData.end}</p>
+            <p className="text-sm text-ui-textMuted">{resultsData.optimalDistance} hops · gold = optimal path</p>
+          </div>
+          <HostTravelMap
+            startName={resultsData.start}
+            endName={resultsData.end}
+            allChainEntries={resultsChainEntries}
+            optimalChainNames={resultsData.optimalChain}
+          />
+          <p className="break-words text-lg font-bold text-game-leader">
+            {(resultsData.optimalChain || []).join(' → ')}
+          </p>
         </div>
-        <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-black/40 p-6">
-          <p className="eyebrow mb-3">Top scorers</p>
-          <ul className="space-y-2 text-2xl">
-            {top.map((r: any, i: number) => (
-              <li key={r.playerId} className="flex items-baseline justify-between gap-4">
-                <span className="font-bold">#{i + 1} · {r.playerName} {r.firstSolver && '⭐'}</span>
-                <span className="text-game-leader">{r.score} pts{r.solved ? '' : ' (didn\'t solve)'}</span>
-              </li>
-            ))}
-          </ul>
+
+        {/* Scoreboard — right, compact */}
+        <div className="flex w-80 flex-col justify-center">
+          <div className="rounded-3xl border border-white/10 bg-black/40 p-6">
+            <p className="eyebrow mb-3">Top scorers</p>
+            <ul className="space-y-2 text-xl">
+              {top.map((r: any, i: number) => (
+                <li key={r.playerId} className="flex items-baseline justify-between gap-4">
+                  <span className="font-bold">#{i + 1} · {r.playerName} {r.firstSolver && '⭐'}</span>
+                  <span className="text-game-leader">{r.score} pts{r.solved ? '' : ' (no solve)'}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     );
@@ -92,31 +134,44 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
   const maxGuesses = roundData.maxGuesses;
 
   return (
-    <div className="flex h-screen w-screen flex-col px-12 py-8">
-      <header className="mb-6 flex items-baseline justify-between">
-        <div>
-          <p className="eyebrow text-xl">Travel</p>
-          <p className="mt-1 text-4xl font-bold">{roundData.start} <span className="text-ui-textMuted">→</span> {roundData.end}</p>
-          <p className="text-sm text-ui-textMuted">optimal {roundData.optimalDistance} hops · budget {maxGuesses}</p>
+    <div className="flex h-screen w-screen gap-6 px-10 py-8">
+      {/* Map — left, 60% width */}
+      <div className="flex flex-[3] flex-col gap-4">
+        <header className="flex items-baseline justify-between">
+          <div>
+            <p className="eyebrow text-xl">Travel</p>
+            <p className="mt-1 text-4xl font-bold">{roundData.start} <span className="text-ui-textMuted">→</span> {roundData.end}</p>
+            <p className="text-sm text-ui-textMuted">optimal {roundData.optimalDistance} hops · budget {maxGuesses}</p>
+          </div>
+          <p className="tabular-nums text-4xl font-bold text-white">{Math.ceil(timerMs / 1000)}s</p>
+        </header>
+        <HostTravelMap
+          startName={roundData.start}
+          endName={roundData.end}
+          allChainEntries={allChainEntries}
+        />
+      </div>
+
+      {/* Player cards — right, scrollable */}
+      <div className="flex flex-[2] flex-col gap-4 overflow-y-auto">
+        <p className="text-lg font-semibold text-ui-textMuted">Players</p>
+        <div className="grid grid-cols-2 gap-4">
+          {connected.map((p) => {
+            const s = progress[p.id];
+            return (
+              <HostChainCard
+                key={p.id}
+                playerName={p.name}
+                frontHead={s?.frontHead ?? roundData.start}
+                backHead={s?.backHead ?? roundData.end}
+                chainTotal={s?.chainTotal ?? 2}
+                colors={s?.colors ?? []}
+                solved={s?.solved ?? false}
+                maxGuesses={maxGuesses}
+              />
+            );
+          })}
         </div>
-        <p className="tabular-nums text-4xl font-bold text-white">{Math.ceil(timerMs / 1000)}s</p>
-      </header>
-      <div className="grid flex-1 grid-cols-2 gap-6 overflow-y-auto sm:grid-cols-3 lg:grid-cols-4">
-        {connected.map((p) => {
-          const s = progress[p.id];
-          return (
-            <HostChainCard
-              key={p.id}
-              playerName={p.name}
-              frontHead={s?.frontHead ?? roundData.start}
-              backHead={s?.backHead ?? roundData.end}
-              chainTotal={s?.chainTotal ?? 2}
-              colors={s?.colors ?? []}
-              solved={s?.solved ?? false}
-              maxGuesses={maxGuesses}
-            />
-          );
-        })}
       </div>
     </div>
   );

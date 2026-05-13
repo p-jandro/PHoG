@@ -55,4 +55,9 @@ for (let i = 0; i < 20; i++) {
 // Sanity: dataset isn't empty
 assert.ok(ALL_COUNTRIES.length >= 100, `expected >=100 countries, got ${ALL_COUNTRIES.length}`);
 
+// ISO codes must exist on every country (added in Travel v2)
+for (const c of ALL_COUNTRIES) {
+  assert.ok(typeof c.iso === 'string' && c.iso.length === 3, `${c.name} missing valid iso code (got: ${c.iso})`);
+}
+
 console.log('graph.test.mjs PASS');

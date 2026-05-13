@@ -4,6 +4,7 @@ import { Socket } from 'socket.io-client';
 import { useGameStore } from '../stores/gameStore';
 import { CountryAutocomplete, Country } from '../components/travel/CountryAutocomplete';
 import { ChainList } from '../components/travel/ChainList';
+import { TravelMap } from '../components/travel/TravelMap';
 
 type Phase = 'intro' | 'playing' | 'results';
 
@@ -153,6 +154,14 @@ export const Travel = ({ socket }: TravelProps) => {
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <div className="h-full bg-game-leader" style={{ width: `${progress}%` }} />
         </div>
+
+        <TravelMap
+          startName={roundData.start}
+          endName={roundData.end}
+          frontChain={frontChain}
+          backChain={backChain}
+          solved={solved}
+        />
 
         <ChainList frontChain={frontChain} backChain={backChain} solved={solved} />
 

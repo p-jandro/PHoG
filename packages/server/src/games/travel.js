@@ -18,7 +18,8 @@ import {
   canReach,
   shortestPathChain,
   pickRandomPair,
-  ALL_COUNTRIES
+  ALL_COUNTRIES,
+  neighbors
 } from './travel/graph.js';
 
 const INTRO_DURATION = 8000;
@@ -50,6 +51,8 @@ export class TravelGame {
     this.timer = null;
     this.firstSolverId = null;
     this.phaseStartMs = null;
+    // Cache iso lookup built once from countries data
+    this.isoByName = new Map(ALL_COUNTRIES.map((c) => [c.name, c.iso]));
 
     this.gameState.travel = {
       phase: 'intro',
@@ -115,11 +118,23 @@ export class TravelGame {
     this.gameState.travel.endsAt = endsAt;
     this.firstSolverId = null;
 
-    // Seed each player's chains with start and end
+    const isoByName = this.isoByName;
+    const isoOf = (name) => isoByName.get(name) || null;
+
+    // Compute relevant ISO codes: optimal path + immediate neighbors, for the map viewport
+    const optimalChain = shortestPathChain(start, end) || [start, end];
+    const relevantNames = new Set();
+    for (const c of optimalChain) {
+      relevantNames.add(c);
+      for (const nb of neighbors(c)) relevantNames.add(nb);
+    }
+    const relevantIsos = Array.from(relevantNames).map(isoOf).filter(Boolean);
+
+    // Seed each player's chains with start and end (including iso)
     for (const [pid] of this.gameState.players) {
       this.gameState.travel.players[pid] = {
-        frontChain: [{ name: start }],
-        backChain: [{ name: end }],
+        frontChain: [{ name: start, iso: isoOf(start) }],
+        backChain: [{ name: end, iso: isoOf(end) }],
         history: [],
         solved: false,
         solvedAtMs: null,
@@ -131,8 +146,11 @@ export class TravelGame {
 
     this.io.emit('travel:round:start', {
       start,
+      startIso: isoOf(start),
       end,
+      endIso: isoOf(end),
       optimalDistance: distance,
+      relevantIsos,
       maxGuesses: this.gameState.travel.maxGuesses,
       duration: PLAY_DURATION,
       endsAt
@@ -179,12 +197,13 @@ export class TravelGame {
       else color = 'red';
     }
 
+    const resolvedIso = this.isoByName.get(resolved) || null;
     if (side === 'front') {
-      ps.frontChain.push({ name: resolved, color });
+      ps.frontChain.push({ name: resolved, color, iso: resolvedIso });
     } else {
-      ps.backChain.unshift({ name: resolved, color });
+      ps.backChain.unshift({ name: resolved, color, iso: resolvedIso });
     }
-    ps.history.push({ name: resolved, color, side });
+    ps.history.push({ name: resolved, color, side, iso: resolvedIso });
     ps.guessesUsed++;
 
     const newFront = ps.frontChain[ps.frontChain.length - 1].name;
@@ -225,6 +244,8 @@ export class TravelGame {
         frontHead: ps.frontChain[ps.frontChain.length - 1]?.name || null,
         backHead: ps.backChain[0]?.name || null,
         chainTotal: ps.frontChain.length + ps.backChain.length, // total nodes across both
+        frontChain: ps.frontChain,    // full chain with name, color, iso
+        backChain: ps.backChain,      // full chain with name, color, iso
         colors: ps.history.map((h) => h.color),
         solved: ps.solved,
         guessesUsed: ps.guessesUsed
@@ -296,12 +317,15 @@ export class TravelGame {
       });
     }
 
+    const optimalChainIsos = (optimalChain || []).map((n) => this.isoByName.get(n)).filter(Boolean);
+
     const endsAt = Date.now() + RESULTS_DURATION;
     this.io.emit('travel:round:results', {
       start,
       end,
       optimalDistance,
       optimalChain,
+      optimalChainIsos,
       results: playerResults,
       duration: RESULTS_DURATION,
       endsAt
