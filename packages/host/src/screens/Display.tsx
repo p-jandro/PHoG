@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
+import { Button, Card, Chip } from '../ui';
 import { ThemedDleDisplay } from './ThemedDleDisplay';
 import { NumbersDisplay } from './NumbersDisplay';
 import { WordleDisplay } from './WordleDisplay';
@@ -403,12 +404,9 @@ export const Display = () => {
 
   const displayControl = authenticated && pointlessReadyToReveal ? (
     <div className="fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6">
-      <button
-        onClick={revealResults}
-        className="rounded-full bg-primary-teal px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_30px_rgba(0,0,0,0.28)] transition-transform hover:bg-primary-teal/90 active:scale-95 sm:text-base"
-      >
+      <Button variant="action" size="lg" onClick={revealResults}>
         Reveal Pointless Results
-      </button>
+      </Button>
     </div>
   ) : null;
 
@@ -1344,28 +1342,29 @@ export const Display = () => {
   if (currentGame === 'pointless' && pointlessRound) {
     return (
       <>
-        <div className="screen-shell overflow-y-auto py-8">
+        <div className="min-h-screen overflow-y-auto bg-bg-base py-8 text-ink">
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame text-center"
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto w-full max-w-6xl px-4 text-center sm:px-6"
           >
-          <div className="mb-8">
-            <span className="text-xl text-ui-textMuted sm:text-3xl">
-              Round {pointlessRound.roundIndex + 1} of {pointlessRound.totalRounds}
-            </span>
-          </div>
+            <div className="mb-6 flex flex-wrap justify-center gap-2">
+              <Chip variant="info">
+                Round {pointlessRound.roundIndex + 1} of {pointlessRound.totalRounds}
+              </Chip>
+              <Chip variant="default">{pointlessRound.category}</Chip>
+            </div>
 
-          <div className="card mb-8 p-6 sm:p-12">
-            <p className="mb-4 text-sm uppercase tracking-[0.3em] text-ui-textMuted sm:text-2xl">
-              {pointlessRound.category}
+            <Card eyebrow="Pointless" className="text-center">
+              <h2 className="font-display text-3xl font-extrabold text-ink sm:text-5xl">
+                {pointlessRound.question}
+              </h2>
+            </Card>
+
+            <p className="mt-6 text-lg font-semibold uppercase tracking-[0.18em] text-ink-muted sm:text-xl">
+              Players have {Math.ceil((pointlessRound.duration || 30000) / 1000)} seconds · Lowest valid answer wins
             </p>
-            <h2 className="text-3xl font-bold sm:text-5xl">{pointlessRound.question}</h2>
-          </div>
-
-          <p className="text-lg text-ui-textMuted sm:text-2xl">
-            Players have {Math.ceil((pointlessRound.duration || 30000) / 1000)} seconds. Lowest valid answer wins.
-          </p>
           </motion.div>
         </div>
         {displayControl}
@@ -1376,76 +1375,94 @@ export const Display = () => {
   if (currentGame === 'pointless' && pointlessReveal) {
     return (
       <>
-        <div className="screen-shell flex items-center">
+        <div className="min-h-screen bg-bg-base py-8 text-ink">
           <motion.div
             initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="screen-frame"
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="mx-auto w-full max-w-6xl px-4 sm:px-6"
           >
-          <div className="card p-8 sm:p-10">
-            <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="eyebrow mb-3">Pointless Reveal</p>
-                <h1 className="text-4xl font-bold sm:text-6xl">{pointlessReveal.category}</h1>
-                <p className="mt-3 max-w-4xl text-xl text-ui-textMuted sm:text-2xl">
-                  {pointlessReveal.question}
-                </p>
-              </div>
-              <span className="status-pill">
-                Round {pointlessReveal.roundIndex + 1} / {pointlessReveal.totalRounds}
-              </span>
-            </div>
-
-            <div className="grid gap-5 xl:grid-cols-2">
-              <div className="rounded-[1.7rem] border border-primary-teal/35 bg-primary-teal/10 p-6">
-                <div className="mb-5 flex items-end justify-between gap-4">
-                  <div>
-                    <p className="section-label mb-2">Most Obscure</p>
-                    <h2 className="text-3xl font-bold">Top 3 Lowest Answers</h2>
-                  </div>
-                  <span className="status-pill">Lower is better</span>
+            <Card eyebrow="Pointless Reveal">
+              <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h1 className="font-display text-4xl font-extrabold text-ink sm:text-6xl">
+                    {pointlessReveal.category}
+                  </h1>
+                  <p className="mt-3 max-w-4xl text-xl text-ink-muted sm:text-2xl">
+                    {pointlessReveal.question}
+                  </p>
                 </div>
-                <div className="space-y-3">
-                  {pointlessReveal.obscureAnswers.map((answer, index) => (
-                    <div
-                      key={`${answer.answer}-${answer.score}-obscure`}
-                      className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-4 rounded-[1.25rem] border border-white/10 bg-black/20 px-4 py-3"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 font-bold text-white">
-                        {index + 1}
-                      </div>
-                      <p className="truncate text-xl font-semibold">{answer.answer}</p>
-                      <p className="text-right text-xl font-bold text-primary-teal">{answer.score}</p>
-                    </div>
-                  ))}
-                </div>
+                <Chip variant="info">
+                  Round {pointlessReveal.roundIndex + 1} of {pointlessReveal.totalRounds}
+                </Chip>
               </div>
 
-              <div className="rounded-[1.7rem] border border-white/10 bg-black/20 p-6">
-                <div className="mb-5 flex items-end justify-between gap-4">
-                  <div>
-                    <p className="section-label mb-2">Most Frequent</p>
-                    <h2 className="text-3xl font-bold">Top 3 Highest Answers</h2>
-                  </div>
-                  <span className="status-pill">Higher is common</span>
-                </div>
-                <div className="space-y-3">
-                  {pointlessReveal.frequentAnswers.map((answer, index) => (
-                    <div
-                      key={`${answer.answer}-${answer.score}-frequent`}
-                      className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-4 rounded-[1.25rem] border border-white/10 bg-white/[0.04] px-4 py-3"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 font-bold text-white">
-                        {index + 1}
-                      </div>
-                      <p className="truncate text-xl font-semibold">{answer.answer}</p>
-                      <p className="text-right text-xl font-bold text-game-warning">{answer.score}</p>
+              <div className="grid gap-5 xl:grid-cols-2">
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink">
+                  <div className="mb-5 flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
+                        Most Obscure
+                      </p>
+                      <h2 className="mt-2 font-display text-2xl font-extrabold text-ink sm:text-3xl">
+                        Top 3 Lowest Answers
+                      </h2>
                     </div>
-                  ))}
+                    <Chip variant="default">Lower is better</Chip>
+                  </div>
+                  <div className="space-y-3">
+                    {pointlessReveal.obscureAnswers.map((answer, index) => (
+                      <div
+                        key={`${answer.answer}-${answer.score}-obscure`}
+                        className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-4 rounded-xl border-2 border-ink bg-bg-surface px-4 py-3 shadow-ink-sm"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-action font-display text-lg font-extrabold text-white shadow-ink-sm">
+                          {index + 1}
+                        </div>
+                        <p className="truncate font-display text-xl font-extrabold text-ink">
+                          {answer.answer}
+                        </p>
+                        <p className="text-right font-display text-2xl font-extrabold text-action">
+                          {answer.score}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border-2 border-ink bg-bg-sunken p-6 shadow-ink">
+                  <div className="mb-5 flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-muted">
+                        Most Frequent
+                      </p>
+                      <h2 className="mt-2 font-display text-2xl font-extrabold text-ink sm:text-3xl">
+                        Top 3 Highest Answers
+                      </h2>
+                    </div>
+                    <Chip variant="streak">Higher is common</Chip>
+                  </div>
+                  <div className="space-y-3">
+                    {pointlessReveal.frequentAnswers.map((answer, index) => (
+                      <div
+                        key={`${answer.answer}-${answer.score}-frequent`}
+                        className="grid grid-cols-[3rem_minmax(0,1fr)_5rem] items-center gap-4 rounded-xl border-2 border-ink bg-bg-surface px-4 py-3 shadow-ink-sm"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-streak font-display text-lg font-extrabold text-white shadow-ink-sm">
+                          {index + 1}
+                        </div>
+                        <p className="truncate font-display text-xl font-extrabold text-ink">
+                          {answer.answer}
+                        </p>
+                        <p className="text-right font-display text-2xl font-extrabold text-streak">
+                          {answer.score}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </Card>
           </motion.div>
         </div>
         {displayControl}
