@@ -24,16 +24,26 @@ interface Player {
     trueFalse: number | null;
     countdown: number | null;
     pointless: number | null;
+    pokedle: number | null;
+    hpdle: number | null;
+    numbers: number | null;
+    wordle: number | null;
+    travel: number | null;
   };
   connected: boolean;
 }
 
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | 'travel';
 const GAME_LABELS: Record<GameKey, string> = {
   quiz: 'Quiz',
   trueFalse: 'True/False',
   countdown: 'Countdown',
-  pointless: 'Pointless'
+  pointless: 'Pointless',
+  pokedle: 'Pokédle',
+  hpdle: 'HP-dle',
+  numbers: 'Numbers',
+  wordle: 'Wordle',
+  travel: 'Travel'
 };
 
 export const Dashboard = () => {
@@ -61,7 +71,12 @@ export const Dashboard = () => {
   const availableGames = [
     { id: 'quiz', name: 'Quiz' },
     { id: 'trueFalse', name: 'True or False' },
-    { id: 'pointless', name: 'Pointless' }
+    { id: 'pointless', name: 'Pointless' },
+    { id: 'pokedle', name: 'Pokédle' },
+    { id: 'hpdle', name: 'HP-dle' },
+    { id: 'numbers', name: 'Numbers Round' },
+    { id: 'wordle', name: 'Wordle' },
+    { id: 'travel', name: 'Travel' }
   ];
 
   const activeGame = (gameState?.currentGame || null) as GameKey | null;
@@ -606,6 +621,41 @@ export const Dashboard = () => {
                 >
                   Start Pointless
                 </button>
+                <button
+                  onClick={() => startGame('pokedle')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-yellow-500 text-black"
+                >
+                  Start Pokédle
+                </button>
+                <button
+                  onClick={() => startGame('hpdle')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-purple-600"
+                >
+                  Start HP-dle
+                </button>
+                <button
+                  onClick={() => startGame('numbers')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-emerald-600"
+                >
+                  Start Numbers Round
+                </button>
+                <button
+                  onClick={() => startGame('wordle')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-slate-600"
+                >
+                  Start Wordle
+                </button>
+                <button
+                  onClick={() => startGame('travel')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-sky-600"
+                >
+                  Start Travel
+                </button>
               </div>
             )}
 
@@ -761,7 +811,7 @@ export const Dashboard = () => {
                           Championship total: {player.totalPlacementScore || '-'}
                         </p>
                         <div className="mt-3 flex flex-wrap gap-2">
-                          {(['quiz', 'trueFalse', 'pointless'] as GameKey[]).map((game) => (
+                          {(['quiz', 'trueFalse', 'pointless', 'pokedle', 'hpdle', 'numbers', 'wordle', 'travel'] as GameKey[]).map((game) => (
                             <span
                               key={game}
                               className="rounded-full border border-ui-border/70 bg-black/20 px-3 py-1 text-xs font-semibold text-ui-textMuted"

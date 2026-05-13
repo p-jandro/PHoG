@@ -5,7 +5,12 @@ const GAME_LABELS = {
   quiz: 'Quiz',
   trueFalse: 'True/False',
   countdown: 'Countdown',
-  pointless: 'Pointless'
+  pointless: 'Pointless',
+  pokedle: 'Pokédle',
+  hpdle: 'HP-dle',
+  numbers: 'Numbers',
+  wordle: 'Wordle',
+  travel: 'Travel'
 } as const;
 
 export const RoundLeaderboardOverlay = () => {

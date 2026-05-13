@@ -1,0 +1,422 @@
+[
+  {
+    "incantation": "Expelliarmus",
+    "effect": "Disarms the target, forcing whatever they are holding (typically a wand) to fly out of their hand. Harry's signature spell.",
+    "category": "Charm",
+    "firstAppearance": { "book": 2, "scene": "Snape disarms Lockhart at the Duelling Club demonstration" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier1",
+    "firstLetter": "E",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Expecto Patronum",
+    "effect": "Conjures a corporeal animal Patronus that wards off Dementors and Lethifolds. Requires the caster to focus on a single intensely happy memory.",
+    "category": "Charm",
+    "firstAppearance": { "book": 3, "scene": "Lupin teaches Harry the Patronus Charm in private lessons using a boggart-Dementor in the History of Magic classroom" },
+    "notableCaster": "Remus Lupin",
+    "iconicTier": "tier1",
+    "firstLetter": "E",
+    "lastLetter": "M"
+  },
+  {
+    "incantation": "Avada Kedavra",
+    "effect": "Instantly kills the target with a flash of green light. One of the three Unforgivable Curses; has no known counter-curse.",
+    "category": "Curse",
+    "firstAppearance": { "book": 4, "scene": "Barty Crouch Jr. (disguised as Mad-Eye Moody) demonstrates the Unforgivable Curses on a spider in DADA class" },
+    "notableCaster": "Lord Voldemort",
+    "iconicTier": "tier1",
+    "firstLetter": "A",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Crucio",
+    "effect": "Inflicts unbearable, excruciating pain on the victim. One of the three Unforgivable Curses; prolonged use can drive the victim insane.",
+    "category": "Curse",
+    "firstAppearance": { "book": 4, "scene": "Barty Crouch Jr. (as Mad-Eye Moody) demonstrates the Cruciatus Curse on a spider in DADA class" },
+    "notableCaster": "Bellatrix Lestrange",
+    "iconicTier": "tier1",
+    "firstLetter": "C",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Imperio",
+    "effect": "Places the victim under the caster's complete control, forcing them to obey any command. One of the three Unforgivable Curses; can be resisted only by exceptional willpower.",
+    "category": "Curse",
+    "firstAppearance": { "book": 4, "scene": "Barty Crouch Jr. (as Mad-Eye Moody) demonstrates the Imperius Curse by making a spider dance in DADA class" },
+    "notableCaster": "Barty Crouch Jr.",
+    "iconicTier": "tier1",
+    "firstLetter": "I",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Wingardium Leviosa",
+    "effect": "Causes a target object to levitate into the air. The first formal spell taught to Hogwarts first-years.",
+    "category": "Charm",
+    "firstAppearance": { "book": 1, "scene": "Professor Flitwick's first-year Charms class, where Hermione corrects Ron's pronunciation ('it's leviOsa, not levioSA')" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier1",
+    "firstLetter": "W",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Lumos",
+    "effect": "Ignites a bright light at the tip of the caster's wand, allowing them to see in the dark.",
+    "category": "Charm",
+    "firstAppearance": { "book": 2, "scene": "Harry and Ron use it to navigate the spider-filled Forbidden Forest while following Aragog's trail" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier1",
+    "firstLetter": "L",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Nox",
+    "effect": "Extinguishes the light produced by Lumos at the caster's wand tip. Counter-charm to the Wand-Lighting Charm.",
+    "category": "Charm",
+    "firstAppearance": { "book": 3, "scene": "Harry and Hermione extinguish their wands at the base of the Whomping Willow before following Sirius and Ron into the Shrieking Shack tunnel" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier1",
+    "firstLetter": "N",
+    "lastLetter": "X"
+  },
+  {
+    "incantation": "Accio",
+    "effect": "Summons an object to the caster, even from a great distance and out of sight. The caster must clearly visualize what they want.",
+    "category": "Charm",
+    "firstAppearance": { "book": 4, "scene": "Molly Weasley summons Fred and George's hidden Ton-Tongue Toffees at the Burrow before the Quidditch World Cup" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier1",
+    "firstLetter": "A",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Alohomora",
+    "effect": "Unlocks doors, gates and other sealed objects. Ineffective against locks reinforced by stronger magic.",
+    "category": "Charm",
+    "firstAppearance": { "book": 1, "scene": "Hermione unlocks the door to the forbidden third-floor corridor while hiding from Filch, leading the trio to discover Fluffy" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier1",
+    "firstLetter": "A",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Stupefy",
+    "effect": "Fires a jet of red light that stuns and knocks the target unconscious. A staple of duelling and Auror combat.",
+    "category": "Charm",
+    "firstAppearance": { "book": 4, "scene": "Ministry officials including Barty Crouch Sr. fire Stunners into the woods to apprehend whoever conjured the Dark Mark at the Quidditch World Cup" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier1",
+    "firstLetter": "S",
+    "lastLetter": "Y"
+  },
+  {
+    "incantation": "Riddikulus",
+    "effect": "Forces a Boggart to assume a humorous form chosen by the caster, since Boggarts are defeated by laughter.",
+    "category": "Charm",
+    "firstAppearance": { "book": 3, "scene": "Lupin's third-year Defence Against the Dark Arts class with the staffroom-wardrobe boggart, where Neville faces Snape first" },
+    "notableCaster": "Neville Longbottom",
+    "iconicTier": "tier1",
+    "firstLetter": "R",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Sectumsempra",
+    "effect": "Slashes the target as if with an invisible sword, causing deep, bleeding wounds. Invented by the Half-Blood Prince and labelled 'For Enemies'.",
+    "category": "Curse",
+    "firstAppearance": { "book": 6, "scene": "Harry casts it on Draco in the sixth-floor boys' bathroom after Draco tries to use Crucio on him; Snape arrives to heal Draco" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier1",
+    "firstLetter": "S",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Obliviate",
+    "effect": "Erases specific memories from the victim's mind. Used by the Ministry to hide magic from Muggles; powerful enough to cause permanent amnesia if cast strongly.",
+    "category": "Charm",
+    "firstAppearance": { "book": 2, "scene": "Lockhart tries to wipe Harry and Ron's memories in the Chamber of Secrets tunnel with Ron's broken wand, and the spell backfires onto himself" },
+    "notableCaster": "Gilderoy Lockhart",
+    "iconicTier": "tier1",
+    "firstLetter": "O",
+    "lastLetter": "E"
+  },
+  {
+    "incantation": "Reparo",
+    "effect": "Seamlessly mends broken or torn objects, restoring them to their original condition.",
+    "category": "Charm",
+    "firstAppearance": { "book": 2, "scene": "Arthur Weasley uses it to repair Harry's broken glasses at the Leaky Cauldron after Harry's exit from Knockturn Alley" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier1",
+    "firstLetter": "R",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Aguamenti",
+    "effect": "Conjures a jet of clean, drinkable water from the tip of the caster's wand.",
+    "category": "Charm",
+    "firstAppearance": { "book": 6, "scene": "Harry refills the crystal goblet for Dumbledore in the seaside cave guarding Slytherin's locket Horcrux" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier2",
+    "firstLetter": "A",
+    "lastLetter": "I"
+  },
+  {
+    "incantation": "Confringo",
+    "effect": "Causes the target to explode in a burst of flame. A combat-grade blasting curse popular in duelling.",
+    "category": "Curse",
+    "firstAppearance": { "book": 7, "scene": "Harry casts it from the falling motorbike sidecar during the Battle of the Seven Potters while fleeing Privet Drive" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier2",
+    "firstLetter": "C",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Diffindo",
+    "effect": "Cuts, tears or severs objects with surgical precision.",
+    "category": "Charm",
+    "firstAppearance": { "book": 4, "scene": "Ron uses the Severing Charm on the lace cuffs and ruff of his Yule Ball dress robes in an attempt to make them less embarrassing" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier2",
+    "firstLetter": "D",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Engorgio",
+    "effect": "Causes the target object to swell to many times its normal size. Counter-charm: Reducio.",
+    "category": "Charm",
+    "firstAppearance": { "book": 4, "scene": "Barty Crouch Jr. (as Mad-Eye Moody) enlarges the three spiders before demonstrating the Unforgivable Curses on them" },
+    "notableCaster": "Barty Crouch Jr.",
+    "iconicTier": "tier2",
+    "firstLetter": "E",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Reducio",
+    "effect": "Shrinks an enlarged object back to its normal size. Counter-charm to the Engorgement Charm.",
+    "category": "Charm",
+    "firstAppearance": { "book": 4, "scene": "Barty Crouch Jr. (as Mad-Eye Moody) uses it to shrink the demonstration spiders back down after the Unforgivable Curses lesson" },
+    "notableCaster": "Barty Crouch Jr.",
+    "iconicTier": "tier2",
+    "firstLetter": "R",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Episkey",
+    "effect": "Heals relatively minor injuries such as broken noses, split lips and broken toes.",
+    "category": "Charm",
+    "firstAppearance": { "book": 6, "scene": "Tonks fixes Harry's broken nose on the Hogwarts Express after Draco stomps on it under the Invisibility Cloak" },
+    "notableCaster": "Nymphadora Tonks",
+    "iconicTier": "tier2",
+    "firstLetter": "E",
+    "lastLetter": "Y"
+  },
+  {
+    "incantation": "Ferula",
+    "effect": "Conjures bandages and a splint around a wounded limb, easing pain and immobilising broken bones.",
+    "category": "Charm",
+    "firstAppearance": { "book": 3, "scene": "Lupin splints Ron's broken leg in the Shrieking Shack after Sirius's dog-form drags him through the Whomping Willow tunnel" },
+    "notableCaster": "Remus Lupin",
+    "iconicTier": "tier2",
+    "firstLetter": "F",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Finite Incantatem",
+    "effect": "Terminates the effects of currently active spells in its area. A general counter-spell.",
+    "category": "Charm",
+    "firstAppearance": { "book": 2, "scene": "Snape ends the chaos at the Duelling Club, cancelling out the Tickling Charm, Tarantallegra and other spells flying between paired students" },
+    "notableCaster": "Severus Snape",
+    "iconicTier": "tier2",
+    "firstLetter": "F",
+    "lastLetter": "M"
+  },
+  {
+    "incantation": "Furnunculus",
+    "effect": "Causes the victim's skin to erupt in painful boils.",
+    "category": "Jinx",
+    "firstAppearance": { "book": 4, "scene": "Harry casts it at Draco in a corridor confrontation after the Quidditch World Cup; the spell collides with Draco's Densaugeo and hits Goyle instead, covering his face in boils" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier2",
+    "firstLetter": "F",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Geminio",
+    "effect": "Creates an exact duplicate of the target object. The curse form causes touched items to multiply uncontrollably and burn the toucher.",
+    "category": "Charm",
+    "firstAppearance": { "book": 7, "scene": "Hermione duplicates Slytherin's locket after stealing the real one from Umbridge during the trio's infiltration of the Ministry of Magic" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier2",
+    "firstLetter": "G",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Impedimenta",
+    "effect": "Slows or temporarily freezes the target's movement, useful for halting an attacker or fleeing creature.",
+    "category": "Jinx",
+    "firstAppearance": { "book": 4, "scene": "Harry uses it inside the Triwizard maze to slow down a Blast-Ended Skrewt and later an Acromantula during the Third Task" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier2",
+    "firstLetter": "I",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Incarcerous",
+    "effect": "Conjures thick magical ropes that fly out of thin air and bind the target.",
+    "category": "Spell",
+    "firstAppearance": { "book": 5, "scene": "Umbridge binds the centaur Magorian after he threatens her in the Forbidden Forest, just before the herd attacks her" },
+    "notableCaster": "Dolores Umbridge",
+    "iconicTier": "tier2",
+    "firstLetter": "I",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Incendio",
+    "effect": "Conjures a jet of flames that can set objects alight or fill a fireplace.",
+    "category": "Charm",
+    "firstAppearance": { "book": 4, "scene": "Arthur Weasley lights a fire in the Dursleys' boarded-up fireplace at Privet Drive when collecting Harry for the Quidditch World Cup" },
+    "notableCaster": "Arthur Weasley",
+    "iconicTier": "tier2",
+    "firstLetter": "I",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Levicorpus",
+    "effect": "Hoists the victim into the air by the ankle, leaving them dangling upside-down. Invented by the young Severus Snape.",
+    "category": "Jinx",
+    "firstAppearance": { "book": 6, "scene": "Harry reads the spell in the margins of the Half-Blood Prince's potions book and accidentally casts it nonverbally on Ron in their dormitory" },
+    "notableCaster": "James Potter",
+    "iconicTier": "tier2",
+    "firstLetter": "L",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Morsmordre",
+    "effect": "Conjures the Dark Mark, a colossal skull-and-serpent image, in the night sky. Used by Death Eaters as a calling card after a killing.",
+    "category": "Curse",
+    "firstAppearance": { "book": 4, "scene": "Barty Crouch Jr. fires the Dark Mark into the sky using Harry's stolen wand after the 1994 Quidditch World Cup, terrifying the Death Eaters who had abandoned Voldemort" },
+    "notableCaster": "Barty Crouch Jr.",
+    "iconicTier": "tier2",
+    "firstLetter": "M",
+    "lastLetter": "E"
+  },
+  {
+    "incantation": "Muffliato",
+    "effect": "Fills the ears of anyone nearby with an unidentifiable buzzing, allowing the caster to hold a private conversation in public. Invented by the Half-Blood Prince.",
+    "category": "Charm",
+    "firstAppearance": { "book": 6, "scene": "Harry finds the spell scribbled in the margin of his second-hand Advanced Potion-Making and the trio quickly adopt it for private conversations" },
+    "notableCaster": "Severus Snape",
+    "iconicTier": "tier2",
+    "firstLetter": "M",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Petrificus Totalus",
+    "effect": "Locks the victim's body completely rigid; arms snap to sides, legs spring together, and they topple over. Eyes remain mobile.",
+    "category": "Curse",
+    "firstAppearance": { "book": 1, "scene": "Hermione stuns Neville with it in the Gryffindor common room when he tries to stop the trio from leaving to find the Philosopher's Stone" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier2",
+    "firstLetter": "P",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Protego",
+    "effect": "Conjures an invisible magical shield that deflects spells and physical attacks back at the attacker.",
+    "category": "Charm",
+    "firstAppearance": { "book": 4, "scene": "Hermione teaches it to Harry while drilling him for the Third Task of the Triwizard Tournament, with Ron firing hexes for him to deflect" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier2",
+    "firstLetter": "P",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Rictusempra",
+    "effect": "Sends a jet of silver light into the target that triggers uncontrollable laughter and tickling, weakening them. Often used as a diversion in duels.",
+    "category": "Charm",
+    "firstAppearance": { "book": 2, "scene": "Harry casts it on Draco at Lockhart's Duelling Club; it is the first incantation Harry has ever spoken aloud with a wand in canon" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier2",
+    "firstLetter": "R",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Scourgify",
+    "effect": "A cleaning charm that scrubs the target object clean, often producing soap bubbles.",
+    "category": "Charm",
+    "firstAppearance": { "book": 5, "scene": "Tonks cleans out Hedwig's filthy cage when the Advance Guard collects Harry from Privet Drive to take him to Grimmauld Place" },
+    "notableCaster": "Nymphadora Tonks",
+    "iconicTier": "tier2",
+    "firstLetter": "S",
+    "lastLetter": "Y"
+  },
+  {
+    "incantation": "Silencio",
+    "effect": "Renders the victim temporarily mute. Especially useful against opponents who must vocalise their incantations.",
+    "category": "Charm",
+    "firstAppearance": { "book": 5, "scene": "Flitwick teaches fifth-years the Silencing Charm using bullfrogs and ravens; Hermione masters it instantly while Harry and Ron struggle" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier2",
+    "firstLetter": "S",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Tarantallegra",
+    "effect": "Forces the victim's legs into uncontrollable, frantic dancing, leaving them unable to stand still or aim properly.",
+    "category": "Jinx",
+    "firstAppearance": { "book": 2, "scene": "Draco casts it on Harry during their Duelling Club match, sending Harry's legs into a manic jig before Snape ends the duel" },
+    "notableCaster": "Draco Malfoy",
+    "iconicTier": "tier2",
+    "firstLetter": "T",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Reducto",
+    "effect": "Blasts solid objects apart in a burst of force. Useful for breaking through barriers but can be lethal against living targets.",
+    "category": "Curse",
+    "firstAppearance": { "book": 4, "scene": "Harry blasts through the hedges of the Triwizard maze during the Third Task while practising for and navigating the labyrinth" },
+    "notableCaster": "Harry Potter",
+    "iconicTier": "tier3",
+    "firstLetter": "R",
+    "lastLetter": "O"
+  },
+  {
+    "incantation": "Mobilicorpus",
+    "effect": "Suspends an unconscious body a few inches off the ground and moves it forward, like a magical stretcher.",
+    "category": "Spell",
+    "firstAppearance": { "book": 3, "scene": "Lupin levitates the Stunned Snape back through the Whomping Willow tunnel toward Hogwarts after the Shrieking Shack confrontation" },
+    "notableCaster": "Remus Lupin",
+    "iconicTier": "tier3",
+    "firstLetter": "M",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Serpensortia",
+    "effect": "Conjures a live snake from the caster's wand tip.",
+    "category": "Spell",
+    "firstAppearance": { "book": 2, "scene": "Draco produces a black serpent against Harry at Lockhart's Duelling Club, prompting Harry to accidentally reveal his Parseltongue ability" },
+    "notableCaster": "Draco Malfoy",
+    "iconicTier": "tier3",
+    "firstLetter": "S",
+    "lastLetter": "A"
+  },
+  {
+    "incantation": "Locomotor Mortis",
+    "effect": "Locks the victim's legs together, preventing them from walking or running.",
+    "category": "Curse",
+    "firstAppearance": { "book": 1, "scene": "Draco hits Neville with the Leg-Locker Curse in a Hogwarts corridor; Neville hops back into the Gryffindor common room and Hermione undoes it" },
+    "notableCaster": "Draco Malfoy",
+    "iconicTier": "tier3",
+    "firstLetter": "L",
+    "lastLetter": "S"
+  },
+  {
+    "incantation": "Oppugno",
+    "effect": "Directs conjured creatures or animated objects under the caster's control to attack the target.",
+    "category": "Jinx",
+    "firstAppearance": { "book": 6, "scene": "Hermione sets a flock of conjured canaries on Ron after he walks into the room with Lavender Brown, hand in hand" },
+    "notableCaster": "Hermione Granger",
+    "iconicTier": "tier3",
+    "firstLetter": "O",
+    "lastLetter": "O"
+  }
+]

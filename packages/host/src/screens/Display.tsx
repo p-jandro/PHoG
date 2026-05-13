@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
+import { ThemedDleDisplay } from './ThemedDleDisplay';
+import { NumbersDisplay } from './NumbersDisplay';
+import { WordleDisplay } from './WordleDisplay';
+import { TravelDisplay } from './TravelDisplay';
 import { QRCodeSVG } from 'qrcode.react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
@@ -14,7 +18,7 @@ const PLAYER_URL = import.meta.env.VITE_PLAYER_URL || (
     : 'http://localhost:5173'
 );
 const CHAMPIONSHIP_PREVIEW_DELAY = 5000;
-type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+type GameKey = 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | 'travel';
 
 interface Player {
   id: string;
@@ -27,6 +31,11 @@ interface Player {
     trueFalse: number | null;
     countdown: number | null;
     pointless: number | null;
+    pokedle: number | null;
+    hpdle: number | null;
+    numbers: number | null;
+    wordle: number | null;
+    travel: number | null;
   };
   connected: boolean;
 }
@@ -42,7 +51,7 @@ interface RoundLeaderboardEntry {
 }
 
 interface RoundLeaderboardState {
-  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless';
+  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | 'travel';
   duration: number;
   leaderboard: RoundLeaderboardEntry[];
   roundNumber?: number | null;
@@ -119,6 +128,7 @@ export const Display = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [leaderboardStage, setLeaderboardStage] = useState<'game' | 'championship'>('game');
   const [now, setNow] = useState(Date.now());
+  const [socket, setSocket] = useState<Socket | null>(null);
   const playerJoinLabel = PLAYER_URL.replace(/^https?:\/\//, '');
 
   // Quiz state
@@ -345,7 +355,10 @@ export const Display = () => {
       setPointlessReadyToReveal(false);
     });
 
+    setSocket(newSocket);
+
     return () => {
+      setSocket(null);
       if (roundLeaderboardTimeout) {
         clearTimeout(roundLeaderboardTimeout);
       }
@@ -471,7 +484,12 @@ export const Display = () => {
       quiz: 'Quiz',
       trueFalse: 'True/False',
       countdown: 'Countdown',
-      pointless: 'Pointless'
+      pointless: 'Pointless',
+      pokedle: 'Pokédle',
+      hpdle: 'HP-dle',
+      numbers: 'Numbers',
+      wordle: 'Wordle',
+      travel: 'Travel'
     }[roundLeaderboard.game];
 
     return (
@@ -561,6 +579,46 @@ export const Display = () => {
     );
   }
 
+  if ((currentGame === 'pokedle' || currentGame === 'hpdle') && phase === 'playing') {
+    return (
+      <>
+        <ThemedDleDisplay
+          socket={socket}
+          currentGame={currentGame as 'pokedle' | 'hpdle'}
+          players={players}
+        />
+        {displayControl}
+      </>
+    );
+  }
+
+  if (currentGame === 'numbers' && phase === 'playing') {
+    return (
+      <>
+        <NumbersDisplay socket={socket} players={players} />
+        {displayControl}
+      </>
+    );
+  }
+
+  if (currentGame === 'wordle' && phase === 'playing') {
+    return (
+      <>
+        <WordleDisplay socket={socket} players={players} />
+        {displayControl}
+      </>
+    );
+  }
+
+  if (currentGame === 'travel' && phase === 'playing') {
+    return (
+      <>
+        <TravelDisplay socket={socket} players={players} />
+        {displayControl}
+      </>
+    );
+  }
+
   if (currentGame === 'quiz' && quizIntro) {
     return renderIntroView('Quiz Briefing', 'text-primary-blue', quizIntro);
   }
@@ -620,7 +678,12 @@ export const Display = () => {
                     quiz: 'Quiz',
                     trueFalse: 'True/False',
                     countdown: 'Countdown',
-                    pointless: 'Pointless'
+                    pointless: 'Pointless',
+                    pokedle: 'Pokédle',
+                    hpdle: 'HP-dle',
+                    numbers: 'Numbers',
+                    wordle: 'Wordle',
+                    travel: 'Travel'
                   }[activeGame]} Placements`}
                 </h1>
                 <p className="mt-3 text-2xl text-ui-textMuted">
@@ -637,19 +700,24 @@ export const Display = () => {
             <div className="overflow-hidden rounded-[1.6rem] border border-ui-border/80">
               {showChampionship ? (
                 <>
-                  <div className="grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr] gap-3 border-b border-ui-border/80 bg-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ui-textMuted">
+                  <div className="grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-3 border-b border-ui-border/80 bg-white/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ui-textMuted">
                     <span>Rank</span>
                     <span>Player</span>
                     <span className="text-right">Quiz</span>
                     <span className="text-right">T/F</span>
                     <span className="text-right">PTL</span>
+                    <span className="text-right">PKD</span>
+                    <span className="text-right">HP</span>
+                    <span className="text-right">NUM</span>
+                    <span className="text-right">WRD</span>
+                    <span className="text-right">TRV</span>
                     <span className="text-right">Total</span>
                   </div>
                   <div className="max-h-[62vh] divide-y divide-ui-border/70 overflow-y-auto">
                     {sortedPlayers.map((player, index) => (
                       <div
                         key={player.id}
-                        className={`grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr] items-center gap-3 px-5 py-3 ${
+                        className={`grid grid-cols-[4rem_minmax(0,1.8fr)_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-3 px-5 py-3 ${
                           index < 3 ? 'bg-white/[0.05]' : 'bg-black/15'
                         }`}
                       >
@@ -665,6 +733,11 @@ export const Display = () => {
                         <p className="text-right text-lg">{player.gamePlacements?.quiz || '-'}</p>
                         <p className="text-right text-lg">{player.gamePlacements?.trueFalse || '-'}</p>
                         <p className="text-right text-lg">{player.gamePlacements?.pointless || '-'}</p>
+                        <p className="text-right text-lg">{player.gamePlacements?.pokedle || '-'}</p>
+                        <p className="text-right text-lg">{player.gamePlacements?.hpdle || '-'}</p>
+                        <p className="text-right text-lg">{player.gamePlacements?.numbers || '-'}</p>
+                        <p className="text-right text-lg">{player.gamePlacements?.wordle || '-'}</p>
+                        <p className="text-right text-lg">{player.gamePlacements?.travel || '-'}</p>
                         <p className="text-right text-2xl font-bold text-white">{player.totalPlacementScore || '-'}</p>
                       </div>
                     ))}

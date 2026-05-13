@@ -267,18 +267,28 @@ export function updatePlayerPlacements(players, gameType) {
             quiz: null,
             trueFalse: null,
             countdown: null,
-            pointless: null
+            pointless: null,
+            pokedle: null,
+            hpdle: null,
+            numbers: null,
+            wordle: null,
+            travel: null
         };
       }
-      
+
       player.placements[gameType] = placement;
-      
+
       // Recalculate total placement (sum of completed games only — null means not played)
       const completedPlacements = [
         player.placements.quiz,
         player.placements.trueFalse,
         player.placements.countdown,
-        player.placements.pointless
+        player.placements.pointless,
+        player.placements.pokedle,
+        player.placements.hpdle,
+        player.placements.numbers,
+        player.placements.wordle,
+        player.placements.travel
       ].filter(p => p !== null && p !== undefined);
 
       player.totalPlacement = completedPlacements.reduce((sum, p) => sum + p, 0);
