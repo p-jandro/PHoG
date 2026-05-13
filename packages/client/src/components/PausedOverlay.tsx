@@ -1,8 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useGameStore } from '../stores/gameStore';
+import { Card, Chip } from '../ui';
 
 export const PausedOverlay = () => {
   const { paused } = useGameStore();
+  const reduced = useReducedMotion();
 
   return (
     <AnimatePresence>
@@ -11,47 +13,40 @@ export const PausedOverlay = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md"
-        >
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ type: 'spring', duration: 0.5 }}
-          className="card max-w-xl px-6 py-8 text-center sm:px-8"
+          transition={{ duration: 0.22 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/70 px-4 backdrop-blur-md"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Game paused"
         >
           <motion.div
-            animate={{
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-              className="mb-4 text-4xl font-black tracking-[0.18em] text-game-leader sm:text-6xl sm:tracking-[0.28em]"
-            >
-              PAUSED
-            </motion.div>
-            <h1 className="mb-4 text-3xl font-bold text-white sm:text-5xl">
-              Game Paused
-            </h1>
-            <p className="text-lg text-ui-textMuted sm:text-2xl">
-              Waiting for host to resume...
-            </p>
-            <motion.div
-              animate={{
-                opacity: [0.5, 1, 0.5],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-              className="mt-8 text-base text-primary-teal sm:text-xl"
-            >
-              Waiting for the host...
-            </motion.div>
+            initial={reduced ? { opacity: 0 } : { scale: 0.92, opacity: 0 }}
+            animate={reduced ? { opacity: 1 } : { scale: 1, opacity: 1 }}
+            exit={reduced ? { opacity: 0 } : { scale: 0.96, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.34, 1.56, 0.64, 1] }}
+            className="w-full max-w-xl"
+          >
+            <Card className="text-center">
+              <motion.div
+                animate={reduced ? undefined : { scale: [1, 1.05, 1] }}
+                transition={
+                  reduced
+                    ? undefined
+                    : { duration: 2, repeat: Infinity, ease: 'easeInOut' }
+                }
+                className="mb-6 flex justify-center"
+              >
+                <Chip variant="now" className="text-base tracking-[0.28em]">
+                  PAUSED
+                </Chip>
+              </motion.div>
+              <h1 className="mb-3 text-3xl font-extrabold text-ink sm:text-5xl">
+                Game Paused
+              </h1>
+              <p className="text-lg text-ink-muted sm:text-xl">
+                Waiting for the host to resume…
+              </p>
+            </Card>
           </motion.div>
         </motion.div>
       )}
