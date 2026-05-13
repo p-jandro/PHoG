@@ -27,6 +27,7 @@ import { CountdownGame } from './games/countdown.js';
 import { PointlessGame, POINTLESS_ROUND_DURATION } from './games/pointless.js';
 import { ThemedDleGame } from './games/themedDle.js';
 import { NumbersGame } from './games/numbers.js';
+import { WordleGame } from './games/wordle.js';
 
 const app = express();
 const server = createServer(app);
@@ -168,6 +169,10 @@ function startSpecificGame(gameName) {
       const numbersGame = new NumbersGame(gameState, io, gameEngine);
       gameEngine.startGame('numbers', numbersGame);
       numbersGame.start();
+  } else if (gameName === 'wordle') {
+      const wordleGame = new WordleGame(gameState, io, gameEngine);
+      gameEngine.startGame('wordle', wordleGame);
+      wordleGame.start();
   }
 }
 
@@ -521,6 +526,26 @@ io.on('connection', (socket) => {
     const currentGame = gameEngine.currentGameModule;
     if (currentGame && typeof currentGame.handleSubmit === 'function') {
       currentGame.handleSubmit(playerId, { expression, claimedValue });
+    }
+  });
+
+  socket.on('wordle:submit', ({ guess }) => {
+    const playerId = connectionManager.getPlayerId(socket.id);
+    if (!playerId) {
+      socket.emit('error', { message: 'Not registered' });
+      return;
+    }
+    if (gameState.currentGame !== 'wordle') {
+      socket.emit('error', { message: 'Wordle not running' });
+      return;
+    }
+    if (gameState.wordle?.phase !== 'playing') {
+      socket.emit('error', { message: 'Not in playing phase' });
+      return;
+    }
+    const currentGame = gameEngine.currentGameModule;
+    if (currentGame && typeof currentGame.handleSubmit === 'function') {
+      currentGame.handleSubmit(playerId, { guess });
     }
   });
 
