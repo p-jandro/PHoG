@@ -24,6 +24,7 @@ export const Wordle = ({ socket }: WordleProps) => {
   const [solved, setSolved] = useState(false);
   const [invalidToast, setInvalidToast] = useState<string | null>(null);
   const [timerMs, setTimerMs] = useState(0);
+  const [flippingRowIndex, setFlippingRowIndex] = useState<number | null>(null);
 
   // Cumulative keyboard state — derived from rows
   const keyboardStates = useMemo(() => {
@@ -63,7 +64,15 @@ export const Wordle = ({ socket }: WordleProps) => {
       setRoundData(d);
     };
     const onResult = (d: any) => {
-      setRows((prev) => [...prev, { guess: d.guess, colors: d.colors }]);
+      setRows((prev) => {
+        const next = [...prev, { guess: d.guess, colors: d.colors }];
+        // Trigger flip on the newly added row.
+        const newIndex = next.length - 1;
+        setFlippingRowIndex(newIndex);
+        // Clear after the cascade completes (4 × 0.18 + 0.25 ≈ 0.97s).
+        setTimeout(() => setFlippingRowIndex((cur) => (cur === newIndex ? null : cur)), 1100);
+        return next;
+      });
       setDraft('');
       if (d.solved) setSolved(true);
     };
@@ -189,7 +198,12 @@ export const Wordle = ({ socket }: WordleProps) => {
           <div className="h-full bg-game-leader" style={{ width: `${progress}%` }} />
         </div>
 
-        <WordleBoard rows={rows} current={solved ? '' : draft} maxGuesses={MAX} />
+        <WordleBoard
+          rows={rows}
+          current={solved ? '' : draft}
+          maxGuesses={MAX}
+          flippingRowIndex={flippingRowIndex}
+        />
 
         {invalidToast && (
           <div className="rounded-xl border border-game-incorrect/40 bg-game-incorrect/10 px-3 py-2 text-center text-sm text-game-incorrect">
