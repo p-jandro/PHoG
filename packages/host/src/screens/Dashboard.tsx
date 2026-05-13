@@ -629,6 +629,13 @@ export const Dashboard = () => {
                 >
                   Start HP-dle
                 </button>
+                <button
+                  onClick={() => startGame('numbers')}
+                  disabled={gameState?.phase !== 'lobby'}
+                  className="btn bg-emerald-600"
+                >
+                  Start Numbers Round
+                </button>
               </div>
             )}
 
