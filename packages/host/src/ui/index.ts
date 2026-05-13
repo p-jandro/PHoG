@@ -16,3 +16,5 @@ export { UiShowcase } from './UiShowcase';
 export { HostScreenShell } from './HostScreenShell';
 export { PlayerTracker } from './PlayerTracker';
 export type { TrackedPlayer } from './PlayerTracker';
+export { AnswerFeedback } from './AnswerFeedback';
+export type { AnswerFeedbackState } from './AnswerFeedback';

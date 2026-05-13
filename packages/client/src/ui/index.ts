@@ -13,3 +13,5 @@ export { Countdown } from './Countdown';
 export { ScoreDrop } from './ScoreDrop';
 export { ThemeToggle } from './ThemeToggle';
 export { UiShowcase } from './UiShowcase';
+export { AnswerFeedback } from './AnswerFeedback';
+export type { AnswerFeedbackState } from './AnswerFeedback';
