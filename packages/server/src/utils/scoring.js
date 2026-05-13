@@ -185,12 +185,12 @@ export function calculatePlacements(players, gameType) {
   if (gameType === 'pointless') {
     playerArray.sort((a, b) => {
       if (a.score !== b.score) return a.score - b.score;
-      return a.totalResponseTime - b.totalResponseTime;
+      return (a.totalResponseTime || 0) - (b.totalResponseTime || 0);
     });
   } else {
     playerArray.sort((a, b) => {
       if (a.score !== b.score) return b.score - a.score;
-      return a.totalResponseTime - b.totalResponseTime;
+      return (a.totalResponseTime || 0) - (b.totalResponseTime || 0);
     });
   }
 

@@ -102,8 +102,12 @@ export class CountdownGame {
       letters.push(vowelPool[randomIndex]);
     }
 
-    // Shuffle letters
-    return letters.sort(() => Math.random() - 0.5);
+    // Fisher-Yates shuffle for unbiased randomization
+    for (let i = letters.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [letters[i], letters[j]] = [letters[j], letters[i]];
+    }
+    return letters;
   }
 
   /**

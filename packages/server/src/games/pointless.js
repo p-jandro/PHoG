@@ -348,13 +348,16 @@ export class PointlessGame {
 
     this.io.emit('pointless:reveal:display', this.getDisplayRevealPayload(triggerTime));
 
-    // Send individual results to each player
+    // Update scores for ALL players, emit results only to connected ones
     for (const [playerId, answerData] of this.gameState.pointless.answers) {
       const player = this.gameState.players.get(playerId);
-      if (player && player.connected) {
-        // Update score
-        player.score += answerData.score;
+      if (!player) continue;
 
+      // Always update score regardless of connection status
+      player.score += answerData.score;
+
+      // Only emit to connected players with active sockets
+      if (player.connected) {
         const socket = this.io.sockets.sockets.get(player.socketId);
         if (socket) {
           socket.emit('game:pointless:reveal', this.getRevealPayload(playerId, triggerTime));

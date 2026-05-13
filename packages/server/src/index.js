@@ -257,11 +257,21 @@ io.on('connection', (socket) => {
   socket.on('host:join', ({ password }) => {
     try {
       const expectedPassword = process.env.HOST_PASSWORD || 'admin';
-      console.log(`[HOST] Login attempt - Expected: "${expectedPassword}", Received: "${password}"`);
+      console.log(`[HOST] Login attempt - password ${password === expectedPassword ? 'matches' : 'does not match'}`);
 
       if (password !== expectedPassword) {
         socket.emit('host:rejected', { message: 'Invalid password' });
         return;
+      }
+
+      // Evict previous host session if one exists
+      if (gameState.meta.hostSocketId && gameState.meta.hostSocketId !== socket.id) {
+        const oldHostSocket = io.sockets.sockets.get(gameState.meta.hostSocketId);
+        if (oldHostSocket) {
+          console.log(`[HOST] Evicting previous host: ${gameState.meta.hostSocketId}`);
+          oldHostSocket.emit('host:rejected', { message: 'Another host session has taken over' });
+          oldHostSocket.disconnect();
+        }
       }
 
       gameState.meta.hostSocketId = socket.id;
@@ -590,7 +600,7 @@ io.on('connection', (socket) => {
 
   // Handle disconnection
   socket.on('disconnect', () => {
-    const playerId = connectionManager.handleDisconnection(socket.id);
+    const playerId = connectionManager.handleDisconnection(socket.id, socket);
 
     if (playerId) {
       const player = gameState.players.get(playerId);

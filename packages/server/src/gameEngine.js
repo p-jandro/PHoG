@@ -91,12 +91,19 @@ export class GameEngine extends EventEmitter {
    * @param {string} gameName - Name of the game finishing
    */
   finalizeGameResults(gameName) {
+    // Guard against concurrent calls
+    if (this._isFinalizingResults) {
+      console.warn(`[SCORING] finalizeGameResults already in progress, skipping duplicate call for ${gameName}`);
+      return;
+    }
+    this._isFinalizingResults = true;
+
     console.log(`[SCORING] Finalizing results for ${gameName}`);
 
     // 1. Calculate placements based on current game scores (which are temporarily in .score from legacy code)
     // NOTE: The current game logic writes to player.score. We use this to calculate placement,
     // then we'll archive it to currentGameScore and reset score for the next game.
-    
+
     updatePlayerPlacements(this.gameState.players, gameName);
 
     // 2. Archive current scores and reset for next game
@@ -110,6 +117,8 @@ export class GameEngine extends EventEmitter {
 
     // 3. Emit update
     this.broadcastPlayerList();
+
+    this._isFinalizingResults = false;
   }
 
   /**
@@ -595,6 +604,14 @@ export class GameEngine extends EventEmitter {
    */
   skip() {
     console.log('[GAME] Emergency skip requested');
+
+    // Clear leaderboard timeout to prevent stale emissions after skip
+    if (this.leaderboardTimeout) {
+      clearTimeout(this.leaderboardTimeout);
+      this.leaderboardTimeout = null;
+      console.log('[GAME] Cleared leaderboard timeout on skip');
+    }
+
     if (this.currentGameModule && typeof this.currentGameModule.skip === 'function') {
       this.currentGameModule.skip();
     } else {

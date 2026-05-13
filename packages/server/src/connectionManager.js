@@ -57,9 +57,10 @@ export class ConnectionManager {
     resetPingTimeout();
 
     // Listen for pong responses
-    socket.on('pong', () => {
+    const pongHandler = () => {
       resetPingTimeout();
-    });
+    };
+    socket.on('pong', pongHandler);
 
     // Send ping every 10 seconds
     const pingInterval = setInterval(() => {
@@ -71,7 +72,7 @@ export class ConnectionManager {
       }
     }, 10000);
 
-    this.heartbeatIntervals.set(socket.id, pingInterval);
+    this.heartbeatIntervals.set(socket.id, { pingInterval, pingTimeout, pongHandler });
   }
 
   /**
@@ -135,11 +136,15 @@ export class ConnectionManager {
    * @param {string} socketId - Socket ID
    * @returns {string|null} - Player ID if found, null otherwise
    */
-  handleDisconnection(socketId) {
-    // Clear heartbeat interval
-    const interval = this.heartbeatIntervals.get(socketId);
-    if (interval) {
-      clearInterval(interval);
+  handleDisconnection(socketId, socket) {
+    // Clear heartbeat interval, timeout, and pong listener
+    const heartbeat = this.heartbeatIntervals.get(socketId);
+    if (heartbeat) {
+      clearInterval(heartbeat.pingInterval);
+      clearTimeout(heartbeat.pingTimeout);
+      if (socket && heartbeat.pongHandler) {
+        socket.off('pong', heartbeat.pongHandler);
+      }
       this.heartbeatIntervals.delete(socketId);
     }
 
