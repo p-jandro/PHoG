@@ -122,7 +122,8 @@ export class NumbersGame {
         pool: tilesWithIds.map((t) => ({ id: t.id, value: t.value })),
         history: [],
         solved: false,
-        solvedAtMs: null
+        solvedAtMs: null,
+        bestValue: null
       };
     }
 
@@ -180,12 +181,19 @@ export class NumbersGame {
     ps.history.push({ aId, bId, op, aValue: a, bValue: b, resultId: newTile.id, result });
 
     // Check solved — any tile in the pool equals target?
-    const solved = newPool.some((t) => t.value === this.gameState.numbers.target);
+    const target = this.gameState.numbers.target;
+    const solved = newPool.some((t) => t.value === target);
     if (solved) {
       ps.solved = true;
       ps.solvedAtMs = Date.now();
       if (this._firstSolverId === null) this._firstSolverId = playerId;
     }
+
+    // Track best value: the tile in the current pool closest to target
+    const closest = newPool.reduce((best, t) => {
+      return Math.abs(target - t.value) < Math.abs(target - best) ? t.value : best;
+    }, ps.bestValue ?? newPool[0].value);
+    ps.bestValue = closest;
 
     this._ack(playerId, { accepted: true, pool: newPool, history: ps.history, solved });
     this._broadcastProgress();
@@ -213,7 +221,8 @@ export class NumbersGame {
     for (const [pid, ps] of Object.entries(this.gameState.numbers.playerStates)) {
       playerProgress[pid] = {
         solved: ps.solved,
-        operations: ps.history.length
+        operations: ps.history.length,
+        bestValue: ps.bestValue ?? null
       };
     }
     this.io.emit('numbers:progress', { playerProgress });
