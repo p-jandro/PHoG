@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useGameStore } from '../stores/gameStore';
 import { Card, Chip } from '../ui';
-import { screenEnter, reducedFade } from '../lib/motion';
+import { screenEnter, reducedFade, stagger } from '../lib/motion';
+import { Confetti } from '../components/Confetti';
 
 type GameKey =
   | 'quiz'
@@ -44,6 +45,7 @@ export const FinalLeaderboard = () => {
   const enterVariants = reduced ? reducedFade : screenEnter;
 
   const [showChampionshipPreview, setShowChampionshipPreview] = useState(false);
+  const [confettiArmed, setConfettiArmed] = useState(false);
 
   useEffect(() => {
     if (phase === 'finished') {
@@ -87,6 +89,19 @@ export const FinalLeaderboard = () => {
     { label: 'Overall', value: championshipRank || null },
   ];
 
+  useEffect(() => {
+    if (!showTotalPlacement) {
+      setConfettiArmed(false);
+      return;
+    }
+    if (championshipRank === 1) {
+      // Fire after the bottom-up reveal lands on rank 1 (~5 ranks × stagger.rank seconds).
+      const totalRevealMs = Math.min(placementSummary.length, 5) * stagger.rank * 1000;
+      const t = setTimeout(() => setConfettiArmed(true), totalRevealMs);
+      return () => clearTimeout(t);
+    }
+  }, [showTotalPlacement, championshipRank, placementSummary.length]);
+
   const eyebrow =
     phase === 'finished'
       ? 'Session Complete'
@@ -119,13 +134,22 @@ export const FinalLeaderboard = () => {
         {showTotalPlacement ? (
           <Card title="Placements by game">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {placementSummary.map((item) => {
+              {placementSummary.map((item, index) => {
                 const isOverall = item.label === 'Overall';
                 const isTopThree =
                   typeof item.value === 'number' && item.value > 0 && item.value <= 3;
+                // Bottom-up: the visually last item animates first.
+                const revealIndex = placementSummary.length - 1 - index;
                 return (
-                  <div
+                  <motion.div
                     key={item.label}
+                    initial={reduced ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 }}
+                    animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+                    transition={{
+                      delay: revealIndex * stagger.rank,
+                      duration: reduced ? 0.18 : 0.55,
+                      ease: [0.34, 1.56, 0.64, 1],
+                    }}
                     className={[
                       'rounded-2xl border-2 border-ink p-5 text-center shadow-ink',
                       isOverall
@@ -141,7 +165,7 @@ export const FinalLeaderboard = () => {
                     <p className="font-display text-4xl font-black leading-none tracking-tighter tabular-nums sm:text-5xl">
                       {item.value ? getOrdinalLabel(item.value) : '-'}
                     </p>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -161,6 +185,7 @@ export const FinalLeaderboard = () => {
           </div>
         )}
       </motion.div>
+      <Confetti show={confettiArmed} />
     </div>
   );
 };
