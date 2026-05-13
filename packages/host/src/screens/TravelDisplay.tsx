@@ -4,6 +4,21 @@ import { Socket } from 'socket.io-client';
 import { HostChainCard } from '../components/travel/HostChainCard';
 import { HostTravelMap, HostChainEntry } from '../components/travel/HostTravelMap';
 
+type ChainColor = 'green' | 'orange' | 'red';
+
+function buildVisitedByColor(entries: HostChainEntry[]): Record<ChainColor, Set<string>> {
+  const green = new Set<string>();
+  const orange = new Set<string>();
+  const red = new Set<string>();
+  for (const e of entries) {
+    if (!e.name || !e.color) continue;
+    if (e.color === 'green') green.add(e.name);
+    else if (e.color === 'orange') orange.add(e.name);
+    else if (e.color === 'red') red.add(e.name);
+  }
+  return { green, orange, red };
+}
+
 interface Player { id: string; name: string; connected: boolean; }
 
 interface TravelDisplayProps {
@@ -100,7 +115,8 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
           <HostTravelMap
             startName={resultsData.start}
             endName={resultsData.end}
-            allChainEntries={resultsChainEntries}
+            relevantNames={resultsData.optimalChain || []}
+            visitedNamesByColor={buildVisitedByColor(resultsChainEntries)}
             optimalChainNames={resultsData.optimalChain}
           />
           <p className="break-words text-lg font-bold text-game-leader">
@@ -148,7 +164,8 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
         <HostTravelMap
           startName={roundData.start}
           endName={roundData.end}
-          allChainEntries={allChainEntries}
+          relevantNames={roundData.relevantNames || []}
+          visitedNamesByColor={buildVisitedByColor(allChainEntries)}
         />
       </div>
 

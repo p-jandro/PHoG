@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
+import { geoMercator } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import worldData from 'world-atlas/countries-110m.json';
 
-// Name overrides: world-atlas uses different names for some countries.
-// These are verified against the actual countries-110m.json feature names.
+// World-atlas uses slightly different names for some countries.
 const NAME_OVERRIDES: Record<string, string> = {
   'United States of America': 'United States',
   'Bosnia and Herz.': 'Bosnia and Herzegovina',
@@ -18,7 +18,7 @@ const NAME_OVERRIDES: Record<string, string> = {
   'Macedonia': 'North Macedonia',
   'S. Sudan': 'South Sudan',
   'W. Sahara': 'Western Sahara',
-  'eSwatini': 'Eswatini',
+  'eSwatini': 'Eswatini'
 };
 
 const canonicalName = (geo: { properties: { name: string } }) =>
@@ -35,71 +35,118 @@ export interface MapChainEntry {
 interface TravelMapProps {
   startName: string;
   endName: string;
+  relevantNames: string[];          // viewport set
   frontChain: MapChainEntry[];
   backChain: MapChainEntry[];
   solved?: boolean;
+  width?: number;
+  height?: number;
 }
 
 const FILL = {
-  background: '#1e293b',   // unselected countries — dark slate
-  start: '#facc15',        // yellow for start
-  end: '#facc15',          // yellow for end
+  unvisited: '#1e293b',    // dim slate — in viewport but not in chain
+  outside: 'transparent',  // far away — hide entirely
+  start: '#facc15',
+  end: '#facc15',
   green: '#16a34a',
   orange: '#f97316',
-  red: '#dc2626',
+  red: '#dc2626'
 };
 
-export const TravelMap = ({ startName, endName, frontChain, backChain, solved: _solved }: TravelMapProps) => {
-  // Build name → fill color lookup from the current chain state
+const STROKE = {
+  chain: '#f8fafc',        // bright stroke for chain countries
+  none: 'transparent'      // unvisited get no border
+};
+
+export const TravelMap = ({
+  startName,
+  endName,
+  relevantNames,
+  frontChain,
+  backChain,
+  solved: _solved,
+  width = 600,
+  height = 360
+}: TravelMapProps) => {
+  // Convert TopoJSON → GeoJSON once.
+  const featureCollection = useMemo(() => {
+    const topology = worldData as unknown as Topology<{ countries: GeometryCollection }>;
+    return feature(topology, topology.objects.countries) as any;
+  }, []);
+
+  // Compute name lookups
+  const relevantSet = useMemo(() => new Set(relevantNames), [relevantNames]);
+  const chainNames = useMemo(() => {
+    const s = new Set<string>();
+    if (startName) s.add(startName);
+    if (endName) s.add(endName);
+    for (const e of frontChain) if (e.color) s.add(e.name);
+    for (const e of backChain) if (e.color) s.add(e.name);
+    return s;
+  }, [startName, endName, frontChain, backChain]);
+
   const nameToColor = useMemo(() => {
     const m: Record<string, string> = {};
-    // Endpoints first (highest priority: yellow)
     if (startName) m[startName] = FILL.start;
     if (endName) m[endName] = FILL.end;
-    // Back chain (applied before front so front wins on overlap)
     for (const e of backChain) {
       if (e.name && e.color && !m[e.name]) m[e.name] = FILL[e.color];
     }
-    // Front chain (wins over back chain on same country)
     for (const e of frontChain) {
       if (e.name && e.color) m[e.name] = FILL[e.color];
     }
-    // Re-apply endpoint colors on top so start/end are always yellow
     if (startName) m[startName] = FILL.start;
     if (endName) m[endName] = FILL.end;
     return m;
   }, [startName, endName, frontChain, backChain]);
 
-  // Convert TopoJSON → GeoJSON feature collection once.
-  // world-atlas's countries-110m.json is a Topology with an 'objects.countries' GeometryCollection.
-  const featureCollection = useMemo(() => {
-    const topology = worldData as unknown as Topology<{ countries: GeometryCollection }>;
-    return feature(topology, topology.objects.countries);
-  }, []);
+  // Filter features to the relevant region and fit projection
+  const relevantFeatures = useMemo(() => {
+    if (!relevantNames || relevantNames.length === 0) return featureCollection;
+    const features = featureCollection.features.filter((f: any) =>
+      relevantSet.has(canonicalName(f))
+    );
+    return { type: 'FeatureCollection', features };
+  }, [featureCollection, relevantNames, relevantSet]);
+
+  const projection = useMemo(() => {
+    const padding = 24;
+    const p = geoMercator();
+    if (relevantFeatures.features.length > 0) {
+      p.fitExtent([[padding, padding], [width - padding, height - padding]], relevantFeatures);
+    } else {
+      // Fallback to a sensible world view
+      p.scale(140).center([10, 20]).translate([width / 2, height / 2]);
+    }
+    return p;
+  }, [relevantFeatures, width, height]);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/40">
-      <ComposableMap
-        projection="geoMercator"
-        projectionConfig={{ scale: 140, center: [10, 20] }}
-        style={{ width: '100%', height: 'auto' }}
-      >
+      <ComposableMap projection={projection} width={width} height={height} style={{ width: '100%', height: 'auto' }}>
         <Geographies geography={featureCollection}>
-          {({ geographies }: { geographies: Array<{ rsmKey: string; properties: { name: string } }> }) =>
+          {({ geographies }: { geographies: any[] }) =>
             geographies.map((geo) => {
               const name = canonicalName(geo);
-              const fill = nameToColor[name] ?? FILL.background;
+              const inViewport = relevantSet.has(name);
+              const inChain = chainNames.has(name);
+              if (!inViewport) {
+                // Hide countries that are far outside the relevant region.
+                return null;
+              }
+              const fill = nameToColor[name] ?? FILL.unvisited;
+              const stroke = inChain ? STROKE.chain : STROKE.none;
               return (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
                   fill={fill}
-                  stroke="#334155"
-                  strokeWidth={0.3}
+                  stroke={stroke}
+                  strokeWidth={inChain ? 1.0 : 0}
                   style={{
                     default: { outline: 'none' },
                     hover: { outline: 'none' },
-                    pressed: { outline: 'none' },
+                    pressed: { outline: 'none' }
                   }}
                 />
               );

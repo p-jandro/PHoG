@@ -158,6 +158,7 @@ export const Travel = ({ socket }: TravelProps) => {
         <TravelMap
           startName={roundData.start}
           endName={roundData.end}
+          relevantNames={roundData.relevantNames || []}
           frontChain={frontChain}
           backChain={backChain}
           solved={solved}

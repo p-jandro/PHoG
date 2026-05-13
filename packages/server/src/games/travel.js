@@ -25,7 +25,7 @@ import {
 const INTRO_DURATION = 8000;
 const PLAY_DURATION = 90000;
 const RESULTS_DURATION = 8000;
-const MIN_HOPS = 2;
+const MIN_HOPS = 4;
 const MAX_HOPS = 7;
 
 function scoreSolved(yourLength, optimalDistance, remainingMs, totalMs, isFirst) {
@@ -123,12 +123,13 @@ export class TravelGame {
 
     // Compute relevant ISO codes: optimal path + immediate neighbors, for the map viewport
     const optimalChain = shortestPathChain(start, end) || [start, end];
-    const relevantNames = new Set();
+    const relevantNamesSet = new Set();
     for (const c of optimalChain) {
-      relevantNames.add(c);
-      for (const nb of neighbors(c)) relevantNames.add(nb);
+      relevantNamesSet.add(c);
+      for (const nb of neighbors(c)) relevantNamesSet.add(nb);
     }
-    const relevantIsos = Array.from(relevantNames).map(isoOf).filter(Boolean);
+    const relevantNames = Array.from(relevantNamesSet);
+    const relevantIsos = relevantNames.map(isoOf).filter(Boolean);
 
     // Seed each player's chains with start and end (including iso)
     for (const [pid] of this.gameState.players) {
@@ -151,6 +152,7 @@ export class TravelGame {
       endIso: isoOf(end),
       optimalDistance: distance,
       relevantIsos,
+      relevantNames,
       maxGuesses: this.gameState.travel.maxGuesses,
       duration: PLAY_DURATION,
       endsAt
