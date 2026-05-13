@@ -1,0 +1,108 @@
+/* PHoG design tokens — light + dark themes
+ * Components reference roles (e.g. var(--action)), not raw hex values.
+ * See docs/superpowers/specs/2026-05-13-ui-redesign-design.md §2.1 */
+
+:root[data-theme="light"] {
+  /* Surfaces */
+  --bg-base:    #fdf6e8;
+  --bg-surface: #ffffff;
+  --bg-sunken:  #f2e9d4;
+
+  /* Ink */
+  --ink:        #181614;
+  --ink-muted:  #4a3f33;
+  --shadow:     #181614;
+
+  /* Semantic */
+  --action:     #2ec27e;
+  --now:        #ffd23f;
+  --info:       #4a7adf;
+  --streak:     #d96a3a;
+  --premium:    #5b3a5b;
+  --danger:     #e54848;
+  --warn:       #f59e0b;
+
+  /* Answer letter colors (Quiz / TrueFalse) */
+  --answer-a:   #4a7adf;
+  --answer-b:   #2ec27e;
+  --answer-c:   #ffd23f;
+  --answer-d:   #5b3a5b;
+
+  /* Medals */
+  --medal-gold:   #e0b94a;
+  --medal-silver: #b9b0a3;
+  --medal-bronze: #b8714a;
+
+  /* Foreground over each color (for accessible contrast) */
+  --on-action:  #ffffff;
+  --on-now:     #181614;
+  --on-info:    #ffffff;
+  --on-streak:  #ffffff;
+  --on-premium: #ffffff;
+  --on-danger:  #ffffff;
+}
+
+:root[data-theme="dark"] {
+  /* Surfaces */
+  --bg-base:    #131013;
+  --bg-surface: #1f1b1a;
+  --bg-sunken:  #171313;
+
+  /* Ink */
+  --ink:        #fdf6e8;
+  --ink-muted:  #b4a48b;
+  --shadow:     #d96a3a; /* warm terracotta glow on dark */
+
+  /* Semantic (brighter for dark backgrounds) */
+  --action:     #3ad286;
+  --now:        #ffd23f;
+  --info:       #6b95ee;
+  --streak:     #e88557;
+  --premium:    #7a4f7a;
+  --danger:     #ff6b6b;
+  --warn:       #ffb84d;
+
+  /* Answer letter colors */
+  --answer-a:   #6b95ee;
+  --answer-b:   #3ad286;
+  --answer-c:   #ffd23f;
+  --answer-d:   #7a4f7a;
+
+  /* Medals — same physical color */
+  --medal-gold:   #e0b94a;
+  --medal-silver: #b9b0a3;
+  --medal-bronze: #b8714a;
+
+  /* Foreground over each color */
+  --on-action:  #0d0a09;
+  --on-now:     #181614;
+  --on-info:    #0d0a09;
+  --on-streak:  #0d0a09;
+  --on-premium: #ffffff;
+  --on-danger:  #0d0a09;
+}
+
+/* Smooth theme flip — colors/borders/shadows only, NOT transforms or opacity.
+ * Gated by a `data-theme-transitioning` attribute on <html> so the transition
+ * fires only during theme switches, not on every hover/focus/state change.
+ * §5.5 in the spec: avoid laggy mid-animation flips.
+ * The ThemeProvider (Task 6) sets this attribute for ~220ms on toggle. */
+:root {
+  color-scheme: light dark;
+}
+:root[data-theme-transitioning] *,
+:root[data-theme-transitioning] *::before,
+:root[data-theme-transitioning] *::after {
+  transition:
+    background-color 180ms ease-out,
+    border-color 180ms ease-out,
+    color 180ms ease-out,
+    box-shadow 180ms ease-out,
+    fill 180ms ease-out,
+    stroke 180ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme-transitioning] *,
+  :root[data-theme-transitioning] *::before,
+  :root[data-theme-transitioning] *::after { transition: none; }
+}

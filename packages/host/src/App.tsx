@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Dashboard } from './screens/Dashboard';
 import { Display } from './screens/Display';
+import { UiShowcase } from './ui';
 
 function App() {
   const [view, setView] = useState<'dashboard' | 'display'>('dashboard');
@@ -16,6 +17,10 @@ function App() {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
+
+  if (typeof window !== 'undefined' && window.location.search.includes('showcase')) {
+    return <UiShowcase />;
+  }
 
   return (
     <div className="min-h-screen">
