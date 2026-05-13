@@ -1,6 +1,6 @@
 import { Pill } from '../../ui/Pill';
 
-interface PlayerProgressEntry { solved?: boolean; operations?: number; }
+interface PlayerProgressEntry { solved?: boolean; operations?: number; bestValue?: number | null; }
 interface PlayerLite { id: string; name: string; connected: boolean; }
 
 interface NumbersProgressPanelProps {
@@ -11,17 +11,13 @@ interface NumbersProgressPanelProps {
 /**
  * Bottom-of-screen player tracker for the host's Numbers display.
  * Spec §7.3: "exact / closest so far / in progress / no submission".
- *
- * `closest so far` is currently un-renderable — the server doesn't yet emit
- * per-player best value. A later (server-side) plan can extend the payload;
- * this component is structured so that adding a `bestValue` field per row
- * is a single `if` clause inside `statusFor`.
  */
 function statusFor(entry: PlayerProgressEntry | undefined): { label: string; tone: 'on' | 'off' | 'done' } {
-  if (!entry) return { label: 'no submission', tone: 'off' };
-  if (entry.solved) return { label: 'solved', tone: 'done' };
-  if (entry.operations && entry.operations > 0) return { label: `in progress · ${entry.operations} op${entry.operations === 1 ? '' : 's'}`, tone: 'on' };
-  return { label: 'no submission', tone: 'off' };
+  if (!entry) return { label: 'no submission yet', tone: 'off' };
+  if (entry.solved) return { label: `Exact (${entry.bestValue})`, tone: 'done' };
+  if (entry.bestValue != null) return { label: `Closest so far (${entry.bestValue})`, tone: 'on' };
+  if (entry.operations && entry.operations > 0) return { label: `In progress · ${entry.operations} op${entry.operations === 1 ? '' : 's'}`, tone: 'on' };
+  return { label: 'No submission yet', tone: 'off' };
 }
 
 export const NumbersProgressPanel = ({ players, progress }: NumbersProgressPanelProps) => {
