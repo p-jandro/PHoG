@@ -199,13 +199,29 @@ export class TravelGame {
       else color = 'red';
     }
 
+    // Compute intent: the next country on a shortest path from `resolved` toward
+    // `otherHead`. This gives the host/client a precise arc endpoint rather than
+    // the distant chain endpoint.
+    let intentTarget = otherHead; // fallback: the opposite chain head
+    if (resolved !== otherHead) {
+      const intentInfo = shortestPathInfo(resolved, otherHead);
+      if (intentInfo && intentInfo.nextOnShortestPath.size > 0) {
+        // Pick the first entry (Set iteration order is insertion order, which is
+        // BFS neighbour order — a reasonable canonical choice).
+        intentTarget = intentInfo.nextOnShortestPath.values().next().value;
+      }
+    }
+    // intent.side is the side the player was extending (front extends toward end,
+    // back extends toward start).
+    const intent = { side, target: intentTarget };
+
     const resolvedIso = this.isoByName.get(resolved) || null;
     if (side === 'front') {
       ps.frontChain.push({ name: resolved, color, iso: resolvedIso });
     } else {
       ps.backChain.unshift({ name: resolved, color, iso: resolvedIso });
     }
-    ps.history.push({ name: resolved, color, side, iso: resolvedIso });
+    ps.history.push({ name: resolved, color, side, iso: resolvedIso, intent });
     ps.guessesUsed++;
 
     const newFront = ps.frontChain[ps.frontChain.length - 1].name;
@@ -222,6 +238,7 @@ export class TravelGame {
         name: resolved,
         color,
         side,
+        intent,
         frontChain: ps.frontChain,
         backChain: ps.backChain,
         guessesUsed: ps.guessesUsed,
