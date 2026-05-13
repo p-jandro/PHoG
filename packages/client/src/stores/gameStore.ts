@@ -11,7 +11,7 @@ export interface RoundLeaderboardEntry {
 }
 
 export interface RoundLeaderboardState {
-  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle';
+  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | 'travel';
   duration: number;
   leaderboard: RoundLeaderboardEntry[];
   roundNumber?: number | null;
@@ -35,6 +35,7 @@ export interface Player {
     hpdle: number | null;
     numbers: number | null;
     wordle: number | null;
+    travel: number | null;
   };
   gamePlacements?: {
     quiz: number | null;
@@ -45,6 +46,7 @@ export interface Player {
     hpdle: number | null;
     numbers: number | null;
     wordle: number | null;
+    travel: number | null;
   };
   totalPlacement?: number;
   connected: boolean;
@@ -62,7 +64,7 @@ export interface GameState {
   
   // Game state
   phase: 'lobby' | 'playing' | 'leaderboard' | 'finished';
-  currentGame: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | null;
+  currentGame: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | 'travel' | null;
   players: Player[];
   paused: boolean;
   roundLeaderboard: RoundLeaderboardState | null;
