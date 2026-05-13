@@ -71,12 +71,6 @@ export const Dashboard = () => {
 
   const [players, setPlayers] = useState<Player[]>([]);
 
-  // Live Game State — kept temporarily; cleaned up in Task 8
-  const [_liveData, setLiveData] = useState<any>(null);
-  const [_answeredPlayers, setAnsweredPlayers] = useState<Map<string, 'correct' | 'incorrect' | 'answered'>>(new Map());
-  const [_timeRemaining, setTimeRemaining] = useState(0);
-  const [_totalTime, setTotalTime] = useState(0);
-  const [timerEndsAt, setTimerEndsAt] = useState<number | null>(null);
   const [pointlessReadyToReveal, setPointlessReadyToReveal] = useState(false);
   const [championshipActive, setChampionshipActive] = useState(false);
 
@@ -95,30 +89,6 @@ export const Dashboard = () => {
   ];
 
   const playerJoinLabel = PLAYER_URL.replace(/^https?:\/\//, '');
-
-  useEffect(() => {
-    if (!timerEndsAt) {
-      return;
-    }
-
-    const updateRemaining = () => {
-      const remaining = Math.max(0, timerEndsAt - Date.now());
-      setTimeRemaining(remaining);
-      return remaining;
-    };
-
-    updateRemaining();
-
-    const timer = setInterval(() => {
-      if (updateRemaining() === 0) {
-        clearInterval(timer);
-      }
-    }, 100);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [timerEndsAt]);
 
   useEffect(() => {
     const newSocket = io(SERVER_URL, {
@@ -186,8 +156,6 @@ export const Dashboard = () => {
     newSocket.on('game:start', ({ game }) => {
       console.log('[Host] Game started', game);
       setGameState((prev: any) => ({ ...prev, currentGame: game, phase: 'playing' }));
-      setLiveData(null);
-      setAnsweredPlayers(new Map());
       setPointlessReadyToReveal(false);
     });
 
@@ -206,58 +174,10 @@ export const Dashboard = () => {
       }
     });
 
-    // Live Game Events
-    newSocket.on('quiz:question:start', (data) => {
-      setLiveData({ type: 'quiz', text: data.question, subtext: `Question ${data.questionNumber}/${data.totalQuestions} — ${data.category} (${data.difficulty})` });
-      setAnsweredPlayers(new Map());
-      setTotalTime(data.duration);
-      setTimeRemaining(data.duration);
-      setTimerEndsAt(Date.now() + data.duration);
-    });
-
-    newSocket.on('truefalse:statement', (data) => {
-      setLiveData({ type: 'trueFalse', text: data.statement, subtext: `Statement ${data.statementNumber}/${data.totalStatements}` });
-      setAnsweredPlayers(new Map());
-      setTotalTime(data.duration);
-      setTimeRemaining(data.duration);
-      setTimerEndsAt(Date.now() + data.duration);
-    });
-
-    newSocket.on('countdown:round:start', (data) => {
-      setLiveData({ type: 'countdown', text: data.letters.join(' '), subtext: `Round ${data.roundNumber}/${data.totalRounds}` });
-      setAnsweredPlayers(new Map());
-      setTotalTime(data.duration);
-      setTimeRemaining(data.duration);
-      setTimerEndsAt(Date.now() + data.duration);
-    });
-
-    newSocket.on('pointless:round:start', (data) => {
-      setLiveData({ type: 'pointless', text: data.question, subtext: `Category: ${data.category}` });
-      setAnsweredPlayers(new Map());
-      setTotalTime(data.duration);
-      setTimeRemaining(data.duration);
-      setTimerEndsAt(Date.now() + data.duration);
+    newSocket.on('pointless:round:start', () => {
       setPointlessReadyToReveal(false);
     });
 
-    newSocket.on('host:player_answered', ({ playerId, isCorrect }: { playerId: string; isCorrect?: boolean }) => {
-      setAnsweredPlayers(prev => {
-        const newMap = new Map(prev);
-        const status = isCorrect === true ? 'correct' : isCorrect === false ? 'incorrect' : 'answered';
-        newMap.set(playerId, status);
-        return newMap;
-      });
-    });
-
-    // Clear live data on round ends
-    const clearLive = () => {
-      setTimeRemaining(0);
-      setTimerEndsAt(null);
-    };
-    newSocket.on('quiz:question:end', clearLive);
-    newSocket.on('truefalse:answer', clearLive);
-    newSocket.on('countdown:round:end', clearLive);
-    newSocket.on('pointless:round:end', clearLive);
     newSocket.on('pointless:round:end', () => {
       setPointlessReadyToReveal(true);
     });
