@@ -13,3 +13,4 @@ export { Countdown } from './Countdown';
 export { ScoreDrop } from './ScoreDrop';
 export { ThemeToggle } from './ThemeToggle';
 export { UiShowcase } from './UiShowcase';
+export { HostScreenShell } from './HostScreenShell';
