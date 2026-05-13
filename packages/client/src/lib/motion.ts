@@ -138,6 +138,21 @@ export const shake: Variants = {
              transition: { duration: 0.32, ease: 'linear' } },
 };
 
+/* Travel — pin drop (§4.4): SVG circle drops from above with a small bounce.
+ * Used for every guess pin on the results map. */
+export const pinDrop: Variants = {
+  hidden:  { y: -40, opacity: 0 },
+  visible: { y: 0,  opacity: 1, transition: { duration: 0.38, ease: easing.backOut } },
+};
+
+/* Travel — arc draw (§4.4): used as the `transition` for an SVG <path>'s
+ * strokeDashoffset animation. Caller sets initial={ strokeDashoffset: L }
+ * and animate={ strokeDashoffset: 0 } where L = path.getTotalLength(). */
+export const arcDrawTransition: Transition = {
+  duration: 0.5,
+  ease: easing.easeOut,
+};
+
 /* ---------- Pointless score-drop timing (§3.9) ---------- */
 export const pointlessDrop = {
   baseMs: 4000,
