@@ -132,6 +132,38 @@ The kit every screen consumes. All variants have explicit states: default, hover
 - Pill-shaped track, draggable thumb with ☀ / ☾ icon
 - 180ms spring transition
 
+### 3.11 `HostScreenShell` *(host-only; created in Phase 3, consumed in Phases 4–10)*
+
+The visual scaffold for every host TV screen — guarantees the §7.3 host-screen skeleton (location top-left · time-left top-right · content centre · footer bottom) is consistent across Dashboard, Display, NumbersDisplay, ThemedDleDisplay, TravelDisplay, WordleDisplay.
+
+- **Layout slots:**
+  - top-left: `location` (eyebrow + name strings, e.g. eyebrow "Quiz Round" + name "Question 7 of 15")
+  - top-right: time-left panel — dimmed to "—:—" when `timeLeftSeconds` is `null` or `undefined`, so layout never shifts
+  - centre: `children` (the game's actual content)
+  - bottom: `footer` (typically a `PlayerTracker`)
+- **Props:** `location` (`{ eyebrow: string; name: string }`), `timeLeftSeconds` (`number | null`), `children` (centre content), `footer` (typically a `PlayerTracker`)
+- All host TV screens consume it for visual consistency
+
+### 3.12 `PlayerTracker` *(host-only; created in Phase 3)*
+
+A scrollable horizontal list of player chips showing connection state + score + per-game status (e.g. exact / closest / in-progress / no-submission for Numbers; per-player guess count for Wordle/ThemedDle).
+
+- **Props:** `players` (`TrackedPlayer[]`), optional `label`, optional `count` string ("3 of 6")
+- Consumed by every host screen's `HostScreenShell.footer`
+
+### 3.13 `AnswerFeedback` *(created in Phase 5)*
+
+Wraps any answer-affirming surface with the universal §4.3 reactive feedback contract — correct pulse / wrong shake / streak chip pop — so each game's answer-commit moment looks and feels the same.
+
+- Used by Quiz and TrueFalse today; extensible to any other answer-commit surface (e.g. a future Pointless "submitted" confirmation)
+- Respects `useReducedMotion()` — transforms swap for color flashes; chip still pops in as a fade
+
+### 3.14 `Confetti` *(created in Phase 4)*
+
+Heritage-palette confetti burst (terracotta + plum + gold) for rank-1 reveals on `FinalLeaderboard`. Pure presentational, no audio.
+
+- Renders **nothing** under `useReducedMotion()` — the rank reveal still lands via color + headline; confetti is decorative.
+
 Dark-mode variants of every primitive use the same shapes; only the surface and shadow tokens flip (cream borders, terracotta offset shadow).
 
 ---
@@ -159,6 +191,14 @@ Dark-mode variants of every primitive use the same shapes; only the surface and 
 | `stagger.rank` | 600ms | — | Final leaderboard reveal |
 
 All durations live in one file (`src/lib/motion.ts`) for easy global tuning.
+
+**Motion variants added during migration** — `motion.ts` has been extended phase-by-phase with the following game-specific variants (all built on the tokens above):
+
+- Phase 5 (Quiz / TrueFalse): `correctPulse`, `wrongShake`, `streakChipPop`, `bannerSlideDown`, plus the `prefersReducedMotion()` helper
+- Phase 8 (ThemedDle): `cellScalePop`, `emojiPop`, `silhouetteReveal`, `shake`, plus stagger constants `stagger.cell` and `stagger.emoji`
+- Phase 10 (Travel): `pinDrop`, `arcDrawTransition`
+
+Each is documented inline in `lib/motion.ts`. Both `packages/client` and `packages/host` keep their `motion.ts` in sync (per spec §6.1 — file duplication over a workspace package).
 
 ### 4.3 Universal reactive feedback
 
@@ -353,6 +393,8 @@ theme: {
 
 ### 7.3 Host display (6 screens)
 
+- **Host control-panel composition:** §7.3 originally listed Dashboard panels as "game-launch buttons, player tracker, theme toggle". Three legacy panels (Live Game, Championship Table, Quick Guide) have been **removed** during Phase 3 migration because they duplicated the Display screen's responsibility or weren't in the original spec scope. Dashboard is leaner as a result (~440 lines vs 867 before).
+
 **Host-screen skeleton — same on every screen.** Top-left: location, one line, full text (e.g. "Quiz Round · Question 7 of 15"). Top-right: time-left panel, same component, same place, every screen — dimmed to "—:—" on Dashboard and results screens so the layout never shifts. Centre: only the game's actual content. Bottom: the player tracker (with an explicit "X of Y" count) — and nothing competes with it above. No category chips, no extra player-count badges, no auxiliary pills.
 
 **Full-text labels everywhere.** No three-letter abbreviations (no "GRY/HUF/RAV", no "Q 7/15"). Every header, chip, and label is spelled out.
@@ -418,3 +460,17 @@ Each row is one shippable PR.
 | Host-screen skeleton | location top-left · time-left top-right · content centre · player tracker bottom (consistent on every host screen) |
 | Label discipline | Full-text everywhere; no abbreviations like "GRY" or "Q 7/15" |
 | Dashboard launcher | 4 × 2 grid for the 8 games + secondary row for Championship + Reset |
+| Dashboard panels | Live Game, Championship Table, Quick Guide removed (Phase 3) — duplicated Display responsibility or out of original scope |
+| `PlacementLeaderboard.tsx` | Confirmed unused; deletion scheduled in Phase 11 |
+| Server-side gaps | Pointless reveal / Wordle target / Numbers best / Travel arc — deferred to future tickets (see §9) |
+
+---
+
+## 9. Server-side gaps deferred to a future ticket
+
+The redesign surfaced four places where the host display screens have to fall back to less-rich visuals because the server doesn't (yet) emit the data needed. These are deliberately out of scope for the UI redesign — they're server-event-shape changes, not visual changes — and are flagged here so they can be picked up as separate tickets later.
+
+- **Pointless host — sequential reveal.** Spec §3.9 / §4.4 describe a per-player `ScoreDrop` reveal driven by the answer score. The server currently only emits an aggregate top-3 / round summary, not a `{ playerId, score, triggerTime }` event per player. The host display is reskinned to show the aggregate top-3 instead of a sequenced per-player drop. **Future change:** server emits `{ playerId, score, triggerTime }` per player on reveal so the host can sequence drops.
+- **Wordle host — target word during play.** The host's `WordleDisplay` currently shows empty tiles during the round because the target word is only sent in the results payload, not `wordle:round:start`. **Future change:** send the target word in `wordle:round:start` so the host can render greyed-out target tiles during play (or accept current empty-tile behavior as intentional spoiler-prevention).
+- **Numbers host — closest-so-far.** `NumbersDisplay`'s player tracker would like to show "closest so far · 475" per player to telegraph who's nearest the target. The server doesn't expose a `bestValue` field per player during the round. The tracker uses the fallback "in progress · N op(s)". **Future change:** server emits a per-player `bestValue` (closest absolute distance to target) so the tracker can show real "closest" telemetry.
+- **Travel host — per-guess next-hop intent.** The map's arcs are drawn from each guess to the correct location at results-time. There's no per-guess "where was the player aiming next" data. Arcs are drawn to the chain's start or end based on which side the guess was on — acceptable, but not the richest possible visualisation. **Future change:** emit per-guess `intent` metadata (target country the player was aiming for) so arcs can show actual aim, not inferred direction.
