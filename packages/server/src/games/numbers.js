@@ -43,11 +43,13 @@ function generateRound(targetDifficulty) {
   return { tiles: drawTiles(), target: drawTarget() };
 }
 
-function scoreSolved(remainingMs, totalMs, isFirstSolver) {
+export function scoreSolvedFor(difficulty, remainingMs, totalMs, isFirstSolver) {
   const base = 100;
   const speed = Math.floor(50 * Math.max(0, Math.min(1, remainingMs / totalMs)));
   const firstBonus = isFirstSolver ? 20 : 0;
-  return base + speed + firstBonus;
+  const raw = base + speed + firstBonus;
+  const multiplier = difficulty === 'difficult' ? 2.0 : difficulty === 'medium' ? 1.5 : 1.0;
+  return Math.floor(raw * multiplier);
 }
 
 export class NumbersGame {
@@ -91,6 +93,7 @@ export class NumbersGame {
       scoringRules: [
         'Solving = 100 base + speed (up to +50)',
         'First solver: +20 bonus',
+        'Medium: 1.5× total. Difficult: 2× total.',
         '3 rounds: easy → medium → difficult'
       ],
       totalRounds: TOTAL_ROUNDS,
@@ -254,7 +257,7 @@ export class NumbersGame {
       let roundScore = 0;
       if (ps?.solved) {
         const remainingMs = Math.max(0, (phaseStartMs + PLAY_DURATION) - ps.solvedAtMs);
-        roundScore = scoreSolved(remainingMs, PLAY_DURATION, this._firstSolverId === pid);
+        roundScore = scoreSolvedFor(difficulty, remainingMs, PLAY_DURATION, this._firstSolverId === pid);
       }
       this.gameState.numbers.cumulativeScores[pid] = (this.gameState.numbers.cumulativeScores[pid] || 0) + roundScore;
       p.score = this.gameState.numbers.cumulativeScores[pid];
