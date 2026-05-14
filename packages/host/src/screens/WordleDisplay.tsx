@@ -217,6 +217,16 @@ export const WordleDisplay = ({ socket, players }: WordleDisplayProps) => {
 
   const connected = players.filter((p) => p.connected);
   const solvedCount = connected.filter((p) => progress[p.id]?.solved).length;
+  // Per QA 2026-05-14: host should never broadcast individual "solved" chips
+  // mid-round — only once every connected player has either solved or used
+  // all 6 guesses. Until then we render neutral status only.
+  const allDone =
+    connected.length > 0 &&
+    connected.every((p) => {
+      const s = progress[p.id];
+      if (!s) return false;
+      return s.solved || (s.guessesUsed ?? 0) >= 6;
+    });
 
   return (
     <div className="flex h-screen w-screen flex-col bg-bg-base px-10 py-8 text-ink">
@@ -246,7 +256,7 @@ export const WordleDisplay = ({ socket, players }: WordleDisplayProps) => {
           ))}
         </div>
         <p className="text-lg text-ink-muted">
-          {solvedCount} of {connected.length} solved
+          {allDone ? `${solvedCount} of ${connected.length} solved` : `${connected.length - Object.values(progress).filter((s: any) => s?.solved || (s?.guessesUsed ?? 0) >= 6).length} still playing`}
         </p>
       </section>
 
@@ -261,14 +271,23 @@ export const WordleDisplay = ({ socket, players }: WordleDisplayProps) => {
               const guessesUsed = s?.guessesUsed ?? 0;
               const isSolved = s?.solved ?? false;
               const isFailed = !isSolved && guessesUsed >= 6;
+              // While the round is still in flight, hide per-player solve
+              // outcomes — show "submitted" vs "still playing" only. Once
+              // every player is done, surface the solved/failed coloring.
+              const reveal = allDone;
               let statusLabel = `${guessesUsed} of 6 guesses`;
-              if (isSolved) statusLabel = `Solved in ${guessesUsed}`;
-              else if (isFailed) statusLabel = 'Did not solve';
-              const tone = isSolved
-                ? 'border-action bg-action text-on-action'
-                : isFailed
-                  ? 'border-danger bg-danger text-on-danger'
-                  : 'border-ink bg-bg-surface text-ink';
+              if (reveal && isSolved) statusLabel = `Solved in ${guessesUsed}`;
+              else if (reveal && isFailed) statusLabel = 'Did not solve';
+              else if (!reveal && (isSolved || isFailed)) statusLabel = 'Submitted';
+              const tone = !reveal
+                ? (isSolved || isFailed
+                    ? 'border-ink bg-bg-sunken text-ink'
+                    : 'border-ink bg-bg-surface text-ink')
+                : isSolved
+                  ? 'border-action bg-action text-on-action'
+                  : isFailed
+                    ? 'border-danger bg-danger text-on-danger'
+                    : 'border-ink bg-bg-surface text-ink';
               return (
                 <motion.div
                   key={p.id}
