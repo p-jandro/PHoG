@@ -411,9 +411,16 @@ export class PointlessGame {
         triggerTime
       });
     }
-    // Sort by score ascending so lowest (best) reveals last — most dramatic
+    // Sort by score ascending so lowest (best) reveals last — most dramatic.
+    // Per QA 2026-05-14 §17: only player sockets receive this payload — never
+    // the host. Send per-player so no broadcast lands on the host's connection.
     playerReveals.sort((a, b) => b.score - a.score);
-    this.io.emit('pointless:reveal:players', { players: playerReveals });
+    for (const [playerId] of this.gameState.players) {
+      const player = this.gameState.players.get(playerId);
+      if (!player?.connected) continue;
+      const socket = this.io.sockets.sockets.get(player.socketId);
+      if (socket) socket.emit('pointless:reveal:players', { players: playerReveals });
+    }
 
     // Update scores for ALL players, emit results only to connected ones
     for (const [playerId, answerData] of this.gameState.pointless.answers) {

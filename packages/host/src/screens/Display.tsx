@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
-import { Button, Card, Chip, ScoreDrop, ThemeToggle } from '../ui';
+import { Button, Card, Chip, ThemeToggle } from '../ui';
 import { ThemedDleDisplay } from './ThemedDleDisplay';
 import { NumbersDisplay } from './NumbersDisplay';
 import { WordleDisplay } from './WordleDisplay';
@@ -119,8 +119,9 @@ export const Display = () => {
   const [pointlessIntro, setPointlessIntro] = useState<IntroState | null>(null);
   const [pointlessRound, setPointlessRound] = useState<any>(null);
   const [pointlessReveal, setPointlessReveal] = useState<PointlessRevealState | null>(null);
-  const [pointlessPlayerReveals, setPointlessPlayerReveals] = useState<PointlessPlayerReveal[]>([]);
-  const [pointlessRevealIndex, setPointlessRevealIndex] = useState(0);
+  // Per QA 2026-05-14 §17: Pointless host no longer shows per-player reveals.
+  // The state and setter remain unused below but kept declared so any older
+  // shared types/refs continue to compile without churn.
   // Per bug-report 2026-05-14 §D1/§D2: live submission status per player so the
   // host display can render a Locked-in / Still-thinking tracker without
   // requiring a Dashboard ↔ Display toggle to refresh.
@@ -225,8 +226,6 @@ export const Display = () => {
       setPointlessIntro(null);
       setPointlessRound(null);
       setPointlessReveal(null);
-      setPointlessPlayerReveals([]);
-      setPointlessRevealIndex(0);
       setPointlessReadyToReveal(false);
     });
 
@@ -340,10 +339,10 @@ export const Display = () => {
       setPointlessReadyToReveal(false);
     });
 
-    newSocket.on('pointless:reveal:players', (data: { players: PointlessPlayerReveal[] }) => {
-      setPointlessPlayerReveals(data.players || []);
-      setPointlessRevealIndex(0);
-    });
+    // Per QA 2026-05-14 §17: host no longer renders per-player Pointless answer
+    // reveals — the server must not broadcast this event to the host, and even
+    // if it leaks, the host display ignores it. Player phones still receive
+    // game:pointless:reveal individually for their own score-drop animation.
 
     setSocket(newSocket);
 
@@ -1362,12 +1361,8 @@ export const Display = () => {
   }
 
   if (currentGame === 'pointless' && pointlessReveal) {
-    const hasPlayerReveals = pointlessPlayerReveals.length > 0;
-    const allRevealed = pointlessRevealIndex >= pointlessPlayerReveals.length;
-    const currentPlayerReveal = hasPlayerReveals && !allRevealed
-      ? pointlessPlayerReveals[pointlessRevealIndex]
-      : null;
-
+    // Per QA 2026-05-14 §17: host shows ONLY the library top/bottom 3 at reveal.
+    // No per-player names, no per-player answer text, no per-player ScoreDrop.
     return (
       <>
         <div className="min-h-screen bg-bg-base py-8 text-ink overflow-y-auto">
@@ -1392,86 +1387,6 @@ export const Display = () => {
                 Round {pointlessReveal.roundIndex + 1} of {pointlessReveal.totalRounds}
               </Chip>
             </div>
-
-            {/* Sequential per-player ScoreDrop — shown while players remain */}
-            {hasPlayerReveals && !allRevealed && currentPlayerReveal && (
-              <motion.div
-                key={`player-drop-${pointlessRevealIndex}`}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.22, ease: 'easeOut' }}
-                className="mb-6 rounded-3xl border-2 border-ink bg-bg-surface p-6 shadow-ink-lg sm:p-8"
-              >
-                <div className="mb-4 flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-streak">
-                      Player {pointlessRevealIndex + 1} of {pointlessPlayerReveals.length}
-                    </p>
-                    <h2 className="mt-1 font-display text-3xl font-extrabold text-ink sm:text-4xl">
-                      {currentPlayerReveal.playerName}
-                    </h2>
-                    <p className="mt-1 text-base text-ink-muted">
-                      {currentPlayerReveal.isCorrect ? (
-                        <>Answered: <span className="font-semibold text-ink">{currentPlayerReveal.originalInput}</span>{' '}
-                        {currentPlayerReveal.originalInput !== currentPlayerReveal.correctAnswer && (
-                          <>→ <span className="font-semibold text-action">{currentPlayerReveal.correctAnswer}</span></>
-                        )}</>
-                      ) : (
-                        <><span className="font-semibold text-danger">No valid answer</span>
-                        {currentPlayerReveal.originalInput ? <> · guessed: {currentPlayerReveal.originalInput}</> : null}</>
-                      )}
-                    </p>
-                  </div>
-                  <Chip variant={currentPlayerReveal.score === 0 ? 'streak' : currentPlayerReveal.isCorrect ? 'info' : 'default'}>
-                    {currentPlayerReveal.score === 0 ? 'Pointless!' : currentPlayerReveal.isCorrect ? 'Correct' : 'Wrong'}
-                  </Chip>
-                </div>
-                <ScoreDrop
-                  targetScore={currentPlayerReveal.score}
-                  autoStart={true}
-                  onLanded={() => setPointlessRevealIndex((i) => i + 1)}
-                />
-              </motion.div>
-            )}
-
-            {/* All dropped: summary of all players sorted by score */}
-            {hasPlayerReveals && allRevealed && (
-              <motion.div
-                key="all-revealed"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.28, ease: 'easeOut' }}
-                className="mb-6 rounded-3xl border-2 border-ink bg-bg-surface p-6 shadow-ink-lg sm:p-8"
-              >
-                <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.22em] text-streak">All Players Revealed</p>
-                <div className="space-y-3">
-                  {[...pointlessPlayerReveals]
-                    .sort((a, b) => a.score - b.score)
-                    .map((pr, idx) => (
-                      <div
-                        key={pr.playerId}
-                        className="grid grid-cols-[3rem_minmax(0,1fr)_auto_5rem] items-center gap-4 rounded-xl border-2 border-ink bg-bg-sunken px-4 py-3 shadow-ink-sm"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-ink bg-bg-surface font-display text-lg font-extrabold text-ink shadow-ink-sm">
-                          {idx + 1}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="truncate font-display text-xl font-extrabold text-ink">{pr.playerName}</p>
-                          <p className="truncate text-sm text-ink-muted">
-                            {pr.isCorrect ? pr.correctAnswer : 'No answer'}
-                          </p>
-                        </div>
-                        <Chip variant={pr.score === 0 ? 'streak' : pr.isCorrect ? 'info' : 'default'}>
-                          {pr.score === 0 ? 'Pointless!' : pr.isCorrect ? 'Correct' : 'Wrong'}
-                        </Chip>
-                        <p className={`text-right font-display text-2xl font-extrabold ${pr.score === 0 ? 'text-streak' : pr.score >= 80 ? 'text-danger' : 'text-action'}`}>
-                          {pr.score}
-                        </p>
-                      </div>
-                    ))}
-                </div>
-              </motion.div>
-            )}
 
             {/* Aggregate top-3 (always shown as reference / fallback when no player reveals) */}
             <div className="grid gap-5 xl:grid-cols-2">
