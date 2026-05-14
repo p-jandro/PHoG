@@ -180,7 +180,28 @@ export class TravelGame {
     const adjBack = isAdjacent(backHead, resolved);
 
     if (!adjFront && !adjBack) {
-      this._ackInvalid(playerId, `${resolved} doesn't border ${frontHead} or ${backHead}`);
+      // Per QA 2026-05-14: a non-adjacent (i.e. wrong) guess still consumes
+      // the player's guess budget. Record it as a red history entry, but
+      // don't extend either chain.
+      const isoOfResolved = this.isoByName.get(resolved) || null;
+      ps.history.push({ name: resolved, color: 'red', side: null, iso: isoOfResolved, intent: null });
+      ps.guessesUsed++;
+      const socket = this._socketFor(playerId);
+      if (socket) {
+        socket.emit('travel:guess:result', {
+          name: resolved,
+          color: 'red',
+          side: null,
+          intent: null,
+          frontChain: ps.frontChain,
+          backChain: ps.backChain,
+          guessesUsed: ps.guessesUsed,
+          guessesRemaining: this.gameState.travel.maxGuesses - ps.guessesUsed,
+          solved: ps.solved
+        });
+      }
+      this._broadcastProgress();
+      this._checkEarlyEnd();
       return;
     }
 
