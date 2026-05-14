@@ -1,6 +1,6 @@
 # QA Bundle 2 — 2026-05-14
 
-A second QA punch list from a manual playthrough of PHoG `main`, scoped as a single bundled fix. 14 items across Pokédle/HP-dle, Wordle, Pointless, Quiz, T/F, Travle, Numbers.
+A second QA punch list from a manual playthrough of PHoG `main`, scoped as a single bundled fix. 17 items across Pokédle/HP-dle, Wordle, Pointless, Quiz, T/F, Travle, Numbers, and the championship end flow + host-display privacy/status pass.
 
 ## Scope
 
@@ -20,6 +20,9 @@ A second QA punch list from a manual playthrough of PHoG `main`, scoped as a sin
 | 12 | Travle end-of-round | At reveal, fill in only the missing optimal-route countries — nothing else. |
 | 13 | Travle wrong guesses | Count toward the guess budget. |
 | 14 | Travle timer | Move countdown into the existing header next to guesses-remaining, format `Xs`. |
+| 15 | Championship end | Last game complete → final leaderboard + podium + winner congratulation. |
+| 16 | Host display player tracker (all games) | Show player count + per-player status (connected, submitted, correct/wrong for Quiz/T/F). |
+| 17 | Pointless privacy + reveal | Host never shows player answers or per-player ScoreDrop animations. Player-side animation: wider + slower, numeric column labels removed. Host reveal: only top 3 + bottom 3 library answers. |
 
 ## Per-item design
 
@@ -130,6 +133,51 @@ Client-side: in `packages/host/src/screens/WordleDisplay.tsx`, track per-player 
 - Existing header shows guess counter; add a sibling element bound to the round's `endsAt` and tick every 250ms, formatted as `Xs` (e.g. `45s`).
 - Reuse the existing countdown hook used elsewhere (`packages/client/src/hooks/`) if one exists; otherwise write a small `useCountdown(endsAt)` hook.
 
+### 15. Championship end — final leaderboard, podium, winner congratulation
+
+`packages/server/src/gameEngine.js endSession` already emits `session:end` with `leaderboard` and `winner`. The client side currently renders `FinalLeaderboard.tsx` but the user-reported behavior is that the championship doesn't visually "conclude" — no podium, no winner congratulation moment.
+
+Changes:
+- `packages/client/src/screens/FinalLeaderboard.tsx`: add a podium section (1st/2nd/3rd) above the full leaderboard list, plus a "Congratulations, {winnerName}!" hero band with confetti / framer-motion celebration animation. Auto-scale to "Tie" if multiple players share top score.
+- `packages/host/src/screens/Display.tsx` final-screen branch: same podium + congratulation layout, sized for a TV/projector display.
+- Ensure `championship.active` is set back to `false` in `endSession` (verify — currently it stays `active: true` until reset, which may cause UI to mistakenly re-render mid-flight).
+- Ensure no further game-engine transitions happen after `session:end` until the host clicks "Return to lobby" / "Reset".
+
+### 16. Host display player tracker — universal status pass
+
+Goal: a consistent host-side tracker, present on every game's display, showing every connected player and what they're doing right now. Replace per-game ad-hoc trackers with a shared component.
+
+- Add `packages/host/src/components/PlayerStatusGrid.tsx` (new). Accepts a list of `{ playerId, name, connected, status }` and renders a grid of chips. Status values per game:
+  - **Lobby / pre-round**: `connected` (green dot) or `disconnected` (grey dot).
+  - **Quiz / T/F (during question)**: `submitted` (filled chip) vs. `thinking` (outline chip).
+  - **Quiz / T/F (after question results)**: `correct` (green bg) vs. `wrong` (red bg). Use the `host:player_answered` `isCorrect` already emitted (`quiz.js:329-333`); mirror this in `trueFalse.js` if missing.
+  - **Pointless (during play)**: `submitted` vs. `thinking`. Drives off `pointless:progress` (already implemented at `pointless.js:306-319`).
+  - **Wordle / Travle / DLEs / Numbers**: `solved` (green), `in-progress` (outline), `out-of-guesses` (red). Drive off the existing `*:progress` events.
+- Mount it on:
+  - `packages/host/src/screens/Display.tsx` (Quiz, T/F, Pointless branches)
+  - `packages/host/src/screens/WordleDisplay.tsx`
+  - `packages/host/src/screens/TravelDisplay.tsx`
+  - `packages/host/src/screens/ThemedDleDisplay.tsx`
+  - `packages/host/src/screens/NumbersDisplay.tsx`
+- Always show the player count `(n/total)` somewhere in the header of the host display.
+- Never show submitted text content in this tracker — only status. Player answers stay private to the answering player until the round's authoritative reveal.
+
+### 17. Pointless privacy + reveal rework
+
+**Host display (`packages/host/src/screens/Display.tsx`, Pointless branch around lines 1313+):**
+- Remove the per-player ScoreDrop sequential reveal (current `pointless:reveal:players` consumer). The host no longer iterates through each player's answer + score on screen.
+- Remove `pointlessPlayerReveals` / `pointlessRevealIndex` state and the JSX that renders `currentPlayerReveal`.
+- During play: show only the `PlayerStatusGrid` (item #16) with `submitted` / `thinking` chips.
+- When the round ends (every connected player submitted OR timer expired), reveal **only** the library highlights — top 3 (most-frequent) and bottom 3 (most-obscure) answers from `obscureAnswers` / `frequentAnswers` already in the `pointless:reveal:display` payload. Render as two clean columns. No player names, no player text, no per-player score drops on the host.
+
+**Server (`packages/server/src/games/pointless.js`):**
+- Keep emitting `pointless:reveal:display` (host needs it for highlights).
+- Stop emitting `pointless:reveal:players` (or leave it but host ignores it). Players still receive the personal `game:pointless:reveal` event so they see their own score drop on their phone.
+
+**Player phone animation (`packages/client/src/screens/Pointless.tsx` reveal view):**
+- Restore the old wider, slower animation: scale the column wider (e.g. `w-64` → `w-80` or full-width on mobile, with proportionally taller drop track) and slow the `ScoreDrop` `duration` (the previous value before the recent speed-up — find it in git history or the `motion.ts` constants).
+- Remove the numeric column markers `100 / 75 / 50 / 25 / 0` next to the column. The column itself + landing chip is enough.
+
 ## Components and data flow (changes only)
 
 ```
@@ -149,6 +197,12 @@ Quiz.tsx, TrueFalse.tsx, Display.tsx → inter-round leaderboard overlay
 WordleDisplay.tsx → defer answer reveal until all done
 Travel.tsx       → pan/zoom map; countdown in header; reveal fills missing optimal route
 TravelDisplay.tsx → mirror reveal-fill behavior
+FinalLeaderboard.tsx → add podium + winner congratulation
+gameEngine.js    → set championship.active = false on endSession
+PlayerStatusGrid.tsx → NEW shared host tracker (used by all *Display.tsx)
+trueFalse.js     → emit host:player_answered with isCorrect (mirror quiz.js)
+Pointless host branch (Display.tsx) → drop per-player ScoreDrop; show only top/bottom 3 highlights at reveal
+Pointless.tsx (client) → wider/slower drop animation; remove 100/75/50/25/0 column labels
 ```
 
 ## Testing strategy
@@ -158,6 +212,7 @@ For each change, run the relevant existing test suite under `tests/`. New tests 
 - `tests/travel/early-end.test.mjs` — assert non-adjacent guesses count toward budget.
 - `tests/pointless/early-end.test.mjs` — assert round ends early when all players submit.
 - `tests/themed-dle/autocomplete.test.tsx` (client unit test) — startsWith behavior.
+- `tests/pointless/host-privacy.test.mjs` — assert server does not include per-player answer text in any host-bound payload during reveal.
 
 Manual checklist will be added to the implementation plan for UI-only items (zoom curve, map pan, grid header overflow, host displays).
 
