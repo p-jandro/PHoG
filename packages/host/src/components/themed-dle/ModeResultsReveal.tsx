@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { motion } from 'framer-motion';
 import { Card, LeaderboardRow, Chip } from '../../ui';
 
@@ -13,9 +14,62 @@ interface ModeResultsRevealProps {
   };
 }
 
+const renderGridReveal = (target: any) => {
+  if (!target?.cellAnswers || !target?.rows || !target?.cols) return null;
+  return (
+    <div
+      className="grid w-full max-w-5xl gap-2"
+      style={{ gridTemplateColumns: 'minmax(7rem, 1fr) repeat(3, minmax(0, 1fr))' }}
+    >
+      <div />
+      {target.cols.map((c: string) => (
+        <div
+          key={c}
+          className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-ink bg-ink p-2 text-center font-extrabold uppercase tracking-[0.08em] leading-tight text-bg-surface break-words"
+          style={{ fontSize: 'clamp(0.7rem, 1.3vw, 1.1rem)' }}
+        >
+          {c}
+        </div>
+      ))}
+      {target.rows.map((rowLabel: string, r: number) => (
+        <Fragment key={rowLabel}>
+          <div
+            className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-ink bg-premium p-2 text-center font-extrabold uppercase tracking-[0.06em] leading-tight text-on-premium break-words"
+            style={{ fontSize: 'clamp(0.7rem, 1.3vw, 1.1rem)' }}
+          >
+            {rowLabel}
+          </div>
+          {target.cols.map((_: string, c: number) => {
+            const names: string[] = (target.cellAnswers[`${r},${c}`] || []).slice(0, 5);
+            return (
+              <div
+                key={c}
+                className="min-h-[5rem] rounded-2xl border-2 border-ink bg-bg-surface p-2 text-left text-xs leading-tight"
+              >
+                {names.length ? (
+                  <ul className="space-y-0.5">
+                    {names.map((n) => (
+                      <li key={n} className="truncate font-semibold">{n}</li>
+                    ))}
+                    {(target.cellAnswers[`${r},${c}`] || []).length > 5 && (
+                      <li className="text-ink-muted">+{(target.cellAnswers[`${r},${c}`] || []).length - 5} more</li>
+                    )}
+                  </ul>
+                ) : (
+                  <span className="text-ink-muted">—</span>
+                )}
+              </div>
+            );
+          })}
+        </Fragment>
+      ))}
+    </div>
+  );
+};
+
 const renderTarget = (mode: string, target: any) => {
   if (!target) return null;
-  if (mode === 'grid') return <p className="text-3xl font-extrabold text-ink">Grid revealed below</p>;
+  if (mode === 'grid') return renderGridReveal(target);
   if (mode === 'spell') return (
     <>
       <p className="font-serif text-7xl font-bold text-premium">{target.incantation}</p>
