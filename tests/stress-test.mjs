@@ -52,10 +52,27 @@ const stats = {
   quizAnswers: 0,
   trueFalseAnswers: 0,
   pointlessAnswers: 0,
+  countdownSubmits: 0,
+  numbersOps: 0,
+  wordleGuesses: 0,
+  travelGuesses: 0,
+  themedDleGuesses: 0,
   errors: 0,
   disconnects: 0,
   gamesCompleted: new Set()
 };
+
+// Small word lists for free-form game inputs. Don't need to be valid for every
+// puzzle — server validates; invalid submissions are no-ops, not errors.
+const COMMON_5_LETTER_WORDS = [
+  'plays', 'plumb', 'crane', 'slate', 'audio', 'piano', 'media', 'beach',
+  'house', 'place', 'thing', 'world', 'right', 'might', 'plane', 'glory',
+  'water', 'fight', 'light', 'sound', 'green', 'black', 'spore', 'crone'
+];
+const COMMON_SHORT_WORDS = [
+  'cat', 'dog', 'run', 'sun', 'sea', 'eat', 'bat', 'rat', 'tap', 'pet',
+  'four', 'time', 'race', 'tear', 'rope', 'star', 'rest', 'east', 'mate'
+];
 
 function randomDelay(min, max) {
   return new Promise(resolve => setTimeout(resolve, min + Math.random() * (max - min)));
@@ -70,7 +87,7 @@ function generateName(index) {
 }
 
 function printStats() {
-  console.log(`\n📊 Stats: ${stats.connected} connected, ${stats.joined} joined | Quiz: ${stats.quizVotes}v/${stats.quizAnswers}a | TF: ${stats.trueFalseAnswers}a | Pointless: ${stats.pointlessAnswers}a | Errors: ${stats.errors} | DC: ${stats.disconnects}`);
+  console.log(`\n📊 Stats: ${stats.connected}c/${stats.joined}j | Quiz ${stats.quizVotes}v/${stats.quizAnswers}a | TF ${stats.trueFalseAnswers}a | PL ${stats.pointlessAnswers}a | CD ${stats.countdownSubmits} | NUM ${stats.numbersOps} | WRD ${stats.wordleGuesses} | TRV ${stats.travelGuesses} | DLE ${stats.themedDleGuesses} | err ${stats.errors} | dc ${stats.disconnects}`);
 }
 
 function createPlayer(index) {
@@ -183,6 +200,163 @@ function createPlayer(index) {
       stats.pointlessAnswers++;
     });
 
+    // --- COUNTDOWN (word from letters): submit a short word ---
+    socket.on('countdown:round:start', async (data) => {
+      await randomDelay(2000, 18000);
+      // Try to form a 2-4 letter word from the given letters; fall back to a common word
+      // (server validates; invalid is rejected silently — that's fine for the smoke test).
+      const letters = (data.letters || []).map(l => String(l).toLowerCase());
+      let word = null;
+      // Try a known short word that uses only letters from the pool (with multiplicity)
+      for (const w of COMMON_SHORT_WORDS) {
+        const pool = letters.slice();
+        let ok = true;
+        for (const c of w) {
+          const i = pool.indexOf(c);
+          if (i < 0) { ok = false; break; }
+          pool.splice(i, 1);
+        }
+        if (ok) { word = w; break; }
+      }
+      if (!word) word = letters.slice(0, 3).join(''); // last resort
+      socket.emit('countdown:submit', { word });
+      stats.countdownSubmits++;
+    });
+
+    // --- NUMBERS: do one or two random operations to make progress ---
+    let numbersPool = []; // current pool per player
+    socket.on('numbers:round:start', async (data) => {
+      numbersPool = (data.tiles || []).map(t => ({ id: t.id, value: t.value }));
+      // Do up to 3 random valid operations
+      for (let i = 0; i < 3 && numbersPool.length >= 2; i++) {
+        await randomDelay(1500, 5000);
+        const a = randomChoice(numbersPool);
+        const candidates = numbersPool.filter(t => t.id !== a.id);
+        if (candidates.length === 0) break;
+        const b = randomChoice(candidates);
+        const op = randomChoice(['+', '*', '-']); // skip '/' to avoid frequent non-integer rejects
+        socket.emit('numbers:operation', { aId: a.id, op, bId: b.id });
+        stats.numbersOps++;
+      }
+    });
+    // Track operation acks so we can update our local pool
+    socket.on('numbers:operation:ack', (payload) => {
+      // payload typically includes new tile id + value, and the consumed ids
+      // We don't need to be precise — just remove consumed and add new
+      if (payload?.consumed && payload?.result) {
+        numbersPool = numbersPool.filter(t => !payload.consumed.includes(t.id));
+        numbersPool.push({ id: payload.result.id, value: payload.result.value });
+      }
+    });
+    socket.on('numbers:progress', () => {
+      // No-op — bots don't react to others' progress
+    });
+
+    // --- WORDLE: submit a random 5-letter word, up to 6 attempts ---
+    let wordleGuessesUsed = 0;
+    socket.on('wordle:round:start', () => {
+      wordleGuessesUsed = 0;
+    });
+    async function submitWordleGuess() {
+      if (wordleGuessesUsed >= 6) return;
+      await randomDelay(2000, 9000);
+      const guess = randomChoice(COMMON_5_LETTER_WORDS);
+      socket.emit('wordle:submit', { guess });
+      stats.wordleGuesses++;
+      wordleGuessesUsed++;
+    }
+    // After round start, kick off first guess
+    socket.on('wordle:round:start', () => { submitWordleGuess(); });
+    // Re-guess after every result (until solved or out of guesses)
+    socket.on('wordle:guess:result', (data) => {
+      if (data?.solved) return;
+      if ((data?.guessesRemaining ?? 0) <= 0) return;
+      submitWordleGuess();
+    });
+    socket.on('wordle:guess:invalid', () => {
+      // Try a different word (no count consumed for invalid)
+      if (wordleGuessesUsed < 6) submitWordleGuess();
+    });
+
+    // --- TRAVEL: submit random countries from the relevant list ---
+    let travelCandidates = [];
+    let travelGuessCount = 0;
+    socket.on('travel:round:start', (data) => {
+      // The round-start exposes the full set of relevant countries between start and end.
+      travelCandidates = (data.relevantNames || []).filter(n => n !== data.start && n !== data.end);
+      travelGuessCount = 0;
+      // Submit 2-4 guesses spaced out
+      const numGuesses = 2 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < numGuesses; i++) {
+        setTimeout(() => {
+          if (travelCandidates.length === 0) return;
+          const name = randomChoice(travelCandidates);
+          socket.emit('travel:submit', { name });
+          stats.travelGuesses++;
+          travelGuessCount++;
+        }, 2000 + i * 4000);
+      }
+    });
+    socket.on('travel:guess:result', () => { /* keep submitting from round-start schedule */ });
+
+    // --- THEMED-DLE (Pokédle / HPdle): submit guesses per mode ---
+    let dleRoster = [];        // current mode's public roster (names)
+    let dleSpells = [];        // hp 'spell' mode list (if any)
+    let dleMode = null;
+    let dleGuessesUsed = 0;
+    let dleMaxGuesses = 5;
+    function dleEvent(suffix) {
+      return ['pokedle', 'hpdle'].map(g => `${g}:${suffix}`);
+    }
+    for (const ev of dleEvent('intro')) {
+      socket.on(ev, (data) => {
+        dleMode = data?.mode || null;
+        dleGuessesUsed = 0;
+        dleMaxGuesses = data?.maxGuesses || (data?.mode === 'spell' ? 5 : 5);
+      });
+    }
+    async function submitDleGuess(gameName, fromPayload) {
+      if (dleGuessesUsed >= dleMaxGuesses) return;
+      await randomDelay(2000, 12000);
+      if (dleMode === 'grid') {
+        // Pick a random cell + a random roster name
+        const row = Math.floor(Math.random() * 3);
+        const col = Math.floor(Math.random() * 3);
+        const name = dleRoster.length ? randomChoice(dleRoster).name || randomChoice(dleRoster) : 'unknown';
+        socket.emit('themedDle:guess', { row, col, name: typeof name === 'string' ? name : name?.name });
+      } else if (dleMode === 'spell') {
+        const name = dleSpells.length ? randomChoice(dleSpells) : 'lumos';
+        socket.emit('themedDle:guess', { name: typeof name === 'string' ? name : name?.name });
+      } else {
+        const entry = dleRoster.length ? randomChoice(dleRoster) : { name: 'unknown' };
+        const name = typeof entry === 'string' ? entry : entry?.name;
+        socket.emit('themedDle:guess', { name });
+      }
+      stats.themedDleGuesses++;
+      dleGuessesUsed++;
+    }
+    for (const ev of dleEvent('playing:start')) {
+      socket.on(ev, (data) => {
+        dleMode = data?.mode || dleMode;
+        dleMaxGuesses = data?.maxGuesses || dleMaxGuesses;
+        dleRoster = data?.roster || dleRoster;
+        dleSpells = data?.spells || dleSpells;
+        // Kick off first guess after a short delay
+        setTimeout(() => submitDleGuess(), 1500);
+      });
+    }
+    for (const ev of dleEvent('guess:result')) {
+      socket.on(ev, (data) => {
+        if (data?.solved) return;
+        if (dleGuessesUsed < dleMaxGuesses) submitDleGuess();
+      });
+    }
+    for (const ev of dleEvent('grid:cell:result')) {
+      socket.on(ev, (data) => {
+        if (dleGuessesUsed < dleMaxGuesses) submitDleGuess();
+      });
+    }
+
     // --- Session end ---
     socket.on('session:end', () => {
       if (index === 0) {
@@ -213,6 +387,11 @@ async function createHost() {
       socket.emit('host:join', { password: HOST_PASSWORD });
     });
 
+    // Heartbeat — server expects a pong reply to its ping, otherwise it disconnects us.
+    socket.on('ping', () => {
+      socket.emit('pong');
+    });
+
     socket.on('host:joined', async (data) => {
       console.log('🎙️  Auto-host authenticated. Current phase:', data?.gameState?.phase || 'unknown');
 
@@ -226,12 +405,35 @@ async function createHost() {
       console.log('🎙️  Starting championship in 3s...');
       await randomDelay(3000, 3000);
 
-      console.log('🎙️  Starting championship: quiz → trueFalse → pointless');
+      // Allow caller to choose championship sequence via --sequence=g1,g2,...
+      const seqArg = process.argv.find(a => a.startsWith('--sequence='));
+      const sequence = seqArg
+        ? seqArg.split('=')[1].split(',').filter(Boolean)
+        : ['quiz', 'trueFalse', 'pointless', 'countdown', 'numbers', 'wordle', 'travel', 'pokedle', 'hpdle'];
+      console.log(`🎙️  Starting championship: ${sequence.join(' → ')}`);
       socket.emit('host:control', {
         action: 'startChampionship',
-        sequence: ['quiz', 'trueFalse', 'pointless']
+        sequence
       });
       resolve(socket);
+    });
+
+    // Auto-advance championship: after each `game:end`, wait 12s (leaderboard duration + 2s buffer)
+    // and emit host:control { nextGame }.
+    let nextScheduled = false;
+    socket.on('game:end', ({ game }) => {
+      if (nextScheduled) return;
+      nextScheduled = true;
+      console.log(`🎙️  Game ended (${game}) — scheduling nextGame in 12s`);
+      setTimeout(() => {
+        nextScheduled = false;
+        console.log('🎙️  Sending host:control { action: nextGame }');
+        socket.emit('host:control', { action: 'nextGame' });
+      }, 12000);
+    });
+
+    socket.on('session:end', () => {
+      console.log('🎙️  Auto-host: session ended (championship finished).');
     });
 
     socket.on('host:rejected', (data) => {
