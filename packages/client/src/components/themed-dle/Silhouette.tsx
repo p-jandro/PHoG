@@ -29,8 +29,11 @@ interface SilhouetteProps {
 // Stage 0 = before any guess (most zoomed-in onto the body).
 // Each wrong guess advances one stage, zooming out and slowly revealing colour.
 // 11 entries cover stages 0..10 (initial + up to MAX_GUESSES=10 wrong guesses).
-const ZOOM       = [2.4, 2.1, 1.8, 1.55, 1.35, 1.2, 1.1, 1.05, 1.0, 1.0, 1.0];
-const BRIGHTNESS = [0,   0,   0.05, 0.1, 0.2, 0.3, 0.4, 0.55, 0.7, 0.8, 0.85];
+// Zoom decreases smoothly across the full guess budget so the body unfolds
+// gradually. Brightness stays at 0 for the first 5 wrong guesses (pure
+// silhouette) and only starts ramping after that.
+const ZOOM       = [2.4, 2.25, 2.1, 1.95, 1.8, 1.65, 1.5, 1.35, 1.2, 1.1, 1.0];
+const BRIGHTNESS = [0,   0,    0,   0,    0,   0.2,  0.35, 0.5, 0.65, 0.8, 0.95];
 
 /**
  * Compute the centroid of the silhouette (non-transparent pixels) for the
