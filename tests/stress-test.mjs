@@ -407,15 +407,26 @@ async function createHost() {
 
       // Allow caller to choose championship sequence via --sequence=g1,g2,...
       const seqArg = process.argv.find(a => a.startsWith('--sequence='));
+      // Default sequence excludes 'countdown' (the word-game) per current product scope.
+      // Pass --sequence=quiz,countdown,... to override.
       const sequence = seqArg
         ? seqArg.split('=')[1].split(',').filter(Boolean)
-        : ['quiz', 'trueFalse', 'pointless', 'countdown', 'numbers', 'wordle', 'travel', 'pokedle', 'hpdle'];
+        : ['quiz', 'trueFalse', 'pointless', 'numbers', 'wordle', 'travel', 'pokedle', 'hpdle'];
       console.log(`🎙️  Starting championship: ${sequence.join(' → ')}`);
       socket.emit('host:control', {
         action: 'startChampionship',
         sequence
       });
       resolve(socket);
+    });
+
+    // Pointless requires a host trigger to advance from "round ended" to the reveal
+    // animation. Without this, the game stalls after round 1.
+    socket.on('pointless:round:end', () => {
+      setTimeout(() => {
+        console.log('🎙️  Pointless round ended — sending host:control { action: reveal }');
+        socket.emit('host:control', { action: 'reveal' });
+      }, 1500);
     });
 
     // Auto-advance championship: after each `game:end`, wait 12s (leaderboard duration + 2s buffer)
@@ -500,11 +511,13 @@ async function main() {
   process.on('SIGINT', cleanup);
   process.on('SIGTERM', cleanup);
 
-  // Auto-exit after 20 minutes
+  // Auto-exit after a configurable number of minutes (default 20).
+  const timeoutArg = process.argv.find(a => a.startsWith('--timeout-min='));
+  const timeoutMin = timeoutArg ? parseInt(timeoutArg.split('=')[1], 10) : 20;
   setTimeout(() => {
-    console.log('\n⏰ 20-minute timeout reached.');
+    console.log(`\n⏰ ${timeoutMin}-minute timeout reached.`);
     cleanup();
-  }, 20 * 60 * 1000);
+  }, timeoutMin * 60 * 1000);
 }
 
 main().catch(err => {
