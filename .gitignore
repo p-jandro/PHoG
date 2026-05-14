@@ -8,3 +8,5 @@ dist/
 coverage/
 .vite/
 build/
+*.bak
+.claude/scheduled_tasks.lock

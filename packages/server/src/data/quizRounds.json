@@ -58,7 +58,8 @@
         },
         "correct": "A"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 2,
@@ -119,7 +120,8 @@
         },
         "correct": "A"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 3,
@@ -180,7 +182,8 @@
         },
         "correct": "D"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 4,
@@ -241,7 +244,8 @@
         },
         "correct": "A"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 5,
@@ -302,7 +306,8 @@
         },
         "correct": "C"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 6,
@@ -363,7 +368,8 @@
         },
         "correct": "A"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 7,
@@ -424,7 +430,8 @@
         },
         "correct": "D"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 8,
@@ -485,7 +492,8 @@
         },
         "correct": "C"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 9,
@@ -546,7 +554,8 @@
         },
         "correct": "A"
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "roundNumber": 10,
@@ -607,6 +616,7 @@
         },
         "correct": "D"
       }
-    ]
+    ],
+    "enabled": true
   }
 ]
