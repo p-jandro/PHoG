@@ -293,6 +293,16 @@ export class PointlessGame {
     // Per bug-report 2026-05-14 §D1: broadcast per-player progress so the host
     // display can render the locked-in / still-thinking tracker live.
     this.broadcastProgress();
+
+    // Early-end: once every connected player has submitted, don't waste the
+    // remaining timer — close the round immediately.
+    const connectedIds = Array.from(this.gameState.players.entries())
+      .filter(([, p]) => p.connected)
+      .map(([id]) => id);
+    if (connectedIds.length > 0 && connectedIds.every((id) => this.gameState.pointless.answers.has(id))) {
+      if (this.timer) { this.timer.stop(); this.timer = null; }
+      this.endRound();
+    }
   }
 
   /**
