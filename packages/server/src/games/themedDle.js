@@ -137,23 +137,32 @@ function scoreEmoji(emojisRevealed, solved, timeRemainingMs, totalMs) {
 function scoreSilhouette(guessesUsed, solved, timeRemainingMs, totalMs) {
   if (!solved) return 0;
   if (guessesUsed > SCORING_GUESS_CAP) return 0;
-  const base = 120; // harder mode, slightly higher base
-  const efficiency = (SCORING_GUESS_CAP - guessesUsed) * 20; // 0..100
+  // Per QA 2026-05-14 scoring audit: Silhouette is the hardest visual mode,
+  // so a strong run should outweigh a strong Classic run. Bumped base + per-
+  // guess efficiency. Max = 130 + 125 + 30 = 285 (Classic max = 230).
+  const base = 130;
+  const efficiency = (SCORING_GUESS_CAP - guessesUsed) * 25; // 0..125
   const speed = Math.max(0, Math.floor(30 * (timeRemainingMs / totalMs)));
   return base + efficiency + speed;
 }
 
 function scoreSpell(hintsUsed, solved, timeRemainingMs, totalMs) {
   if (!solved) return 0;
-  const base = 100;
-  const efficiency = (3 - hintsUsed) * 25; // 3 hint tiers; fewer used = more points
+  // Per QA 2026-05-14 scoring audit: Spell harder than Classic — bumped per-
+  // hint efficiency so an unaided solve clearly outscores a hint-heavy one.
+  // Max = 110 + 105 + 30 = 245 (Classic max = 230).
+  const base = 110;
+  const efficiency = (3 - hintsUsed) * 35; // 3 hint tiers; fewer used = more points
   const speed = Math.max(0, Math.floor(30 * (timeRemainingMs / totalMs)));
   return base + efficiency + speed;
 }
 
 function scoreGridCell(matchingPlayersCount) {
   if (matchingPlayersCount === 0) return 0;
-  return Math.round(100 / matchingPlayersCount);
+  // Per QA 2026-05-14 scoring audit: per-cell value capped at 50 (was 100) so
+  // a solo or 2-player Grid run can't dwarf the cumulative Pokédle/HP-dle
+  // total. Solo max becomes 450 (was 900); 2-player matched max ~225.
+  return Math.round(50 / matchingPlayersCount);
 }
 
 // ---------- Color comparison logic for Classic --------------------------------
