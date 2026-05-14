@@ -29,8 +29,8 @@ export const AutocompletePicker = ({
     if (!q) return [];
     return roster
       .filter((entry) => {
-        if (entry.name.toLowerCase().includes(q)) return true;
-        return (entry.aliases || []).some((a) => a.toLowerCase().includes(q));
+        if (entry.name.toLowerCase().startsWith(q)) return true;
+        return (entry.aliases || []).some((a) => a.toLowerCase().startsWith(q));
       })
       .slice(0, maxResults);
   }, [query, roster, maxResults]);
