@@ -35,6 +35,7 @@ import { ThemedDleGame } from './games/themedDle.js';
 import { NumbersGame } from './games/numbers.js';
 import { WordleGame } from './games/wordle.js';
 import { TravelGame } from './games/travel.js';
+import { contentStore } from './contentStore.js';
 
 const app = express();
 const server = createServer(app);
@@ -353,6 +354,61 @@ io.on('connection', (socket) => {
     } catch (error) {
       console.error('[ERROR] host:join:', error);
       socket.emit('error', { message: 'Failed to join as host' });
+    }
+  });
+
+  // Host settings (content editor) events — gated on host auth + lobby phase.
+  function isAuthorizedHost() {
+    return socket.id === gameState.meta?.hostSocketId;
+  }
+
+  socket.on('host:settings:get', ({ kind } = {}) => {
+    try {
+      if (!isAuthorizedHost()) {
+        socket.emit('host:settings:rejected', { kind, reason: 'not_authorized' });
+        return;
+      }
+      let data;
+      if (kind === 'quiz')           data = contentStore.getQuizRoundsAll();
+      else if (kind === 'trueFalse') data = contentStore.getStatementsAll();
+      else if (kind === 'pointless') data = contentStore.getPointlessRoundsAll();
+      else { socket.emit('host:settings:rejected', { kind, reason: 'unknown_kind' }); return; }
+      const version = contentStore.getVersion(kind);
+      socket.emit('host:settings:data', { kind, data, version });
+    } catch (err) {
+      console.error('[ERROR] host:settings:get:', err);
+      socket.emit('host:settings:rejected', { kind, reason: 'server_error' });
+    }
+  });
+
+  socket.on('host:settings:save', ({ kind, data, version } = {}) => {
+    try {
+      if (!isAuthorizedHost()) {
+        socket.emit('host:settings:rejected', { kind, reason: 'not_authorized' });
+        return;
+      }
+      if (gameState.phase !== 'lobby') {
+        socket.emit('host:settings:rejected', { kind, reason: 'wrong_phase' });
+        return;
+      }
+      const currentVersion = contentStore.getVersion(kind);
+      if (typeof version === 'number' && version > 0 && Math.abs(currentVersion - version) > 1) {
+        socket.emit('host:settings:rejected', { kind, reason: 'stale_version', currentVersion });
+        return;
+      }
+      let result;
+      if (kind === 'quiz')           result = contentStore.saveQuizRounds(data);
+      else if (kind === 'trueFalse') result = contentStore.saveStatements(data);
+      else if (kind === 'pointless') result = contentStore.savePointlessRounds(data);
+      else { socket.emit('host:settings:rejected', { kind, reason: 'unknown_kind' }); return; }
+      if (result.ok) {
+        socket.emit('host:settings:saved', { kind, version: result.version });
+      } else {
+        socket.emit('host:settings:rejected', { kind, reason: 'validation', details: result.reason });
+      }
+    } catch (err) {
+      console.error('[ERROR] host:settings:save:', err);
+      socket.emit('host:settings:rejected', { kind, reason: 'server_error' });
     }
   });
 
