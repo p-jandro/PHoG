@@ -641,52 +641,8 @@ io.on('connection', (socket) => {
     if (gameEngine.currentGameModule && typeof gameEngine.currentGameModule.getState === 'function') {
       const state = gameEngine.currentGameModule.getState();
 
-      if (gameState.currentGame === 'quiz' && gameState.quiz) {
-        if (gameState.quiz.phase === 'intro') {
-          const remaining = Math.max(0, (state.introEndsAt || Date.now()) - Date.now());
-
-          socket.emit('quiz:intro', {
-            title: 'Quiz Challenge',
-            description: `${state.totalQuestions} rounds of trivia questions`,
-            scoringRules: [
-              'Easy: 100 pts base',
-              'Medium: 200 pts base',
-              'Hard: 300 pts base',
-              'Impossible: 500 pts base',
-              'Speed bonus: up to 10% for fast answers',
-              'Leader gets 2x voting power'
-            ],
-            placementInfo: 'Your rank in this game determines your placement score',
-            duration: remaining,
-            endsAt: Date.now() + remaining
-          });
-        }
-      }
-
-      if (gameState.currentGame === 'trueFalse' && gameState.trueFalse) {
-        if (gameState.trueFalse.phase === 'intro') {
-          const remaining = Math.max(0, (state.introEndsAt || Date.now()) - Date.now());
-
-          socket.emit('truefalse:intro', {
-            title: 'True or False Rapid Fire',
-            description: '20 statements, answer as fast as you can!',
-            scoringRules: [
-              'Base: 10 points per correct answer',
-              '2 in a row: 12 pts',
-              '3 in a row: 14 pts',
-              '4 in a row: 16 pts',
-              '5+ in a row: 18+ pts',
-              'Formula: 10 + (2 × (streak - 1)) points',
-              'Wrong answer resets streak'
-            ],
-            placementInfo: 'Your rank in this game determines your placement score',
-            totalStatements: state.totalStatements,
-            timePerStatement: 5000,
-            duration: remaining,
-            endsAt: Date.now() + remaining
-          });
-        }
-      }
+      // Quiz / TrueFalse intro+playing resync is handled by their
+      // getResyncEvents() implementations below.
 
       if (gameState.currentGame === 'pointless' && gameState.pointless) {
         const pointlessState = gameState.pointless;
@@ -751,37 +707,26 @@ io.on('connection', (socket) => {
       // the screen will resync on the next live event anyway.
       const gameModule = gameEngine.currentGameModule;
       try {
-        if (gameState.currentGame === 'quiz' && state.phase === 'question' && state.currentQuestion) {
-          socket.emit('quiz:question:start', {
-            ...state.currentQuestion,
-            questionNumber: state.questionNumber,
-            totalQuestions: state.totalQuestions,
-            endsAt: state.questionEndsAt
-          });
-        } else if (gameState.currentGame === 'quiz' && state.phase === 'voting' && state.currentRoundOptions) {
-          socket.emit('quiz:voting:start', {
-            options: state.currentRoundOptions,
-            questionNumber: state.questionNumber,
-            totalQuestions: state.totalQuestions,
-            endsAt: state.votingEndsAt
-          });
-        }
-
-        if (gameState.currentGame === 'trueFalse' && state.currentStatement) {
-          socket.emit('truefalse:statement', {
-            statementId: state.currentStatement.id,
-            statement: state.currentStatement.statement,
-            statementNumber: state.statementNumber,
-            totalStatements: state.totalStatements,
-            endsAt: state.statementEndsAt
-          });
-        }
-
-        // Themed-dle, numbers, wordle, travel: replay the playing-start event
-        // from the module's snapshot so the host display re-routes off
-        // "Loading…" immediately.
+        // Themed-dle, numbers, wordle, travel, quiz, trueFalse: replay the
+        // playing-start (or results) events from the module's snapshot so the
+        // host display re-routes off "Loading…" immediately. The contract:
+        //
+        //   getResyncEvents({ socketId, playerId, isHost }) -> Array<{name, payload}>
+        //
+        // The returned events are emitted ONLY to the requesting socket. Each
+        // module decides what to expose to host vs. player (e.g. the host gets
+        // the target for wordle / themed-dle; players never do). If a module
+        // can't safely resync the current phase, it returns []. Note the
+        // pointless / quiz-intro / truefalse-intro / quiz-question / quiz-voting
+        // / truefalse-statement branches above handle their own resync inline,
+        // so games shouldn't double-emit those.
         if (typeof gameModule?.getResyncEvents === 'function') {
-          const events = gameModule.getResyncEvents() || [];
+          const requestingPlayerId = connectionManager.getPlayerId(socket.id);
+          const events = gameModule.getResyncEvents({
+            socketId: socket.id,
+            playerId: requestingPlayerId,
+            isHost: socket.id === gameState.meta.hostSocketId
+          }) || [];
           for (const evt of events) {
             socket.emit(evt.name, evt.payload);
           }

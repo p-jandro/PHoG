@@ -16,7 +16,6 @@ const __dirname = dirname(__filename);
 // Load quiz rounds
 const quizRoundsPath = join(__dirname, '../data/quizRounds.json');
 const quizRounds = JSON.parse(readFileSync(quizRoundsPath, 'utf-8'));
-const ROUND_LEADERBOARD_DURATION = 5000;
 const QUESTION_RESULTS_DURATION = 3000;
 
 export class QuizGame {
@@ -411,21 +410,16 @@ export class QuizGame {
 
     // Broadcast updated player list
     this.gameEngine.broadcastPlayerList();
-    this.trackTimeout(() => {
-      this.gameEngine.showRoundLeaderboard('quiz', ROUND_LEADERBOARD_DURATION, {
-        roundNumber: this.gameState.quiz.questionNumber,
-        totalRounds: this.gameState.quiz.totalQuestions,
-        unitLabel: 'Question'
-      });
 
-      // Continue to next question or end quiz
-      this.trackTimeout(() => {
-        if (this.gameState.quiz.questionNumber >= this.gameState.quiz.totalQuestions) {
-          this.endQuiz();
-        } else {
-          this.startVoting();
-        }
-      }, ROUND_LEADERBOARD_DURATION);
+    // Per bug-report 2026-05-14 §A4: the inter-round leaderboard overlay is
+    // gone, so we transition directly from the question-results screen to the
+    // next voting round (or the final leaderboard) after the results window.
+    this.trackTimeout(() => {
+      if (this.gameState.quiz.questionNumber >= this.gameState.quiz.totalQuestions) {
+        this.endQuiz();
+      } else {
+        this.startVoting();
+      }
     }, QUESTION_RESULTS_DURATION);
   }
 
@@ -505,6 +499,77 @@ export class QuizGame {
     console.log(`[QUIZ] Clearing ${this.pendingTimeouts.length} pending timeouts`);
     this.pendingTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
     this.pendingTimeouts = [];
+  }
+
+  /**
+   * Per bug-report 2026-05-14 §A5: return the events the host display needs to
+   * subscribe to in order to render the current phase. The caller (index.js
+   * `request:state`) emits these only to the requesting socket. Quiz contains
+   * no answer-secret in the question payload (correct answer is stripped at
+   * emit time and held server-side), so we can replay to player or host
+   * indistinguishably.
+   */
+  getResyncEvents(/* { socketId, playerId, isHost } */) {
+    const events = [];
+    const q = this.gameState.quiz;
+    if (!q) return events;
+
+    if (q.phase === 'intro' && q.introEndsAt) {
+      const remaining = Math.max(0, q.introEndsAt - Date.now());
+      events.push({
+        name: 'quiz:intro',
+        payload: {
+          title: 'Quiz Challenge',
+          description: `${q.totalQuestions} rounds of trivia questions`,
+          scoringRules: [
+            'Easy: 100 pts base',
+            'Medium: 200 pts base',
+            'Hard: 300 pts base',
+            'Impossible: 500 pts base',
+            'Speed bonus: up to 10% for fast answers',
+            'Leader gets 2x voting power'
+          ],
+          placementInfo: 'Your rank in this game determines your placement score',
+          duration: remaining,
+          endsAt: q.introEndsAt
+        }
+      });
+    } else if (q.phase === 'voting' && q.currentRoundOptions) {
+      const votingOptions = q.currentRoundOptions.map((opt) => ({
+        id: opt.id,
+        label: `${opt.category} (${opt.difficulty.charAt(0).toUpperCase() + opt.difficulty.slice(1)})`,
+        color: opt.color,
+        category: opt.category,
+        difficulty: opt.difficulty
+      }));
+      events.push({
+        name: 'quiz:voting:start',
+        payload: {
+          options: votingOptions,
+          duration: Math.max(0, (q.votingEndsAt || Date.now()) - Date.now()),
+          endsAt: q.votingEndsAt,
+          questionNumber: q.questionNumber + 1,
+          totalQuestions: q.totalQuestions
+        }
+      });
+    } else if (q.phase === 'question' && q.currentQuestion) {
+      events.push({
+        name: 'quiz:question:start',
+        payload: {
+          questionId: q.currentQuestion.id,
+          question: q.currentQuestion.question,
+          answers: q.currentQuestion.answers,
+          category: q.currentQuestion.category,
+          difficulty: q.currentQuestion.difficulty,
+          color: q.currentQuestion.color,
+          questionNumber: q.questionNumber,
+          totalQuestions: q.totalQuestions,
+          duration: Math.max(0, (q.questionEndsAt || Date.now()) - Date.now()),
+          endsAt: q.questionEndsAt
+        }
+      });
+    }
+    return events;
   }
 
   /**

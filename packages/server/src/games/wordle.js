@@ -266,4 +266,81 @@ export class WordleGame {
       endsAt: this.gameState.wordle?.endsAt
     };
   }
+
+  /**
+   * Per bug-report 2026-05-14 §A5: replay the round-start (host gets target,
+   * players don't), plus the public progress snapshot, plus the requesting
+   * player's private board so their own grid doesn't reset on remount.
+   */
+  getResyncEvents({ isHost = false, playerId } = {}) {
+    const events = [];
+    const w = this.gameState.wordle;
+    if (!w) return events;
+
+    if (w.phase === 'intro') {
+      events.push({
+        name: 'wordle:intro',
+        payload: {
+          title: 'Wordle',
+          description: 'Guess the 5-letter word in 6 tries. Same word for everyone.',
+          scoringRules: [
+            'Solving = 50 base + efficiency + speed (up to ~220 total)',
+            'Not solving = partial credit per unique green / yellow letter',
+            'First solver: +10 bonus'
+          ],
+          duration: Math.max(0, (w.endsAt || Date.now()) - Date.now()),
+          endsAt: w.endsAt || null
+        }
+      });
+    } else if (w.phase === 'playing') {
+      events.push({
+        name: 'wordle:round:start',
+        payload: {
+          duration: Math.max(0, (w.endsAt || Date.now()) - Date.now()),
+          endsAt: w.endsAt,
+          maxGuesses: MAX_GUESSES
+        }
+      });
+
+      // Host-only: the target word, mirroring the original emit in _startRound.
+      if (isHost && w.answer) {
+        events.push({
+          name: 'wordle:round:start:host',
+          payload: { target: w.answer }
+        });
+      }
+
+      // Public progress (color rows for every player) so host tracker repaints.
+      const playerProgress = {};
+      for (const [pid, ps] of Object.entries(w.players || {})) {
+        playerProgress[pid] = {
+          guessesUsed: ps.guessesUsed,
+          solved: ps.solved,
+          colorRows: ps.history.map((h) => h.colors)
+        };
+      }
+      events.push({ name: 'wordle:progress', payload: { playerProgress } });
+
+      // Requesting player's private board (letters + colors). Other players'
+      // letters never leak — only the colors went out in `wordle:progress`.
+      if (playerId && w.players[playerId]) {
+        const ps = w.players[playerId];
+        // Replay each historical guess so the client can rebuild its grid.
+        for (const row of ps.history) {
+          events.push({
+            name: 'wordle:guess:result',
+            payload: {
+              guess: row.guess,
+              colors: row.colors,
+              guessesUsed: ps.guessesUsed,
+              guessesRemaining: MAX_GUESSES - ps.guessesUsed,
+              solved: ps.solved,
+              resync: true
+            }
+          });
+        }
+      }
+    }
+    return events;
+  }
 }

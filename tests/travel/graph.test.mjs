@@ -37,7 +37,10 @@ assert.ok(sk, 'South Korea → Norway should still be reachable via NK → Russi
 assert.equal(sk.distance, 3);
 
 // canReach uses the same graph
-assert.equal(canReach('Spain', 'Brazil'), true);  // France ↔ Brazil via French Guiana
+// (Post-H2: Brazil no longer borders France, so Europe ↔ South America is
+// disconnected. Use an intra-continent pair instead.)
+assert.equal(canReach('Spain', 'Germany'), true);
+assert.equal(canReach('Brazil', 'Argentina'), true);
 
 // shortestPathChain returns endpoints
 const chain = shortestPathChain('Portugal', 'Germany');
@@ -59,5 +62,35 @@ assert.ok(ALL_COUNTRIES.length >= 100, `expected >=100 countries, got ${ALL_COUN
 for (const c of ALL_COUNTRIES) {
   assert.ok(typeof c.iso === 'string' && c.iso.length === 3, `${c.name} missing valid iso code (got: ${c.iso})`);
 }
+
+// H2 regression — sea-hop edges must NOT be in the adjacency graph.
+// Borders are symmetric; assert both directions to guard against asymmetric drift.
+const seaHops = [
+  ['France', 'Brazil'],
+  ['France', 'Suriname'],
+  ['Spain', 'Morocco'],
+  ['United States', 'Russia'],
+  ['Italy', 'Tunisia']
+];
+for (const [a, b] of seaHops) {
+  assert.equal(isAdjacent(a, b), false, `${a} ↔ ${b} should not be adjacent (sea hop)`);
+  assert.equal(isAdjacent(b, a), false, `${b} ↔ ${a} should not be adjacent (sea hop)`);
+}
+
+// USA accepts the 'USA' alias too — make sure removing the Russia edge holds under that alias
+assert.equal(isAdjacent('USA', 'Russia'), false);
+
+// Real land borders still hold after the scrub
+assert.equal(isAdjacent('France', 'Spain'), true);
+
+// Spain ↔ Andorra ↔ France: BFS distance ≤ 2 (in fact France-Spain is direct = 1)
+const sf = shortestPathInfo('Spain', 'France');
+assert.ok(sf, 'Spain → France should be reachable');
+assert.ok(sf.distance <= 2, `Spain → France distance ${sf.distance} should be ≤ 2`);
+
+// Italy ↔ Switzerland ↔ Austria — also ≤ 2 (Italy borders both Switzerland and Austria directly)
+const ia = shortestPathInfo('Italy', 'Austria');
+assert.ok(ia, 'Italy → Austria should be reachable');
+assert.ok(ia.distance <= 2, `Italy → Austria distance ${ia.distance} should be ≤ 2`);
 
 console.log('graph.test.mjs PASS');

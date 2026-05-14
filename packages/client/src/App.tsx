@@ -14,7 +14,6 @@ import { Wordle } from './screens/Wordle';
 import { Travel } from './screens/Travel';
 import { FinalLeaderboard } from './screens/FinalLeaderboard';
 import { PausedOverlay } from './components/PausedOverlay';
-import { RoundLeaderboardOverlay } from './components/RoundLeaderboardOverlay';
 
 function App() {
   const socket = useSocket();
@@ -82,7 +81,6 @@ function App() {
   return (
     <div className="App">
       {renderScreen()}
-      <RoundLeaderboardOverlay />
       <PausedOverlay />
     </div>
   );

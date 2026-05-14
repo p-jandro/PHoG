@@ -16,7 +16,6 @@ const statementsPath = join(__dirname, '../data/statements.json');
 const allStatements = JSON.parse(readFileSync(statementsPath, 'utf-8'));
 const INTRO_DURATION = 30000;
 const ANSWER_REVEAL_DURATION = 5000;
-const ROUND_LEADERBOARD_DURATION = 5000;
 
 export class TrueFalseGame {
   constructor(gameState, io, gameEngine) {
@@ -283,17 +282,10 @@ export class TrueFalseGame {
 
     this.gameEngine.broadcastPlayerList();
 
+    // Per bug-report 2026-05-14 §A4: drop the inter-statement leaderboard pop
+    // and chain straight to the next statement after the answer-reveal window.
     this.trackTimeout(() => {
-      this.gameEngine.showRoundLeaderboard('trueFalse', ROUND_LEADERBOARD_DURATION, {
-        roundNumber: this.gameState.trueFalse.statementNumber,
-        totalRounds: this.gameState.trueFalse.totalStatements,
-        unitLabel: 'Statement',
-        leaderboard
-      });
-
-      this.trackTimeout(() => {
-        this.nextStatement();
-      }, ROUND_LEADERBOARD_DURATION);
+      this.nextStatement();
     }, ANSWER_REVEAL_DURATION);
   }
 
@@ -421,6 +413,54 @@ export class TrueFalseGame {
     this.pendingTimeouts = [];
 
     console.log('[TRUE/FALSE] Cleanup complete');
+  }
+
+  /**
+   * Per bug-report 2026-05-14 §A5: see quiz.js. The statement payload has no
+   * answer-secret (the truth value lives only on the server until showAnswer
+   * is called), so we can replay to host or player indistinguishably.
+   */
+  getResyncEvents(/* { socketId, playerId, isHost } */) {
+    const events = [];
+    const tf = this.gameState.trueFalse;
+    if (!tf) return events;
+
+    if (tf.phase === 'intro' && tf.introEndsAt) {
+      const remaining = Math.max(0, tf.introEndsAt - Date.now());
+      events.push({
+        name: 'truefalse:intro',
+        payload: {
+          title: 'True or False Rapid Fire',
+          description: '20 statements, answer as fast as you can!',
+          scoringRules: [
+            'Base: 10 points per correct answer',
+            '2 in a row: 12 pts',
+            '3 in a row: 14 pts',
+            '4 in a row: 16 pts',
+            '5+ in a row: 18+ pts',
+            'Formula: 10 + (2 × (streak - 1)) points',
+            'Wrong answer resets streak'
+          ],
+          placementInfo: 'Your rank in this game determines your placement score',
+          totalStatements: tf.totalStatements,
+          timePerStatement: 5000,
+          duration: remaining,
+          endsAt: tf.introEndsAt
+        }
+      });
+    } else if (tf.phase === 'playing' && tf.currentStatement) {
+      events.push({
+        name: 'truefalse:statement',
+        payload: {
+          statementId: tf.currentStatement.id,
+          statement: tf.currentStatement.statement,
+          statementNumber: tf.statementNumber,
+          totalStatements: tf.totalStatements,
+          duration: 5000
+        }
+      });
+    }
+    return events;
   }
 
   /**

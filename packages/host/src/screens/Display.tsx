@@ -41,26 +41,6 @@ interface Player {
   connected: boolean;
 }
 
-interface RoundLeaderboardEntry {
-  rank: number;
-  id: string;
-  name: string;
-  score: number;
-  connected: boolean;
-  streak?: number;
-  rankDelta?: number | null;
-}
-
-interface RoundLeaderboardState {
-  game: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | 'travel';
-  duration: number;
-  leaderboard: RoundLeaderboardEntry[];
-  roundNumber?: number | null;
-  totalRounds?: number | null;
-  unitLabel?: string;
-  timestamp: number;
-}
-
 interface PointlessRevealAnswer {
   answer: string;
   score: number;
@@ -105,31 +85,6 @@ interface TrueFalseRevealState {
   explanation: string;
 }
 
-const getRankDeltaMeta = (rankDelta: number | null | undefined) => {
-  if (rankDelta === null || rankDelta === undefined) {
-    return null;
-  }
-
-  if (rankDelta > 0) {
-    return {
-      label: `↑${rankDelta} since last round`,
-      className: 'bg-action/20 text-action'
-    };
-  }
-
-  if (rankDelta < 0) {
-    return {
-      label: `↓${Math.abs(rankDelta)} since last round`,
-      className: 'bg-danger/20 text-danger'
-    };
-  }
-
-  return {
-    label: 'No change',
-    className: 'bg-ink/10 text-ink-muted'
-  };
-};
-
 export const Display = () => {
   const [connected, setConnected] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
@@ -165,7 +120,6 @@ export const Display = () => {
   // host display can render a Locked-in / Still-thinking tracker without
   // requiring a Dashboard ↔ Display toggle to refresh.
   const [pointlessProgress, setPointlessProgress] = useState<Record<string, { status: 'submitted' | 'none' }>>({});
-  const [roundLeaderboard, setRoundLeaderboard] = useState<RoundLeaderboardState | null>(null);
 
   useEffect(() => {
     if (phase !== 'leaderboard') {
@@ -190,8 +144,6 @@ export const Display = () => {
   }, []);
 
   useEffect(() => {
-    let roundLeaderboardTimeout: ReturnType<typeof setTimeout> | null = null;
-
     const newSocket = io(SERVER_URL, {
       autoConnect: true,
       transports: ['websocket']
@@ -256,7 +208,6 @@ export const Display = () => {
     newSocket.on('game:start', ({ game }) => {
       setCurrentGame(game);
       setPhase('playing');
-      setRoundLeaderboard(null);
       setQuizIntro(null);
       setQuizVoting(null);
       setQuizVotingResults(null);
@@ -272,22 +223,6 @@ export const Display = () => {
       setPointlessPlayerReveals([]);
       setPointlessRevealIndex(0);
       setPointlessReadyToReveal(false);
-    });
-
-    newSocket.on('round:leaderboard:show', (data) => {
-      setRoundLeaderboard(data);
-      setQuizResults(null);
-      setTfReveal(null);
-      setPointlessReveal(null);
-
-      if (roundLeaderboardTimeout) {
-        clearTimeout(roundLeaderboardTimeout);
-      }
-
-      roundLeaderboardTimeout = setTimeout(() => {
-        setRoundLeaderboard(null);
-        roundLeaderboardTimeout = null;
-      }, data.duration || 5000);
     });
 
     // Quiz events
@@ -390,9 +325,6 @@ export const Display = () => {
 
     return () => {
       setSocket(null);
-      if (roundLeaderboardTimeout) {
-        clearTimeout(roundLeaderboardTimeout);
-      }
       newSocket.disconnect();
     };
   }, []);
@@ -583,106 +515,6 @@ export const Display = () => {
       </>
     );
   };
-
-  if (roundLeaderboard) {
-    const gameLabel = {
-      quiz: 'Quiz',
-      trueFalse: 'True/False',
-      countdown: 'Countdown',
-      pointless: 'Pointless',
-      pokedle: 'Pokédle',
-      hpdle: 'HP-dle',
-      numbers: 'Numbers',
-      wordle: 'Wordle',
-      travel: 'Travel'
-    }[roundLeaderboard.game];
-
-    return (
-      <>
-        <div className="min-h-screen px-6 py-6 overflow-y-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mx-auto w-full max-w-7xl"
-          >
-            <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface p-8 shadow-ink-lg sm:p-10">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ink-muted mb-3">Round Standings</p>
-                <h1 className="text-4xl font-bold sm:text-6xl text-ink">{gameLabel} Leaderboard</h1>
-                {roundLeaderboard.roundNumber && roundLeaderboard.totalRounds ? (
-                  <p className="mt-3 text-lg text-ink-muted sm:text-2xl">
-                    {roundLeaderboard.unitLabel || 'Round'} {roundLeaderboard.roundNumber} of {roundLeaderboard.totalRounds}
-                  </p>
-                ) : null}
-              </div>
-              <Chip variant="default">
-                {roundLeaderboard.game === 'pointless' ? 'Lower score leads' : 'Higher score leads'}
-              </Chip>
-            </div>
-
-            <div className="overflow-hidden rounded-2xl border-2 border-ink">
-              <div className="grid grid-cols-[4rem_minmax(0,1.7fr)_1fr_1.2fr_1fr] gap-3 border-b-2 border-ink bg-bg-sunken px-5 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-ink-muted">
-                <span>Rank</span>
-                <span>Player</span>
-                <span className="text-right">Score</span>
-                <span>Change</span>
-                <span>Streak</span>
-              </div>
-
-              <div className="max-h-[62vh] divide-y divide-ink/20 overflow-y-auto">
-              {roundLeaderboard.leaderboard.map((entry, index) => {
-                const rankDeltaMeta = getRankDeltaMeta(entry.rankDelta);
-
-                return (
-                  <div
-                    key={entry.id}
-                    className={`grid grid-cols-[4rem_minmax(0,1.7fr)_1fr_1.2fr_1fr] items-center gap-3 px-5 py-3 ${
-                      index < 3 ? 'bg-now/10' : 'bg-bg-surface'
-                    }`}
-                  >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink bg-bg-sunken font-bold text-ink shadow-ink-sm">
-                      {entry.rank}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-3">
-                        <span className={`h-2.5 w-2.5 rounded-full ${entry.connected ? 'bg-action' : 'bg-ink-muted'}`} />
-                        <p className="truncate text-xl font-semibold text-ink">{entry.name}</p>
-                      </div>
-                    </div>
-                    <p className="text-right text-2xl font-bold text-ink">
-                      {entry.score}
-                    </p>
-                    <div>
-                      {rankDeltaMeta ? (
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${rankDeltaMeta.className}`}>
-                          {rankDeltaMeta.label}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-ink-muted">Opening round</span>
-                      )}
-                    </div>
-                    <div>
-                      {roundLeaderboard.game === 'trueFalse' && (entry.streak || 0) > 3 ? (
-                        <Chip variant="streak">
-                          {entry.streak}x streak
-                        </Chip>
-                      ) : (
-                        <span className="text-sm text-ink-muted">-</span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-              </div>
-            </div>
-            </div>
-          </motion.div>
-        </div>
-        {displayControl}
-      </>
-    );
-  }
 
   if ((currentGame === 'pokedle' || currentGame === 'hpdle') && phase === 'playing') {
     return (

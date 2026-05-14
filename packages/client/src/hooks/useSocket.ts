@@ -10,7 +10,6 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
 
 export const useSocket = () => {
   const socketRef = useRef<Socket | null>(null);
-  const roundLeaderboardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     setConnected,
     setConnectionError,
@@ -18,8 +17,7 @@ export const useSocket = () => {
     setPhase,
     setCurrentGame,
     setPlayers,
-    setPaused,
-    setRoundLeaderboard
+    setPaused
   } = useGameStore();
 
   useEffect(() => {
@@ -53,7 +51,6 @@ export const useSocket = () => {
       console.log('[Socket] Disconnected:', reason);
       setConnected(false);
       setConnectionError(`Disconnected: ${reason}`);
-      setRoundLeaderboard(null);
     });
 
     socket.on('connect_error', (error) => {
@@ -98,7 +95,6 @@ export const useSocket = () => {
       console.log('[Socket] Game started:', game);
       setCurrentGame(game);
       setPhase('playing');
-      setRoundLeaderboard(null);
     });
 
     socket.on('game:end', ({ game }) => {
@@ -119,34 +115,17 @@ export const useSocket = () => {
       console.log('[Socket] Returned to lobby');
       setPhase('lobby');
       setCurrentGame(null);
-      setRoundLeaderboard(null);
     });
 
     socket.on('session:end', () => {
       console.log('[Socket] Session ended');
       setPhase('finished');
-      setRoundLeaderboard(null);
     });
 
     socket.on('game:reset', () => {
       console.log('[Socket] Game reset');
       setPhase('lobby');
       setCurrentGame(null);
-      setRoundLeaderboard(null);
-    });
-
-    socket.on('round:leaderboard:show', (data) => {
-      console.log('[Socket] Round leaderboard:', data.game);
-      setRoundLeaderboard(data);
-
-      if (roundLeaderboardTimeoutRef.current) {
-        clearTimeout(roundLeaderboardTimeoutRef.current);
-      }
-
-      roundLeaderboardTimeoutRef.current = setTimeout(() => {
-        setRoundLeaderboard(null);
-        roundLeaderboardTimeoutRef.current = null;
-      }, data.duration || 5000);
     });
 
     // Error handling
@@ -158,14 +137,10 @@ export const useSocket = () => {
     // Cleanup on unmount
     return () => {
       console.log('[Socket] Cleaning up...');
-      if (roundLeaderboardTimeoutRef.current) {
-        clearTimeout(roundLeaderboardTimeoutRef.current);
-        roundLeaderboardTimeoutRef.current = null;
-      }
       socket.off();
       socket.disconnect();
     };
-  }, [setConnected, setConnectionError, setPlayer, setPhase, setCurrentGame, setPlayers, setPaused, setRoundLeaderboard]);
+  }, [setConnected, setConnectionError, setPlayer, setPhase, setCurrentGame, setPlayers, setPaused]);
 
   // Return socket for emitting events
   return socketRef.current;

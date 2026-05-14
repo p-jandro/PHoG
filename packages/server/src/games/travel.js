@@ -382,4 +382,104 @@ export class TravelGame {
       endsAt: this.gameState.travel?.endsAt
     };
   }
+
+  /**
+   * Per bug-report 2026-05-14 §A5: replay round-start (start/end are public,
+   * the optimal chain stays server-side until results), public progress, and
+   * the requesting player's private chain on remount. We never emit the
+   * optimal chain mid-round, so neither host nor player leaks the target
+   * solution here.
+   */
+  getResyncEvents({ playerId } = {}) {
+    const events = [];
+    const t = this.gameState.travel;
+    if (!t) return events;
+
+    if (t.phase === 'intro') {
+      events.push({
+        name: 'travel:intro',
+        payload: {
+          title: 'Travel',
+          description: 'Connect two countries via shared land borders. Greens are optimal, oranges still reach the goal, reds are dead ends.',
+          scoringRules: [
+            'Solving = 50 base + optimality (matching optimal = +30) + speed bonus',
+            'First to solve: +10 bonus',
+            'Not solving: 3×greens + 1×oranges − 2×reds (floored at 0)'
+          ],
+          countries: ALL_COUNTRIES.map((c) => ({ name: c.name, aliases: c.aliases || [] })),
+          duration: Math.max(0, (t.endsAt || Date.now()) - Date.now()),
+          endsAt: t.endsAt || null
+        }
+      });
+    } else if (t.phase === 'playing' && t.start && t.end) {
+      // Reconstruct the relevantIsos viewport from the canonical pair.
+      const optimalChain = shortestPathChain(t.start, t.end) || [t.start, t.end];
+      const relevantNamesSet = new Set();
+      for (const c of optimalChain) {
+        relevantNamesSet.add(c);
+        for (const nb of neighbors(c)) relevantNamesSet.add(nb);
+      }
+      const relevantNames = Array.from(relevantNamesSet);
+      const isoOf = (name) => this.isoByName.get(name) || null;
+      const relevantIsos = relevantNames.map(isoOf).filter(Boolean);
+
+      events.push({
+        name: 'travel:round:start',
+        payload: {
+          start: t.start,
+          startIso: isoOf(t.start),
+          end: t.end,
+          endIso: isoOf(t.end),
+          optimalDistance: t.optimalDistance,
+          relevantIsos,
+          relevantNames,
+          maxGuesses: t.maxGuesses,
+          duration: Math.max(0, (t.endsAt || Date.now()) - Date.now()),
+          endsAt: t.endsAt
+        }
+      });
+
+      // Public per-player progress (front/back heads + chain breakdown for the
+      // host tracker). This is the same payload _broadcastProgress sends and
+      // already excludes the optimal chain.
+      const playerProgress = {};
+      for (const [pid, ps] of Object.entries(t.players || {})) {
+        playerProgress[pid] = {
+          frontHead: ps.frontChain[ps.frontChain.length - 1]?.name || null,
+          backHead: ps.backChain[0]?.name || null,
+          chainTotal: ps.frontChain.length + ps.backChain.length,
+          frontChain: ps.frontChain,
+          backChain: ps.backChain,
+          colors: ps.history.map((h) => h.color),
+          solved: ps.solved,
+          guessesUsed: ps.guessesUsed
+        };
+      }
+      events.push({ name: 'travel:progress', payload: { playerProgress } });
+
+      // Requesting player's last guess result so their personal chain UI hydrates.
+      if (playerId && t.players[playerId]) {
+        const ps = t.players[playerId];
+        const last = ps.history[ps.history.length - 1];
+        if (last) {
+          events.push({
+            name: 'travel:guess:result',
+            payload: {
+              name: last.name,
+              color: last.color,
+              side: last.side,
+              intent: last.intent,
+              frontChain: ps.frontChain,
+              backChain: ps.backChain,
+              guessesUsed: ps.guessesUsed,
+              guessesRemaining: t.maxGuesses - ps.guessesUsed,
+              solved: ps.solved,
+              resync: true
+            }
+          });
+        }
+      }
+    }
+    return events;
+  }
 }

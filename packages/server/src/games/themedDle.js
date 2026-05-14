@@ -926,4 +926,83 @@ export class ThemedDleGame {
       playerProgress: s?.playerProgress || {}
     };
   }
+
+  /**
+   * Per bug-report 2026-05-14 §A5: replay the events the host display needs
+   * for the current mode/phase. The host gets the target name when it's safe
+   * for them to know (i.e. when the secret is gameplay-relevant for the host
+   * tracker overlay). Players never get the target identity here — they
+   * receive only the same publicly-known prompt fields that everyone got at
+   * round-start.
+   */
+  getResyncEvents({ isHost = false } = {}) {
+    const events = [];
+    const s = this.gameState[this.gameName];
+    if (!s) return events;
+
+    if (s.phase === 'intro') {
+      events.push({
+        name: `${this.gameName}:intro`,
+        payload: {
+          theme: this.theme,
+          mode: this.mode,
+          difficulty: this.difficulty,
+          duration: Math.max(0, (this.phaseEndsAt || Date.now()) - Date.now()),
+          endsAt: this.phaseEndsAt,
+          ...this._modePublicHint()
+        }
+      });
+    } else if (s.phase === 'playing') {
+      const playingStart = {
+        mode: this.mode,
+        modeIndex: this.currentModeIndex,
+        totalModes: this.modes.length,
+        duration: Math.max(0, (this.phaseEndsAt || Date.now()) - Date.now()),
+        endsAt: this.phaseEndsAt,
+        maxGuesses: this.mode === 'grid' ? null : (this.mode === 'spell' ? 5 : MAX_GUESSES),
+        ...this._modePublicPrompt()
+      };
+      events.push({
+        name: `${this.gameName}:playing:start`,
+        payload: playingStart
+      });
+      // Rebroadcast per-player progress so a host tracker repaints immediately.
+      events.push({
+        name: `${this.gameName}:progress`,
+        payload: { playerProgress: s.playerProgress || {} }
+      });
+      // For the HOST only, also include the target identity so the host display
+      // can render any "answer banner" UI (mirroring the wordle host-only
+      // round:start:host event). Players never receive this.
+      if (isHost && this.targetName) {
+        events.push({
+          name: `${this.gameName}:playing:start:host`,
+          payload: {
+            target: this._targetReveal(),
+            mode: this.mode,
+            modeIndex: this.currentModeIndex
+          }
+        });
+      }
+    } else if (s.phase === 'results' && s.revealedTarget) {
+      // Re-emit mode results so the host display lands on the right screen.
+      // playerResults can't be reconstructed perfectly post-hoc, but the
+      // cumulativeScores + target are enough to repaint the results panel.
+      events.push({
+        name: `${this.gameName}:mode:results`,
+        payload: {
+          mode: this.mode,
+          modeIndex: this.currentModeIndex,
+          totalModes: this.modes.length,
+          target: s.revealedTarget,
+          results: [], // playerResults not retained across the timer window
+          cumulativeScores: s.cumulativeScores || {},
+          isLastMode: this.currentModeIndex >= this.modes.length - 1,
+          duration: Math.max(0, (s.phaseEndsAt || Date.now()) - Date.now()),
+          endsAt: s.phaseEndsAt
+        }
+      });
+    }
+    return events;
+  }
 }

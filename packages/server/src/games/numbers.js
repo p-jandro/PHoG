@@ -320,4 +320,78 @@ export class NumbersGame {
       tiles: (this.gameState.numbers?.tiles || []).map((t) => t.value)
     };
   }
+
+  /**
+   * Per bug-report 2026-05-14 §A5: replay the events the host display needs
+   * to render the current phase. Target and tile draw are public to all
+   * sockets at round start, so no host/player distinction is needed.
+   *
+   * For the requesting player specifically we ALSO re-emit their personal
+   * pool snapshot so the per-player tracker shows their working state, not
+   * the original draw.
+   */
+  getResyncEvents({ playerId } = {}) {
+    const events = [];
+    const n = this.gameState.numbers;
+    if (!n) return events;
+
+    if (n.phase === 'intro') {
+      events.push({
+        name: 'numbers:intro',
+        payload: {
+          title: 'Numbers Round',
+          description: 'Combine the 6 tiles with + − × ÷ to hit the target. Tap a tile, an operator, then another tile. The two tiles merge into the result. No parentheses, no fractions, no negatives.',
+          scoringRules: [
+            'Solving = 100 base + speed (up to +50)',
+            'First solver: +20 bonus',
+            '3 rounds: easy → medium → difficult'
+          ],
+          totalRounds: TOTAL_ROUNDS,
+          duration: Math.max(0, (n.endsAt || Date.now()) - Date.now()),
+          endsAt: n.endsAt || null
+        }
+      });
+    } else if (n.phase === 'playing' && n.target != null) {
+      events.push({
+        name: 'numbers:round:start',
+        payload: {
+          roundNumber: n.roundNumber,
+          totalRounds: TOTAL_ROUNDS,
+          difficulty: n.difficulty,
+          tiles: n.tiles,
+          target: n.target,
+          duration: Math.max(0, (n.endsAt || Date.now()) - Date.now()),
+          endsAt: n.endsAt
+        }
+      });
+
+      // Per-player progress snapshot (best value + solved status for everyone).
+      const playerProgress = {};
+      for (const [pid, ps] of Object.entries(n.playerStates || {})) {
+        playerProgress[pid] = {
+          solved: ps.solved,
+          operations: ps.history.length,
+          bestValue: ps.bestValue ?? null
+        };
+      }
+      events.push({ name: 'numbers:progress', payload: { playerProgress } });
+
+      // For the requesting player, also resend their personal pool so the
+      // tile UI doesn't snap back to the original draw on remount.
+      if (playerId && n.playerStates[playerId]) {
+        const ps = n.playerStates[playerId];
+        events.push({
+          name: 'numbers:operation:ack',
+          payload: {
+            accepted: true,
+            pool: ps.pool,
+            history: ps.history,
+            solved: ps.solved,
+            resync: true
+          }
+        });
+      }
+    }
+    return events;
+  }
 }

@@ -321,19 +321,6 @@ export class GameEngine extends EventEmitter {
   }
 
   /**
-   * Emit a game-specific round leaderboard without changing the main session phase.
-   *
-   * Per bug-report 2026-05-14 (A4/B2/C1): the per-round leaderboard pop between
-   * questions is redundant — the inter-game leaderboard already serves this role.
-   * This method is now a no-op so we still satisfy the call sites without altering
-   * each game module. Clients keep listening on `round:leaderboard:show` but no
-   * payload is ever emitted, so the overlay/host branch never triggers.
-   */
-  showRoundLeaderboard(/* game, duration, extra */) {
-    // Intentionally a no-op. See bug-report-2026-05-14 §A4.
-  }
-
-  /**
    * Return to lobby
    */
   returnToLobby() {

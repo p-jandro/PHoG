@@ -14,7 +14,6 @@ const pointlessData = JSON.parse(readFileSync(pointlessDataPath, 'utf-8'));
 export const POINTLESS_ROUND_DURATION = 30000;
 const POINTLESS_INTRO_DURATION = 30000;
 const POINTLESS_REVEAL_DURATION = 8000;
-const ROUND_LEADERBOARD_DURATION = 5000;
 const ANSWER_LABEL_OVERRIDES = {
   coda: 'CODA'
 };
@@ -425,16 +424,10 @@ export class PointlessGame {
 
     this.gameEngine.broadcastPlayerList();
 
+    // Per bug-report 2026-05-14 §A4: drop the inter-round leaderboard pop and
+    // chain straight from the reveal animation to the next round.
     this.trackTimeout(() => {
-      this.gameEngine.showRoundLeaderboard('pointless', ROUND_LEADERBOARD_DURATION, {
-        roundNumber: this.gameState.pointless.roundIndex + 1,
-        totalRounds: pointlessData.length,
-        unitLabel: 'Round'
-      });
-
-      this.trackTimeout(() => {
-        this.finishRound();
-      }, ROUND_LEADERBOARD_DURATION);
+      this.finishRound();
     }, POINTLESS_REVEAL_DURATION);
   }
 
