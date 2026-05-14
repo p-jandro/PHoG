@@ -5,11 +5,6 @@ import { Card, Chip, Countdown, LeaderboardRow } from '../ui';
 import { HostTravelMap, HostMapGuess } from '../components/travel/HostTravelMap';
 
 type ChainColor = 'green' | 'orange' | 'red';
-const EMPTY_VISITED: Record<ChainColor, Set<string>> = {
-  green: new Set(),
-  orange: new Set(),
-  red: new Set()
-};
 
 interface Player { id: string; name: string; connected: boolean; }
 

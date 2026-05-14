@@ -57,16 +57,6 @@ interface PointlessRevealState {
   frequentAnswers: PointlessRevealAnswer[];
 }
 
-interface PointlessPlayerReveal {
-  playerId: string;
-  playerName: string;
-  score: number;
-  originalInput: string;
-  isCorrect: boolean;
-  correctAnswer: string;
-  triggerTime: number;
-}
-
 interface IntroState {
   title: string;
   description: string;
