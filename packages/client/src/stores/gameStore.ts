@@ -47,6 +47,7 @@ export interface GameState {
   currentGame: 'quiz' | 'trueFalse' | 'countdown' | 'pointless' | 'pokedle' | 'hpdle' | 'numbers' | 'wordle' | 'travel' | null;
   players: Player[];
   paused: boolean;
+  championshipActive: boolean;
 
   // Actions
   setConnected: (connected: boolean) => void;
@@ -57,6 +58,7 @@ export interface GameState {
   setPlayers: (players: Player[]) => void;
   updatePlayer: (player: Player) => void;
   setPaused: (paused: boolean) => void;
+  setChampionshipActive: (active: boolean) => void;
   reset: () => void;
 }
 
@@ -70,6 +72,7 @@ const initialState = {
   currentGame: null,
   players: [],
   paused: false,
+  championshipActive: false,
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -96,6 +99,8 @@ export const useGameStore = create<GameState>((set) => ({
   })),
 
   setPaused: (paused) => set({ paused }),
+
+  setChampionshipActive: (championshipActive) => set({ championshipActive }),
 
   reset: () => set(initialState),
 }));

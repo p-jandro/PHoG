@@ -83,6 +83,7 @@ export const Display = () => {
   const [currentGame, setCurrentGame] = useState<string | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [leaderboardStage, setLeaderboardStage] = useState<'game' | 'championship'>('game');
+  const [championshipActive, setChampionshipActive] = useState(false);
   const [now, setNow] = useState(Date.now());
   const [socket, setSocket] = useState<Socket | null>(null);
   const playerJoinLabel = PLAYER_URL.replace(/^https?:\/\//, '');
@@ -124,12 +125,15 @@ export const Display = () => {
     }
 
     setLeaderboardStage('game');
+    // Single-game runs stay on the per-game leaderboard. Only championships
+    // pre-roll to the cumulative table after the delay.
+    if (!championshipActive) return;
     const timeoutId = setTimeout(() => {
       setLeaderboardStage('championship');
     }, CHAMPIONSHIP_PREVIEW_DELAY);
 
     return () => clearTimeout(timeoutId);
-  }, [phase, currentGame]);
+  }, [phase, currentGame, championshipActive]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -168,12 +172,17 @@ export const Display = () => {
 
     newSocket.on('host:joined', (data) => {
       setAuthenticated(true);
+      setChampionshipActive(Boolean(data.gameState?.championship?.active));
       setPointlessReadyToReveal(
         Boolean(
           data.gameState?.currentGame === 'pointless' &&
           data.gameState?.pointless?.phase === 'reveal'
         )
       );
+    });
+
+    newSocket.on('championship:state', ({ active }: { active: boolean }) => {
+      setChampionshipActive(!!active);
     });
 
     newSocket.on('host:rejected', () => {

@@ -39,7 +39,7 @@ const getOrdinalLabel = (value: number | null | undefined) => {
 };
 
 export const FinalLeaderboard = () => {
-  const { players, playerId, phase, currentGame } = useGameStore();
+  const { players, playerId, phase, currentGame, championshipActive } = useGameStore();
   const activeGame = currentGame as GameKey | null;
   const reduced = useReducedMotion();
   const enterVariants = reduced ? reducedFade : screenEnter;
@@ -48,6 +48,12 @@ export const FinalLeaderboard = () => {
   const [confettiArmed, setConfettiArmed] = useState(false);
 
   useEffect(() => {
+    // Single-game runs never flip to the championship view — they end on
+    // the per-game leaderboard. Only championships preview the standings.
+    if (!championshipActive) {
+      setShowChampionshipPreview(false);
+      return;
+    }
     if (phase === 'finished') {
       setShowChampionshipPreview(true);
       return;
@@ -59,7 +65,7 @@ export const FinalLeaderboard = () => {
     setShowChampionshipPreview(false);
     const t = setTimeout(() => setShowChampionshipPreview(true), CHAMPIONSHIP_PREVIEW_DELAY);
     return () => clearTimeout(t);
-  }, [phase, currentGame]);
+  }, [phase, currentGame, championshipActive]);
 
   const currentPlayer = players.find((p) => p.id === playerId) || null;
   const showTotalPlacement = phase === 'finished' || showChampionshipPreview;
@@ -113,8 +119,9 @@ export const FinalLeaderboard = () => {
     : `Your ${activeGameLabel} Result`;
 
   // Per QA 2026-05-14 §15: at session end, render a podium + congratulation
-  // band above the existing breakdown. Only shown when the championship is
-  // actually finished.
+  // band above the existing breakdown. Server only emits session:end (and
+  // therefore phase: finished) from championship endings — single games stay
+  // at phase: leaderboard — so checking phase alone is sufficient here.
   const podium = phase === 'finished' ? championshipSortedPlayers.slice(0, 3) : [];
   const winner = podium[0] || null;
 

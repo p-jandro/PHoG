@@ -360,6 +360,7 @@ export class GameEngine extends EventEmitter {
     // can't mistakenly attempt a "next game" transition once the final screen
     // is mounted.
     this.championship.active = false;
+    this.io.emit('championship:state', { active: false });
 
     // Emit final results
     this.io.emit('session:end', {
@@ -379,6 +380,10 @@ export class GameEngine extends EventEmitter {
 
     // Cleanup current game module using centralized method
     this.cleanupCurrentGame();
+
+    // Clear championship state
+    this.championship = { active: false, sequence: [], currentIndex: 0, isAdvancing: false };
+    this.io.emit('championship:state', { active: false });
 
     // Reset all player scores
     for (const [playerId, player] of this.gameState.players) {

@@ -424,6 +424,7 @@ io.on('connection', (socket) => {
         case 'startChampionship':
           if (sequence && Array.isArray(sequence)) {
             gameEngine.startChampionship(sequence);
+            io.emit('championship:state', { active: true, sequence });
           }
           break;
         case 'nextGame':

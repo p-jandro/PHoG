@@ -56,7 +56,8 @@ export const useSocket = () => {
     setPhase,
     setCurrentGame,
     setPlayers,
-    setPaused
+    setPaused,
+    setChampionshipActive
   } = useGameStore();
 
   useEffect(() => {
@@ -168,17 +169,26 @@ export const useSocket = () => {
       console.log('[Socket] Returned to lobby');
       setPhase('lobby');
       setCurrentGame(null);
+      setChampionshipActive(false);
     });
 
     socket.on('session:end', () => {
       console.log('[Socket] Session ended');
       setPhase('finished');
+      // Championship may or may not have been active — let the explicit
+      // championship:state broadcast set it. Don't force it here.
     });
 
     socket.on('game:reset', () => {
       console.log('[Socket] Game reset');
       setPhase('lobby');
       setCurrentGame(null);
+      setChampionshipActive(false);
+    });
+
+    socket.on('championship:state', ({ active }: { active: boolean }) => {
+      console.log('[Socket] Championship state:', active);
+      setChampionshipActive(!!active);
     });
 
     // Error handling
