@@ -5,6 +5,7 @@ import { Button, Card, Chip, HostScreenShell, Input, Pill, PlayerTracker } from 
 import type { ButtonVariant, TrackedPlayer } from '../ui';
 import { screenEnter } from '../lib/motion';
 import { QRCodeSVG } from 'qrcode.react';
+import { Settings } from './Settings';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
   typeof window !== 'undefined'
@@ -73,6 +74,7 @@ export const Dashboard = () => {
 
   const [pointlessReadyToReveal, setPointlessReadyToReveal] = useState(false);
   const [championshipActive, setChampionshipActive] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Championship state
   const [championshipMode, setChampionshipMode] = useState(false);
@@ -350,6 +352,10 @@ export const Dashboard = () => {
         : undefined,
   }));
 
+  if (showSettings) {
+    return <Settings socket={socket} onClose={() => setShowSettings(false)} />;
+  }
+
   return (
     <HostScreenShell
       location={`Host Dashboard · ${gameState?.phase === 'lobby' ? 'Lobby' : gameState?.phase === 'leaderboard' ? 'Leaderboard' : 'Playing'}`}
@@ -368,6 +374,11 @@ export const Dashboard = () => {
             )}
             {championshipActive && typeof championshipCompleted === 'number' && typeof championshipTotal === 'number' && (
               <Chip variant="streak">{`Championship · game ${championshipCompleted + 1} of ${championshipTotal}`}</Chip>
+            )}
+            {gameState?.phase === 'lobby' && (
+              <Button variant="ghost" size="sm" onClick={() => setShowSettings(true)}>
+                Settings
+              </Button>
             )}
           </div>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
