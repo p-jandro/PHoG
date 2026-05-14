@@ -462,15 +462,15 @@ Each row is one shippable PR.
 | Dashboard launcher | 4 × 2 grid for the 8 games + secondary row for Championship + Reset |
 | Dashboard panels | Live Game, Championship Table, Quick Guide removed (Phase 3) — duplicated Display responsibility or out of original scope |
 | `PlacementLeaderboard.tsx` | Confirmed unused; deletion scheduled in Phase 11 |
-| Server-side gaps | Pointless reveal / Wordle target / Numbers best / Travel arc — deferred to future tickets (see §9) |
+| Server-side gaps | Pointless reveal / Wordle target / Numbers best / Travel arc — all four resolved (see §9) |
 
 ---
 
-## 9. Server-side gaps deferred to a future ticket
+## 9. Server-side gaps — resolved
 
-The redesign surfaced four places where the host display screens have to fall back to less-rich visuals because the server doesn't (yet) emit the data needed. These are deliberately out of scope for the UI redesign — they're server-event-shape changes, not visual changes — and are flagged here so they can be picked up as separate tickets later.
+The redesign surfaced four places where the host display screens fell back to less-rich visuals because the server didn't (yet) emit the data needed. All four were closed in follow-up work after the initial redesign landed:
 
-- **Pointless host — sequential reveal.** Spec §3.9 / §4.4 describe a per-player `ScoreDrop` reveal driven by the answer score. The server currently only emits an aggregate top-3 / round summary, not a `{ playerId, score, triggerTime }` event per player. The host display is reskinned to show the aggregate top-3 instead of a sequenced per-player drop. **Future change:** server emits `{ playerId, score, triggerTime }` per player on reveal so the host can sequence drops.
-- **Wordle host — target word during play.** The host's `WordleDisplay` currently shows empty tiles during the round because the target word is only sent in the results payload, not `wordle:round:start`. **Future change:** send the target word in `wordle:round:start` so the host can render greyed-out target tiles during play (or accept current empty-tile behavior as intentional spoiler-prevention).
-- **Numbers host — closest-so-far.** `NumbersDisplay`'s player tracker would like to show "closest so far · 475" per player to telegraph who's nearest the target. The server doesn't expose a `bestValue` field per player during the round. The tracker uses the fallback "in progress · N op(s)". **Future change:** server emits a per-player `bestValue` (closest absolute distance to target) so the tracker can show real "closest" telemetry.
-- **Travel host — per-guess next-hop intent.** The map's arcs are drawn from each guess to the correct location at results-time. There's no per-guess "where was the player aiming next" data. Arcs are drawn to the chain's start or end based on which side the guess was on — acceptable, but not the richest possible visualisation. **Future change:** emit per-guess `intent` metadata (target country the player was aiming for) so arcs can show actual aim, not inferred direction.
+- **Pointless host — sequential per-player reveal.** Server now emits `pointless:reveal:players` (bulk array, score-descending) after the aggregate top-3. The host chains `ScoreDrop` reveals via `onLanded`, owning all sequencing. The aggregate top-3 stays as a fallback / final summary. *(commits `f114cbe`, `5d3af35`)*
+- **Wordle host — target word during play.** Server uses a dual-event pattern: `wordle:round:start` (broadcast, no target) plus `wordle:round:start:host` (targeted at the host socket only, includes target). Players still receive the target only on `wordle:round:results`. Host stores the target during play and pre-stages the reveal layout; visible UI during play is unchanged (no spoiler). *(commits `975b62e`, `d52af24`)*
+- **Numbers host — closest-so-far.** Server tracks each player's closest reached value across the round and emits `bestValue` on every `numbers:progress` event. `NumbersProgressPanel.statusFor()` now renders `Closest so far (N)` between solved and in-progress. *(commits `7c1e4e6`, `73f3573`)*
+- **Travel host — per-guess next-hop intent.** Server computes the next country on a BFS shortest path toward the opposite chain head and emits `intent: { side, target }` per guess. Both host and player maps draw arcs to `intent.target` with graceful fallback if absent. *(commits `a482651`, `fc0c17c`, `18a9db3`)*
