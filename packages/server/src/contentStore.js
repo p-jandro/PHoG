@@ -89,6 +89,8 @@ export function createContentStore({ quizPath, statementsPath, pointlessPath }) 
 
   const saveQuizRounds = (data) => {
     if (!Array.isArray(data)) return { ok: false, reason: 'must be an array' };
+    // Migration: existing files predate the `enabled` field — default it to true.
+    for (const r of data) if (r && r.enabled === undefined) r.enabled = true;
     for (let i = 0; i < data.length; i++) {
       const err = validateQuizRound(data[i], i);
       if (err) return { ok: false, reason: err };
@@ -105,6 +107,7 @@ export function createContentStore({ quizPath, statementsPath, pointlessPath }) 
 
   const saveStatements = (data) => {
     if (!Array.isArray(data)) return { ok: false, reason: 'must be an array' };
+    for (const s of data) if (s && s.enabled === undefined) s.enabled = true;
     for (let i = 0; i < data.length; i++) {
       const err = validateStatement(data[i], i);
       if (err) return { ok: false, reason: err };
@@ -121,6 +124,7 @@ export function createContentStore({ quizPath, statementsPath, pointlessPath }) 
 
   const savePointlessRounds = (data) => {
     if (!Array.isArray(data)) return { ok: false, reason: 'must be an array' };
+    for (const r of data) if (r && r.enabled === undefined) r.enabled = true;
     for (let i = 0; i < data.length; i++) {
       const err = validatePointlessRound(data[i], i);
       if (err) return { ok: false, reason: err };

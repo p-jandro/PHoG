@@ -21,7 +21,8 @@ export const PointlessEditor = ({ socket }: Props) => {
     if (!socket) return;
     const onData = (p: any) => {
       if (p?.kind !== 'pointless') return;
-      setItems(p.data || []);
+      const normalized = (p.data || []).map((r: any) => ({ ...r, enabled: r.enabled !== false }));
+      setItems(normalized);
       setVersion(p.version || 0);
     };
     const onSaved = (p: any) => {

@@ -387,7 +387,7 @@ io.on('connection', (socket) => {
         socket.emit('host:settings:rejected', { kind, reason: 'not_authorized' });
         return;
       }
-      if (gameState.phase !== 'lobby') {
+      if (gameState.currentPhase !== 'lobby') {
         socket.emit('host:settings:rejected', { kind, reason: 'wrong_phase' });
         return;
       }

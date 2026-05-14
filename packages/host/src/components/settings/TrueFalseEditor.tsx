@@ -21,7 +21,8 @@ export const TrueFalseEditor = ({ socket }: Props) => {
     if (!socket) return;
     const onData = (p: any) => {
       if (p?.kind !== 'trueFalse') return;
-      setItems(p.data || []);
+      const normalized = (p.data || []).map((s: any) => ({ ...s, enabled: s.enabled !== false }));
+      setItems(normalized);
       setVersion(p.version || 0);
     };
     const onSaved = (p: any) => {
