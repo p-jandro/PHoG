@@ -107,16 +107,20 @@ export const Travel = ({ socket }: TravelProps) => {
     type Color = 'green' | 'orange' | 'red';
     const history: Array<{ name: string; color: Color; side: 'front' | 'back'; intent?: { side: string; target: string } }> = me?.history || [];
 
-    // Map history → MapGuess[] for the reveal animation.
-    // Use intent.target (next hop on shortest path toward the other end) when available;
-    // fall back to the generic start/end heuristic for older servers.
-    const guesses: MapGuess[] = history
-      .filter((h) => h.color !== 'red')  // reds are deliberately hidden on the map
-      .map((h) => ({
-        guess: h.name,
-        answer: h.intent?.target ?? (h.side === 'front' ? resultsData.start : resultsData.end),
-        color: h.color,
-      }));
+    // Per QA 2026-05-14: the reveal map should fill in only the missing
+    // optimal-route countries — no wrong-guess pins, no detour arcs. Build a
+    // single "chain" of the optimal route, colored green for what the player
+    // actually visited, orange for what they didn't.
+    const optimalChain: string[] = resultsData.optimalChain || [];
+    const visited = new Set<string>([
+      ...frontChain.map((c) => c.name),
+      ...backChain.map((c) => c.name)
+    ]);
+    const revealChain: Array<{ name: string; color?: Color }> = optimalChain.map((name) => ({
+      name,
+      color: visited.has(name) ? 'green' : 'orange'
+    }));
+    const guesses: MapGuess[] = []; // no extras — just the filled-in route
 
     // Streak-tinted card via className (Card has no variant prop)
     const streakCardCls = 'border-streak bg-streak text-on-streak shadow-[4px_4px_0_var(--ink)]';
@@ -134,9 +138,9 @@ export const Travel = ({ socket }: TravelProps) => {
           <TravelMap
             startName={resultsData.start}
             endName={resultsData.end}
-            relevantNames={resultsData.relevantNames || resultsData.optimalChain || []}
-            frontChain={frontChain}
-            backChain={backChain}
+            relevantNames={resultsData.optimalChain || []}
+            frontChain={revealChain}
+            backChain={[]}
             solved={true}
             guesses={guesses}
           />

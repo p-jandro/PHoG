@@ -94,18 +94,15 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
     const solvedCount = (resultsData.results || []).filter((r: any) => r.solved).length;
     const totalPlayers = (resultsData.results || []).length;
 
-    const playerGuesses: HostMapGuess[] = (resultsData.results || []).flatMap((r: any) =>
-      (r.history || [])
-        .filter((h: any) => h.color !== 'red')
-        .map((h: any) => ({
-          playerId: r.playerId,
-          guess: h.name,
-          // Use intent.target (next hop on shortest path toward the other end) when
-          // available; fall back to the generic start/end heuristic for older servers.
-          answer: h.intent?.target ?? (h.side === 'front' ? resultsData.start : resultsData.end),
-          color: h.color,
-        }))
-    );
+    // Per QA 2026-05-14: host map should only show the optimal route at
+    // reveal — no per-player wrong/right pins, no arc detours.
+    const playerGuesses: HostMapGuess[] = [];
+    const optimalChain: string[] = resultsData.optimalChain || [];
+    const revealVisitedByColor: Record<ChainColor, Set<string>> = {
+      green: new Set(optimalChain),
+      orange: new Set(),
+      red: new Set()
+    };
 
     return (
       <div className="flex h-screen w-screen flex-col bg-bg-base px-10 py-8 text-ink">
@@ -138,7 +135,7 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
               startName={resultsData.start}
               endName={resultsData.end}
               relevantNames={resultsData.optimalChain || []}
-              visitedNamesByColor={EMPTY_VISITED}
+              visitedNamesByColor={revealVisitedByColor}
               optimalChainNames={resultsData.optimalChain}
               playerGuesses={playerGuesses}
             />
