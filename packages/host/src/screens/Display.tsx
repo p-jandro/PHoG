@@ -110,6 +110,9 @@ export const Display = () => {
   const [tfStatement, setTfStatement] = useState<any>(null);
   const [tfReveal, setTfReveal] = useState<TrueFalseRevealState | null>(null);
   const [tfInterRound, setTfInterRound] = useState<any>(null);
+  // Per QA 2026-05-14 §16: capture host-private per-player correctness so the
+  // T/F display can color each player's chip after the statement ends.
+  const [tfPerPlayer, setTfPerPlayer] = useState<Record<string, { isCorrect: boolean }>>({});
 
   // Countdown state
   const [countdownRound, setCountdownRound] = useState<any>(null);
@@ -277,6 +280,13 @@ export const Display = () => {
       setTrueFalseIntro(null);
       setTfStatement(data);
       setTfReveal(null);
+      setTfPerPlayer({});
+    });
+
+    newSocket.on('host:player_answered', (data: { playerId: string; game: string; isCorrect?: boolean }) => {
+      if (data.game === 'trueFalse' && typeof data.isCorrect === 'boolean') {
+        setTfPerPlayer((prev) => ({ ...prev, [data.playerId]: { isCorrect: !!data.isCorrect } }));
+      }
     });
 
     newSocket.on('truefalse:answer', (data) => {
@@ -1046,15 +1056,28 @@ export const Display = () => {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {players.filter((p) => p.connected).map((p) => (
-                  <span
-                    key={p.id}
-                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-bg-sunken px-2.5 py-1 text-xs font-extrabold text-ink shadow-ink-sm"
-                  >
-                    <span className="h-2 w-2 rounded-full bg-action" aria-hidden="true" />
-                    {p.name}
-                  </span>
-                ))}
+                {players.filter((p) => p.connected).map((p) => {
+                  // Per QA 2026-05-14 §16: after question end, color by
+                  // correctness; during the question, neutral chip.
+                  const resForP = quizResults?.results?.find((r: any) => r.playerId === p.id);
+                  let chipCls = 'bg-bg-sunken text-ink';
+                  let dot = 'bg-action';
+                  if (quizResults && resForP) {
+                    if (resForP.isCorrect) { chipCls = 'bg-action text-on-action'; dot = 'bg-bg-surface'; }
+                    else { chipCls = 'bg-danger text-on-danger'; dot = 'bg-bg-surface'; }
+                  } else if (quizResults && !resForP) {
+                    chipCls = 'bg-bg-sunken text-ink-muted opacity-70'; dot = 'bg-ink-muted';
+                  }
+                  return (
+                    <span
+                      key={p.id}
+                      className={`inline-flex items-center gap-2 rounded-lg border-2 border-ink px-2.5 py-1 text-xs font-extrabold shadow-ink-sm ${chipCls}`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${dot}`} aria-hidden="true" />
+                      {p.name}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
@@ -1128,15 +1151,24 @@ export const Display = () => {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {players.filter((p) => p.connected).map((p) => (
-                  <span
-                    key={p.id}
-                    className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-bg-sunken px-2.5 py-1 text-xs font-extrabold text-ink shadow-ink-sm"
-                  >
-                    <span className="h-2 w-2 rounded-full bg-action" aria-hidden="true" />
-                    {p.name}
-                  </span>
-                ))}
+                {players.filter((p) => p.connected).map((p) => {
+                  const r = tfPerPlayer[p.id];
+                  let chipCls = 'bg-bg-sunken text-ink';
+                  let dot = 'bg-action';
+                  if (r) {
+                    chipCls = r.isCorrect ? 'bg-action text-on-action' : 'bg-danger text-on-danger';
+                    dot = 'bg-bg-surface';
+                  }
+                  return (
+                    <span
+                      key={p.id}
+                      className={`inline-flex items-center gap-2 rounded-lg border-2 border-ink px-2.5 py-1 text-xs font-extrabold shadow-ink-sm ${chipCls}`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${dot}`} aria-hidden="true" />
+                      {p.name}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
