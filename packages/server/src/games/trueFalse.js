@@ -3,17 +3,9 @@
  * Features: Rapid-fire true/false statements, accuracy scoring
  */
 
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 import { Timer } from '../utils/timer.js';
+import { contentStore } from '../contentStore.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load statements
-const statementsPath = join(__dirname, '../data/statements.json');
-const allStatements = JSON.parse(readFileSync(statementsPath, 'utf-8'));
 const INTRO_DURATION = 30000;
 const ANSWER_REVEAL_DURATION = 5000;
 const INTER_ROUND_LEADERBOARD_DURATION = 5000;
@@ -113,7 +105,7 @@ export class TrueFalseGame {
     this.gameState.trueFalse.introEndsAt = null;
 
     // Select random unused statement
-    const availableStatements = allStatements.filter(
+    const availableStatements = contentStore.getStatements().filter(
       s => !this.gameState.trueFalse.usedStatements.has(s.id)
     );
 

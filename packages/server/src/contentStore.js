@@ -154,3 +154,17 @@ export function createContentStore({ quizPath, statementsPath, pointlessPath }) 
     getVersion
   };
 }
+
+// ---------- Default singleton bound to real data files ----------
+
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export const contentStore = createContentStore({
+  quizPath:       join(__dirname, 'data', 'quizRounds.json'),
+  statementsPath: join(__dirname, 'data', 'statements.json'),
+  pointlessPath:  join(__dirname, 'data', 'pointless.json')
+});

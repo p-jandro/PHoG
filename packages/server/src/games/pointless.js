@@ -1,15 +1,6 @@
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 import stringSimilarity from 'string-similarity';
 import { Timer } from '../utils/timer.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load pointless data
-const pointlessDataPath = join(__dirname, '../data/pointless.json');
-const pointlessData = JSON.parse(readFileSync(pointlessDataPath, 'utf-8'));
+import { contentStore } from '../contentStore.js';
 
 export const POINTLESS_ROUND_DURATION = 30000;
 const POINTLESS_INTRO_DURATION = 30000;
@@ -124,7 +115,7 @@ export class PointlessGame {
         'Invalid or missing answers score 100'
       ],
       placementInfo: 'Lowest total score wins this game',
-      totalRounds: pointlessData.length,
+      totalRounds: contentStore.getPointlessRounds().length,
       duration: POINTLESS_INTRO_DURATION,
       endsAt: this.gameState.pointless.introEndsAt
     });
@@ -146,12 +137,12 @@ export class PointlessGame {
       this.timer = null;
     }
 
-    if (index >= pointlessData.length) {
+    if (index >= contentStore.getPointlessRounds().length) {
       this.endGame();
       return;
     }
 
-    const roundData = pointlessData[index];
+    const roundData = contentStore.getPointlessRounds()[index];
 
     this.gameState.pointless.phase = 'playing';
     this.gameState.pointless.roundIndex = index;
@@ -174,7 +165,7 @@ export class PointlessGame {
     // Emit round start to all players
     this.io.emit('pointless:round:start', {
       roundIndex: index,
-      totalRounds: pointlessData.length,
+      totalRounds: contentStore.getPointlessRounds().length,
       category: roundData.category,
       question: roundData.question,
       duration: POINTLESS_ROUND_DURATION
@@ -218,7 +209,7 @@ export class PointlessGame {
       return;
     }
 
-    const roundData = pointlessData[this.gameState.pointless.roundIndex];
+    const roundData = contentStore.getPointlessRounds()[this.gameState.pointless.roundIndex];
     const answerEntries = Object.entries(roundData.answers).map(normalizeAnswerEntry);
     const answers = new Map(answerEntries.map((entry) => [entry.answer, entry]));
 
@@ -450,7 +441,7 @@ export class PointlessGame {
 
   finishRound() {
     const nextRound = this.gameState.pointless.roundIndex + 1;
-    if (nextRound < pointlessData.length) {
+    if (nextRound < contentStore.getPointlessRounds().length) {
       this.startRound(nextRound);
     } else {
       this.endGame();
@@ -462,7 +453,7 @@ export class PointlessGame {
   }
 
   getRoundHighlights() {
-    const roundData = pointlessData[this.gameState.pointless.roundIndex];
+    const roundData = contentStore.getPointlessRounds()[this.gameState.pointless.roundIndex];
     if (!roundData?.answers) {
       return {
         obscureAnswers: [],
@@ -521,7 +512,7 @@ export class PointlessGame {
   }
 
   getDisplayRevealPayload(triggerTime = Date.now() + 250) {
-    const roundData = pointlessData[this.gameState.pointless.roundIndex];
+    const roundData = contentStore.getPointlessRounds()[this.gameState.pointless.roundIndex];
     if (!roundData) {
       return null;
     }
@@ -529,7 +520,7 @@ export class PointlessGame {
     return {
       triggerTime,
       roundIndex: this.gameState.pointless.roundIndex,
-      totalRounds: pointlessData.length,
+      totalRounds: contentStore.getPointlessRounds().length,
       category: roundData.category,
       question: roundData.question,
       obscureAnswers: this.gameState.pointless.obscureAnswers || [],
@@ -603,7 +594,7 @@ export class PointlessGame {
     return {
       phase: this.gameState.pointless.phase,
       roundIndex: this.gameState.pointless.roundIndex,
-      totalRounds: pointlessData.length,
+      totalRounds: contentStore.getPointlessRounds().length,
       introEndsAt: this.gameState.pointless.introEndsAt,
       currentRound: this.gameState.pointless.currentRound,
       answerCount: this.gameState.pointless.answers.size

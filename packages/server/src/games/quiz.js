@@ -3,19 +3,10 @@
  * Features: Category voting, difficulty-based questions, speed bonuses, leader multiplier
  */
 
-import { randomUUID } from 'crypto';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 import { Timer } from '../utils/timer.js';
 import { calculateQuizScore, getLeader } from '../utils/scoring.js';
+import { contentStore } from '../contentStore.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load quiz rounds
-const quizRoundsPath = join(__dirname, '../data/quizRounds.json');
-const quizRounds = JSON.parse(readFileSync(quizRoundsPath, 'utf-8'));
 const QUESTION_RESULTS_DURATION = 3000;
 const INTER_ROUND_LEADERBOARD_DURATION = 5000;
 
@@ -38,7 +29,7 @@ export class QuizGame {
       questionEndsAt: null,
       answers: new Map(), // playerId -> { answer, timeRemaining }
       questionNumber: 0,
-      totalQuestions: Math.min(10, quizRounds.length),
+      totalQuestions: Math.min(10, contentStore.getQuizRounds().length),
       currentRoundOptions: null
     };
   }
@@ -95,7 +86,7 @@ export class QuizGame {
 
     // Get options for current round
     const roundIndex = this.gameState.quiz.questionNumber; // 0-indexed
-    const round = quizRounds[roundIndex];
+    const round = contentStore.getQuizRounds()[roundIndex];
 
     if (!round) {
       console.error('[QUIZ] No round found for index:', roundIndex);
