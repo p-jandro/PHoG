@@ -63,7 +63,8 @@ export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
         {data.cols.map((c) => (
           <div
             key={c}
-            className="rounded-2xl border-2 border-ink bg-ink px-2 py-2 text-center text-xs font-extrabold uppercase tracking-[0.12em] text-bg-surface shadow-[3px_3px_0_var(--streak)]"
+            className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-ink bg-ink p-1 text-center font-extrabold uppercase tracking-[0.08em] leading-tight text-bg-surface shadow-[3px_3px_0_var(--streak)] break-words hyphens-auto"
+            style={{ fontSize: 'clamp(0.55rem, 1.9vw, 0.85rem)' }}
           >
             {c}
           </div>
@@ -73,7 +74,8 @@ export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
         {data.rows.map((rowLabel, r) => (
           <Fragment key={rowLabel}>
             <div
-              className="flex items-center justify-end rounded-2xl border-2 border-ink bg-premium px-3 py-2 text-right text-sm font-extrabold uppercase tracking-[0.10em] text-on-premium shadow-ink-sm"
+              className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-ink bg-premium p-1 text-center font-extrabold uppercase tracking-[0.06em] leading-tight text-on-premium shadow-ink-sm break-words hyphens-auto"
+              style={{ fontSize: 'clamp(0.6rem, 2.1vw, 0.95rem)' }}
             >
               {rowLabel}
             </div>

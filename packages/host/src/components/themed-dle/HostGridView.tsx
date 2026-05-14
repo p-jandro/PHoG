@@ -10,13 +10,26 @@ export const HostGridView = ({ rows, cols, reveal }: HostGridViewProps) => (
       <thead>
         <tr>
           <th />
-          {cols.map((c) => <th key={c} className="px-2 py-2 text-lg">{c}</th>)}
+          {cols.map((c) => (
+            <th
+              key={c}
+              className="w-44 max-w-44 overflow-hidden break-words px-2 py-2 text-center font-extrabold leading-tight align-middle"
+              style={{ fontSize: 'clamp(0.8rem, 1.4vw, 1.4rem)' }}
+            >
+              {c}
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>
         {rows.map((r, ri) => (
           <tr key={r}>
-            <th className="pr-3 text-right text-lg">{r}</th>
+            <th
+              className="w-40 max-w-40 overflow-hidden break-words pr-3 text-center font-extrabold leading-tight align-middle"
+              style={{ fontSize: 'clamp(0.8rem, 1.4vw, 1.4rem)' }}
+            >
+              {r}
+            </th>
             {cols.map((_, ci) => {
               const answers = reveal?.[`${ri},${ci}`] || [];
               return (
