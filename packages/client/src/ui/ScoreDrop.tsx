@@ -64,12 +64,15 @@ export function ScoreDrop({
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   }, [autoStart, targetScore]);
 
+  // Per QA 2026-05-14 §17: phone column is wider; the 100/75/50/25/0
+  // numeric tick column is removed (the landing chip and the score readout
+  // inside the bar are enough).
   return (
-    <div className={`flex items-center gap-4 ${className}`}>
+    <div className={`flex w-full justify-center ${className}`}>
       <div
         className="relative overflow-hidden rounded-2xl border-2 border-ink shadow-ink-lg"
         style={{
-          width: 96, height: 240,
+          width: 168, height: 320,
           background: 'linear-gradient(180deg, #e54848 0%, #d96a3a 20%, #ffd23f 50%, #6ec27e 80%, #2ec27e 100%)',
         }}
         role="meter"
@@ -79,25 +82,22 @@ export function ScoreDrop({
         aria-label="Pointless score"
       >
         <div
-          className="absolute inset-x-0 top-0 flex items-end justify-center pb-1.5"
+          className="absolute inset-x-0 top-0 flex items-end justify-center pb-2"
           style={{
             height: `${dropPct}%`,
             background: 'var(--ink)',
             borderBottom: '4px solid var(--now)',
           }}
         >
-          <span className="font-display text-3xl font-black leading-none text-white">
+          <span className="font-display text-4xl font-black leading-none text-white">
             {displayScore}
           </span>
         </div>
         {showPointless && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md border-2 border-ink bg-ink px-2.5 py-1 font-serif text-sm font-extrabold text-action shadow-ink-sm">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-md border-2 border-ink bg-ink px-3 py-1.5 font-serif text-base font-extrabold text-action shadow-ink-sm">
             POINTLESS
           </div>
         )}
-      </div>
-      <div className="flex flex-col gap-1 text-xs font-extrabold uppercase tracking-[0.16em] text-ink-muted">
-        <span>100</span><span>75</span><span>50</span><span>25</span><span>0</span>
       </div>
     </div>
   );

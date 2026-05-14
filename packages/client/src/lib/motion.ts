@@ -154,9 +154,11 @@ export const arcDrawTransition: Transition = {
 };
 
 /* ---------- Pointless score-drop timing (§3.9) ---------- */
+// Per QA 2026-05-14 §17: restore the older wider/slower drop animation.
+// Roughly +50% slower than the prior tuning.
 export const pointlessDrop = {
-  baseMs: 4000,
-  msPerPoint: 90,
+  baseMs: 6000,
+  msPerPoint: 120,
   landingPauseMs: 1800,
   landingPauseAtZeroMs: 2800,
 } as const;
