@@ -14,16 +14,25 @@ import { Wordle } from './screens/Wordle';
 import { Travel } from './screens/Travel';
 import { FinalLeaderboard } from './screens/FinalLeaderboard';
 import { PausedOverlay } from './components/PausedOverlay';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { ConnectionBanner } from './components/ConnectionBanner';
+import { useWakeLock } from './hooks/useWakeLock';
 
 function App() {
   const socket = useSocket();
   const { phase, currentGame } = useGameStore();
 
+  // Keep the screen awake while the player is in an active game phase.
+  // Released automatically when phase flips back to lobby or finished.
+  useWakeLock(phase === 'playing' || phase === 'leaderboard');
+
   if (typeof window !== 'undefined' && window.location.search.includes('showcase')) {
     return (
-      <Suspense fallback={null}>
-        <UiShowcase />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={null}>
+          <UiShowcase />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
@@ -79,10 +88,13 @@ function App() {
   };
 
   return (
-    <div className="App">
-      {renderScreen()}
-      <PausedOverlay />
-    </div>
+    <ErrorBoundary>
+      <div className="App">
+        <ConnectionBanner />
+        {renderScreen()}
+        <PausedOverlay />
+      </div>
+    </ErrorBoundary>
   );
 }
 

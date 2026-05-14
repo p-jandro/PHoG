@@ -14,6 +14,12 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../../../.env.local') });
 console.log('[ENV] Environment loaded. Host password is:', process.env.HOST_PASSWORD ? 'SET' : 'NOT SET');
 
+// Install process-level error handlers BEFORE any game code so that uncaught
+// exceptions / unhandled rejections during boot are captured into the ring
+// buffer (and forwarded to Sentry if SENTRY_DSN is set).
+import * as errorReporter from './ops/errorReporter.js';
+errorReporter.install();
+
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -127,7 +133,18 @@ app.get('/health', (req, res) => {
     gameId: gameState.meta.gameId,
     phase: gameState.currentPhase,
     players: gameState.players.size,
-    connections: connectionManager.getStats()
+    connections: connectionManager.getStats(),
+    errors: errorReporter.errorStats()
+  });
+});
+
+// Debug endpoint: most recent process-level errors (uncaughtException,
+// unhandledRejection). Server-internal — no auth, only useful on the LAN
+// where the host already sees server logs.
+app.get('/debug/errors', (req, res) => {
+  res.json({
+    stats: errorReporter.errorStats(),
+    entries: errorReporter.recentErrors()
   });
 });
 
@@ -201,18 +218,40 @@ io.on('connection', (socket) => {
     socket.emit('pong');
   });
 
+  // Helper: kick a previously-mapped socket when a duplicate session displaces it.
+  const kickDuplicate = (displacedSocketId) => {
+    if (!displacedSocketId) return;
+    const old = io.sockets.sockets.get(displacedSocketId);
+    if (!old) return;
+    try {
+      old.emit('player:kicked', { reason: 'duplicate_session' });
+      old.disconnect();
+    } catch (e) {
+      console.warn('[KICK] Failed to evict duplicate session:', e?.message || e);
+    }
+  };
+
   // Player join event
   socket.on('player:join', ({ name, reconnectToken: incomingToken }) => {
     try {
-      let playerId;
+      let playerId = null;
       let isReconnect = false;
 
-      // Check for reconnection
+      // Check for reconnection via HMAC-signed token. Token verification is
+      // stateless; a valid token re-binds the new socket to the existing
+      // player record. If another live socket holds the same identity, it
+      // is displaced and we kick it (duplicate-session protection).
       if (incomingToken) {
-        playerId = connectionManager.reconnectPlayer(socket.id, incomingToken);
-        if (playerId) {
+        const result = connectionManager.reconnectPlayer(socket.id, incomingToken);
+        if (result.playerId && gameState.players.has(result.playerId)) {
+          playerId = result.playerId;
           isReconnect = true;
-          console.log(`[PLAYER] ${name} reconnected as ${playerId}`);
+          kickDuplicate(result.displacedSocketId);
+          console.log(`[PLAYER] ${name || '(unknown)'} reconnected as ${playerId}`);
+        } else if (result.playerId && !gameState.players.has(result.playerId)) {
+          // Token verified but the player record is gone (server restarted
+          // mid-game, or session reset). Fall through to fresh-join path.
+          console.log(`[PLAYER] Token valid but player ${result.playerId} no longer exists; treating as new join`);
         }
       }
 
@@ -225,7 +264,8 @@ io.on('connection', (socket) => {
         }
 
         playerId = randomUUID();
-        connectionManager.registerPlayer(socket.id, playerId);
+        const displaced = connectionManager.registerPlayer(socket.id, playerId);
+        kickDuplicate(displaced);
 
         // Create player object
         const player = {
@@ -799,6 +839,13 @@ server.listen(PORT, () => {
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('\n[SHUTDOWN] Received SIGTERM, shutting down gracefully...');
+  const stats = errorReporter.errorStats();
+  if (stats.size > 0) {
+    console.log(`[SHUTDOWN] Dumping ${stats.size} recent error(s) from ring buffer:`);
+    for (const entry of errorReporter.recentErrors()) {
+      console.log(`  - [${entry.type}] ${new Date(entry.ts).toISOString()}: ${entry.payload?.error?.message || ''}`);
+    }
+  }
   server.close(() => {
     console.log('[SHUTDOWN] Server closed');
     process.exit(0);

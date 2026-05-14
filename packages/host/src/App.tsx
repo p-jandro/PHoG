@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { Dashboard } from './screens/Dashboard';
 import { Display } from './screens/Display';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const UiShowcase = lazy(() => import('./ui/UiShowcase').then(m => ({ default: m.UiShowcase })));
 
@@ -21,13 +22,16 @@ function App() {
 
   if (typeof window !== 'undefined' && window.location.search.includes('showcase')) {
     return (
-      <Suspense fallback={null}>
-        <UiShowcase />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={null}>
+          <UiShowcase />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen">
       <div className="sticky top-0 z-30 px-4 pt-4 sm:px-6">
         <div className="mx-auto flex w-full max-w-7xl justify-end">
@@ -58,6 +62,7 @@ function App() {
 
       {view === 'dashboard' ? <Dashboard /> : <Display />}
     </div>
+    </ErrorBoundary>
   );
 }
 

@@ -8,6 +8,45 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL || (
     : 'http://localhost:3000'
 );
 
+const TOKEN_KEY = 'phog_reconnect_token';
+const NAME_KEY = 'phog_player_name';
+const PLAYER_ID_KEY = 'phog_player_id';
+
+const readStorage = (key: string): string | null => {
+  try {
+    return typeof window === 'undefined' ? null : localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+const writeStorage = (key: string, value: string | null) => {
+  try {
+    if (typeof window === 'undefined') return;
+    if (value == null) {
+      localStorage.removeItem(key);
+    } else {
+      localStorage.setItem(key, value);
+    }
+  } catch {
+    /* ignore quota / private-mode errors */
+  }
+};
+
+/**
+ * Emit player:join with everything we know. Server resolves identity in
+ * priority order: valid token → fall through to fresh join (name required).
+ * Safe to call repeatedly — server treats a successful token reconnect as
+ * idempotent.
+ */
+const emitJoin = (socket: Socket, opts: { name?: string | null; token?: string | null }) => {
+  const payload: { name?: string; reconnectToken?: string } = {};
+  if (opts.name && opts.name.trim()) payload.name = opts.name.trim();
+  if (opts.token) payload.reconnectToken = opts.token;
+  if (!payload.name && !payload.reconnectToken) return; // nothing to send
+  socket.emit('player:join', payload);
+};
+
 export const useSocket = () => {
   const socketRef = useRef<Socket | null>(null);
   const {
@@ -39,11 +78,13 @@ export const useSocket = () => {
       setConnectionError(null);
       socket.emit('request:state');
 
-      // Auto-reconnect if token exists
-      const token = localStorage.getItem('phog_reconnect_token');
+      // Auto-reconnect: replay the stored HMAC-signed reconnect token so the
+      // server re-binds this new socket to the existing player record
+      // (preserves score / placements / current-game state).
+      const token = readStorage(TOKEN_KEY);
       if (token) {
         console.log('[Socket] Attempting auto-reconnect with token');
-        socket.emit('player:join', { reconnectToken: token });
+        emitJoin(socket, { token });
       }
     });
 
@@ -68,15 +109,27 @@ export const useSocket = () => {
       console.log('[Socket] Player joined:', playerId, isReconnect ? '(reconnected)' : '(new)');
       setPlayer(playerId, player.name, token);
 
-      // Store reconnect token in localStorage
-      if (token) {
-        localStorage.setItem('phog_reconnect_token', token);
-      }
+      // Persist token + name + playerId so the next page load / next
+      // reconnect can re-attach the same identity.
+      if (token) writeStorage(TOKEN_KEY, token);
+      if (player?.name) writeStorage(NAME_KEY, player.name);
+      if (playerId) writeStorage(PLAYER_ID_KEY, playerId);
     });
 
     socket.on('player:kicked', ({ reason }) => {
       console.log('[Socket] Kicked:', reason);
-      setConnectionError(reason);
+      // Friendly copy for the duplicate-session case (server emits
+      // reason: 'duplicate_session' when the same token shows up on two
+      // sockets — newest wins).
+      const message =
+        reason === 'duplicate_session'
+          ? 'You joined from another tab or device. This tab is now signed out.'
+          : reason || 'You were disconnected.';
+      setConnectionError(message);
+      // Kicked = this identity is no longer ours. Drop the token + playerId
+      // so the next load starts fresh; keep the name (lobby pre-fill).
+      writeStorage(TOKEN_KEY, null);
+      writeStorage(PLAYER_ID_KEY, null);
       socket.disconnect();
     });
 
@@ -152,7 +205,13 @@ export const joinGame = (socket: Socket | null, name: string) => {
     return;
   }
 
-  const reconnectToken = localStorage.getItem('phog_reconnect_token');
+  const trimmed = name.trim();
+  if (trimmed) {
+    // Persist name immediately so visibility-resync / reload paths can use
+    // it even before the server replies with player:joined.
+    writeStorage(NAME_KEY, trimmed);
+  }
 
-  socket.emit('player:join', { name, reconnectToken });
+  const reconnectToken = readStorage(TOKEN_KEY);
+  emitJoin(socket, { name: trimmed, token: reconnectToken });
 };
