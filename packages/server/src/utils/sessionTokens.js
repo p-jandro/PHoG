@@ -12,17 +12,14 @@
 
 import crypto from 'crypto';
 
-const DEFAULT_DEV_SECRET = 'phog-dev-secret-change-me-in-production';
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-const SECRET = process.env.SESSION_SECRET || DEFAULT_DEV_SECRET;
-
 if (!process.env.SESSION_SECRET) {
-  console.warn(
-    '[WARN] SESSION_SECRET is not set. Using a dev fallback. ' +
-    'Set SESSION_SECRET in .env.local for production-ish use.'
-  );
+  process.env.SESSION_SECRET = crypto.randomBytes(32).toString('base64url');
+  console.log('[session] generated ephemeral SESSION_SECRET for this run');
 }
+
+const SECRET = process.env.SESSION_SECRET;
 
 function hmac(payload) {
   return crypto.createHmac('sha256', SECRET).update(payload).digest('base64url');
