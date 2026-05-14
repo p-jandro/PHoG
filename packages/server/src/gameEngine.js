@@ -356,6 +356,11 @@ export class GameEngine extends EventEmitter {
 
     console.log(`[SESSION] Game session ended. Winner: ${winner?.name || 'None'}`);
 
+    // Per QA 2026-05-14 §15: flip championship.active back to false so the UI
+    // can't mistakenly attempt a "next game" transition once the final screen
+    // is mounted.
+    this.championship.active = false;
+
     // Emit final results
     this.io.emit('session:end', {
       leaderboard,

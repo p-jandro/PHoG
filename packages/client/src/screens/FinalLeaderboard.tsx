@@ -112,6 +112,12 @@ export const FinalLeaderboard = () => {
     ? 'Your Championship Standing'
     : `Your ${activeGameLabel} Result`;
 
+  // Per QA 2026-05-14 §15: at session end, render a podium + congratulation
+  // band above the existing breakdown. Only shown when the championship is
+  // actually finished.
+  const podium = phase === 'finished' ? championshipSortedPlayers.slice(0, 3) : [];
+  const winner = podium[0] || null;
+
   return (
     <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 overflow-y-auto">
       <motion.div
@@ -120,6 +126,42 @@ export const FinalLeaderboard = () => {
         animate="visible"
         className="mx-auto w-full max-w-4xl space-y-5 py-6"
       >
+        {phase === 'finished' && winner && (
+          <Card>
+            <motion.h1
+              initial={reduced ? { opacity: 0 } : { opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45 }}
+              className="text-center font-serif text-4xl font-extrabold tracking-tight text-ink sm:text-5xl"
+            >
+              🏆 Congratulations, {winner.name}!
+            </motion.h1>
+            <div className="mt-5 grid grid-cols-3 items-end gap-3">
+              {/* 2nd */}
+              <div className={[
+                'rounded-2xl border-2 border-ink p-4 text-center shadow-ink-sm',
+                podium[1] ? 'bg-bg-surface text-ink' : 'bg-bg-sunken text-ink-muted opacity-60'
+              ].join(' ')}>
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em]">2nd</p>
+                <p className="mt-2 truncate font-display text-xl font-extrabold">{podium[1]?.name ?? '—'}</p>
+              </div>
+              {/* 1st */}
+              <div className="rounded-2xl border-4 border-ink bg-streak p-5 text-center text-on-streak shadow-ink">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] opacity-90">1st</p>
+                <p className="mt-2 truncate font-display text-2xl font-black sm:text-3xl">{winner.name}</p>
+              </div>
+              {/* 3rd */}
+              <div className={[
+                'rounded-2xl border-2 border-ink p-3 text-center shadow-ink-sm',
+                podium[2] ? 'bg-bg-surface text-ink' : 'bg-bg-sunken text-ink-muted opacity-60'
+              ].join(' ')}>
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em]">3rd</p>
+                <p className="mt-2 truncate font-display text-lg font-extrabold">{podium[2]?.name ?? '—'}</p>
+              </div>
+            </div>
+          </Card>
+        )}
+
         <Card eyebrow={eyebrow} title={<span className="font-serif text-4xl sm:text-5xl">{headline}</span>}>
           <div className="flex flex-col gap-3">
             <p className="text-base leading-relaxed text-ink-muted sm:text-lg">

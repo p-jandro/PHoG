@@ -628,6 +628,39 @@ export const Display = () => {
             className="mx-auto w-full max-w-7xl"
           >
             <div className="relative overflow-hidden rounded-[2rem] border border-ink/20 bg-bg-surface p-8 shadow-ink-lg sm:p-10">
+            {phase === 'finished' && sortedPlayers.length > 0 && (
+              <div className="mb-6 rounded-3xl border-4 border-ink bg-bg-sunken p-6 text-center shadow-ink-lg">
+                <motion.h2
+                  initial={{ opacity: 0, y: -12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="font-serif text-5xl font-extrabold text-ink sm:text-6xl"
+                >
+                  🏆 Congratulations, {sortedPlayers[0].name}!
+                </motion.h2>
+                <div className="mx-auto mt-6 grid max-w-3xl grid-cols-3 items-end gap-4">
+                  <div className={[
+                    'rounded-2xl border-2 border-ink p-4 text-center shadow-ink-sm',
+                    sortedPlayers[1] ? 'bg-bg-surface text-ink' : 'bg-bg-sunken text-ink-muted opacity-60'
+                  ].join(' ')}>
+                    <p className="text-xs font-extrabold uppercase tracking-[0.18em]">2nd</p>
+                    <p className="mt-2 truncate font-display text-2xl font-extrabold">{sortedPlayers[1]?.name ?? '—'}</p>
+                  </div>
+                  <div className="rounded-2xl border-4 border-ink bg-streak p-5 text-center text-on-streak shadow-ink">
+                    <p className="text-xs font-extrabold uppercase tracking-[0.18em] opacity-90">1st</p>
+                    <p className="mt-2 truncate font-display text-3xl font-black sm:text-4xl">{sortedPlayers[0].name}</p>
+                  </div>
+                  <div className={[
+                    'rounded-2xl border-2 border-ink p-3 text-center shadow-ink-sm',
+                    sortedPlayers[2] ? 'bg-bg-surface text-ink' : 'bg-bg-sunken text-ink-muted opacity-60'
+                  ].join(' ')}>
+                    <p className="text-xs font-extrabold uppercase tracking-[0.18em]">3rd</p>
+                    <p className="mt-2 truncate font-display text-xl font-extrabold">{sortedPlayers[2]?.name ?? '—'}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="mb-8 flex items-end justify-between gap-6">
               <div>
                 <p className="text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-ink-muted mb-3">
