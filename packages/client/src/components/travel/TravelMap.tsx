@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { geoMercator, geoCentroid } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
@@ -172,8 +173,29 @@ export const TravelMap = ({
   }, [guesses, featureCollection, projection]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border-2 border-ink bg-bg-sunken shadow-ink">
-      <ComposableMap projection={projection} width={width} height={height} style={{ width: '100%', height: 'auto' }}>
+    <div className="relative overflow-hidden rounded-2xl border-2 border-ink bg-bg-sunken shadow-ink">
+      <TransformWrapper
+        initialScale={1}
+        minScale={0.7}
+        maxScale={5}
+        doubleClick={{ disabled: true }}
+        wheel={{ step: 0.15 }}
+        panning={{ velocityDisabled: true }}
+      >
+        {({ resetTransform }) => (
+          <>
+            <button
+              type="button"
+              onClick={() => resetTransform()}
+              className="absolute right-2 top-2 z-10 rounded-lg border-2 border-ink bg-bg-surface px-2 py-1 text-[10px] font-extrabold uppercase tracking-wide shadow-ink-sm"
+            >
+              Reset view
+            </button>
+            <TransformComponent
+              wrapperStyle={{ width: '100%', height: '100%' }}
+              contentStyle={{ width: '100%', height: '100%' }}
+            >
+              <ComposableMap projection={projection} width={width} height={height} style={{ width: '100%', height: 'auto' }}>
         <Geographies geography={featureCollection}>
           {({ geographies }: { geographies: any[] }) =>
             geographies.map((geo) => {
@@ -228,7 +250,11 @@ export const TravelMap = ({
             </g>
           </>
         )}
-      </ComposableMap>
+              </ComposableMap>
+            </TransformComponent>
+          </>
+        )}
+      </TransformWrapper>
     </div>
   );
 };
