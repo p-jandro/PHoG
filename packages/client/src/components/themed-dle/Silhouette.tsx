@@ -140,8 +140,8 @@ export const Silhouette = ({ data, guesses, onGuess }: SilhouetteProps) => {
               src={data.spriteUrl}
               alt="silhouette"
               crossOrigin="anonymous"
-              animate={reduce ? undefined : { scale: zoom }}
-              transition={{ duration: 0.6 }}
+              animate={{ scale: zoom }}
+              transition={{ duration: reduce ? 0 : 0.6 }}
               style={{
                 filter: brightness === 0
                   ? 'brightness(0) invert(1)'
