@@ -321,42 +321,16 @@ export class GameEngine extends EventEmitter {
   }
 
   /**
-   * Emit a game-specific round leaderboard without changing the main session phase
+   * Emit a game-specific round leaderboard without changing the main session phase.
+   *
+   * Per bug-report 2026-05-14 (A4/B2/C1): the per-round leaderboard pop between
+   * questions is redundant — the inter-game leaderboard already serves this role.
+   * This method is now a no-op so we still satisfy the call sites without altering
+   * each game module. Clients keep listening on `round:leaderboard:show` but no
+   * payload is ever emitted, so the overlay/host branch never triggers.
    */
-  showRoundLeaderboard(game, duration = 5000, extra = {}) {
-    const { leaderboard, roundNumber, ...rest } = extra;
-    const nextLeaderboard = leaderboard || this.getLeaderboard();
-    const previousLeaderboard = this.roundLeaderboardHistory[game];
-    const canShowRankDelta =
-      typeof roundNumber === 'number' &&
-      roundNumber > 1 &&
-      Array.isArray(previousLeaderboard) &&
-      previousLeaderboard.length > 0;
-
-    const leaderboardWithDeltas = nextLeaderboard.map((entry) => {
-      const previousEntry = canShowRankDelta
-        ? previousLeaderboard.find((candidate) => candidate.id === entry.id)
-        : null;
-
-      return {
-        ...entry,
-        rankDelta: previousEntry ? previousEntry.rank - entry.rank : null
-      };
-    });
-
-    this.roundLeaderboardHistory[game] = leaderboardWithDeltas.map((entry) => ({
-      id: entry.id,
-      rank: entry.rank
-    }));
-
-    this.io.emit('round:leaderboard:show', {
-      game,
-      duration,
-      leaderboard: leaderboardWithDeltas,
-      timestamp: Date.now(),
-      roundNumber,
-      ...rest
-    });
+  showRoundLeaderboard(/* game, duration, extra */) {
+    // Intentionally a no-op. See bug-report-2026-05-14 §A4.
   }
 
   /**

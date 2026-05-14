@@ -171,11 +171,45 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
     );
   }
 
-  // ── LOADING ────────────────────────────────────────────────────────────
+  // ── FALLBACK ───────────────────────────────────────────────────────────
+  // Per bug-report 2026-05-14 §A5: never show a bare "Loading…" mid-game.
+  // Fall back to a player-tracker holding view if the host display re-mounts
+  // before the next round-start event arrives.
   if (phase !== 'playing' || !roundData) {
+    const connected = players.filter((p) => p.connected);
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-bg-base text-ink">
-        <p className="font-display text-3xl font-extrabold">Loading…</p>
+      <div className="flex h-screen w-screen flex-col bg-bg-base px-10 py-8 text-ink">
+        <header className="flex items-start justify-between">
+          <div className="font-display text-2xl font-extrabold tracking-tight">
+            Travel — in progress
+          </div>
+          <p className="font-display text-5xl font-extrabold tabular-nums text-ink-muted">—:—</p>
+        </header>
+        <section className="flex flex-1 flex-col items-center justify-center text-center">
+          <p className="text-2xl font-semibold text-ink-muted">
+            Waiting for the next round event…
+          </p>
+        </section>
+        <footer className="w-full">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">Players</p>
+            <Chip variant="info">{connected.length} connected</Chip>
+          </div>
+          {connected.length === 0 ? (
+            <p className="text-center text-ink-muted">No players connected.</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {connected.map((p) => (
+                <div
+                  key={p.id}
+                  className="rounded-2xl border-2 border-ink bg-bg-surface px-4 py-3 text-ink shadow-ink-sm"
+                >
+                  <p className="truncate font-display text-xl font-extrabold">{p.name}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </footer>
       </div>
     );
   }

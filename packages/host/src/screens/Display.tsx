@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
-import { Button, Card, Chip, ScoreDrop } from '../ui';
+import { Button, Card, Chip, ScoreDrop, ThemeToggle } from '../ui';
 import { ThemedDleDisplay } from './ThemedDleDisplay';
 import { NumbersDisplay } from './NumbersDisplay';
 import { WordleDisplay } from './WordleDisplay';
@@ -161,6 +161,10 @@ export const Display = () => {
   const [pointlessReveal, setPointlessReveal] = useState<PointlessRevealState | null>(null);
   const [pointlessPlayerReveals, setPointlessPlayerReveals] = useState<PointlessPlayerReveal[]>([]);
   const [pointlessRevealIndex, setPointlessRevealIndex] = useState(0);
+  // Per bug-report 2026-05-14 §D1/§D2: live submission status per player so the
+  // host display can render a Locked-in / Still-thinking tracker without
+  // requiring a Dashboard ↔ Display toggle to refresh.
+  const [pointlessProgress, setPointlessProgress] = useState<Record<string, { status: 'submitted' | 'none' }>>({});
   const [roundLeaderboard, setRoundLeaderboard] = useState<RoundLeaderboardState | null>(null);
 
   useEffect(() => {
@@ -357,11 +361,18 @@ export const Display = () => {
       setPointlessRound(data);
       setPointlessReveal(null);
       setPointlessReadyToReveal(false);
+      // New round — clear stale progress so all players show as "Still thinking".
+      setPointlessProgress({});
     });
 
     newSocket.on('pointless:round:end', () => {
       setPointlessRound(null);
       setPointlessReadyToReveal(true);
+    });
+
+    // Per bug-report 2026-05-14 §D1/§D2: live per-player submission status.
+    newSocket.on('pointless:progress', (data: { playerProgress?: Record<string, { status: 'submitted' | 'none' }> }) => {
+      setPointlessProgress(data?.playerProgress || {});
     });
 
     newSocket.on('pointless:reveal:display', (data) => {
@@ -421,13 +432,22 @@ export const Display = () => {
     });
   };
 
-  const displayControl = authenticated && pointlessReadyToReveal ? (
-    <div className="fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6">
-      <Button variant="action" size="lg" onClick={revealResults}>
-        Reveal Pointless Results
-      </Button>
-    </div>
-  ) : null;
+  const displayControl = (
+    <>
+      {/* Per bug-report 2026-05-14 §A1: the theme toggle is always visible on
+          every host screen, not just the lobby/dashboard. */}
+      <div className="fixed top-4 right-4 z-40 sm:top-6 sm:right-6">
+        <ThemeToggle />
+      </div>
+      {authenticated && pointlessReadyToReveal ? (
+        <div className="fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6">
+          <Button variant="action" size="lg" onClick={revealResults}>
+            Reveal Pointless Results (Skip Timer)
+          </Button>
+        </div>
+      ) : null}
+    </>
+  );
 
   const getCountdownSeconds = (endsAt?: number) => {
     if (!endsAt) {
@@ -1359,6 +1379,8 @@ export const Display = () => {
   }
 
   if (currentGame === 'pointless' && pointlessRound) {
+    const connected = players.filter((p) => p.connected);
+    const submittedCount = connected.filter((p) => pointlessProgress[p.id]?.status === 'submitted').length;
     return (
       <>
         <div className="min-h-screen overflow-y-auto bg-bg-base py-8 text-ink">
@@ -1384,6 +1406,44 @@ export const Display = () => {
             <p className="mt-6 text-lg font-semibold uppercase tracking-[0.18em] text-ink-muted sm:text-xl">
               Players have {Math.ceil((pointlessRound.duration || 30000) / 1000)} seconds · Lowest valid answer wins
             </p>
+
+            {/* Per bug-report 2026-05-14 §D1/§D2: live per-player tracker chips. */}
+            <div className="mt-8 rounded-2xl border-2 border-ink bg-bg-surface p-5 text-left shadow-ink">
+              <div className="mb-3 flex items-end justify-between">
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-streak">Players</p>
+                <p className="font-display text-base font-black text-ink-muted">
+                  {submittedCount} of {connected.length} locked in
+                </p>
+              </div>
+              {connected.length === 0 ? (
+                <p className="text-center text-ink-muted">No players connected.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {connected.map((p) => {
+                    const submitted = pointlessProgress[p.id]?.status === 'submitted';
+                    const tone = submitted
+                      ? 'border-ink bg-action text-on-action'
+                      : 'border-ink bg-bg-sunken text-ink';
+                    const label = submitted ? 'Locked in' : 'Still thinking';
+                    return (
+                      <span
+                        key={p.id}
+                        className={`inline-flex items-center gap-2 rounded-lg border-2 px-2.5 py-1 text-xs font-extrabold shadow-ink-sm ${tone}`}
+                      >
+                        <span
+                          className={`h-2 w-2 rounded-full ${submitted ? 'bg-on-action' : 'bg-ink-muted'}`}
+                          aria-hidden="true"
+                        />
+                        {p.name}
+                        <span className="text-[0.6rem] font-extrabold uppercase tracking-[0.18em] opacity-80">
+                          · {label}
+                        </span>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </motion.div>
         </div>
         {displayControl}

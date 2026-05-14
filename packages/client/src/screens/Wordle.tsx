@@ -78,8 +78,8 @@ export const Wordle = ({ socket }: WordleProps) => {
         // Trigger flip on the newly added row.
         const newIndex = next.length - 1;
         setFlippingRowIndex(newIndex);
-        // Clear after the cascade completes (4 × 0.18 + 0.25 ≈ 0.97s).
-        setTimeout(() => setFlippingRowIndex((cur) => (cur === newIndex ? null : cur)), 1100);
+        // Clear after the cascade completes (4 × 0.18 + 0.5 ≈ 1.22s — small buffer).
+        setTimeout(() => setFlippingRowIndex((cur) => (cur === newIndex ? null : cur)), 1500);
         return next;
       });
       setDraft('');

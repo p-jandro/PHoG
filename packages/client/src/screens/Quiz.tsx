@@ -165,6 +165,18 @@ export const Quiz = ({ socket }: QuizProps) => {
 
     socket.on('quiz:end', (data) => {
       console.log('[Quiz] Quiz ended', data);
+      // B1 fix (2026-05-14): clear out the last question/results so this screen
+      // can't briefly re-paint the previous round between the round-leaderboard
+      // overlay dismissing and the App switching to the final leaderboard.
+      setResults(null);
+      setCurrentQuestion(null);
+      setSelectedAnswer(null);
+      setVotingResults(null);
+      setIntroData(null);
+      if (questionTimer) {
+        clearInterval(questionTimer);
+        setQuestionTimer(null);
+      }
     });
 
     return () => {

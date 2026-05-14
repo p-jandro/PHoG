@@ -26,8 +26,11 @@ interface SilhouetteProps {
   onGuess: (payload: { name: string }) => void;
 }
 
-const ZOOM      = [3.0, 2.4, 1.8, 1.4, 1.1, 1.0, 1.0];
-const BRIGHTNESS = [0, 0, 0, 0.1, 0.3, 0.6, 1.0];
+// Stage 0 = before any guess (most zoomed-in, pure silhouette).
+// Each wrong guess advances one stage, zooming out and slowly revealing colour.
+// 11 entries cover stages 0..10 (initial + up to MAX_GUESSES=10 wrong guesses).
+const ZOOM       = [4.0, 3.6, 3.2, 2.8, 2.4, 2.0, 1.7, 1.4, 1.2, 1.05, 1.0];
+const BRIGHTNESS = [0,   0,   0,   0,   0.1, 0.2, 0.3, 0.45, 0.6, 0.8, 1.0];
 
 export const Silhouette = ({ data, guesses, onGuess }: SilhouetteProps) => {
   const stage = guesses.length > 0 ? guesses[guesses.length - 1].silhouetteStage : 0;

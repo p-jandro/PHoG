@@ -195,7 +195,7 @@ export const Travel = ({ socket }: TravelProps) => {
     );
   }
 
-  // ── PLAYING (map hidden!) ──────────────────────────────────────────────
+  // ── PLAYING ────────────────────────────────────────────────────────────
   const guessesUsed = Math.max(0, (frontChain.length - 1) + (backChain.length - 1));
   const guessesLeft = Math.max(0, roundData.maxGuesses - guessesUsed);
   const noBudget = guessesLeft <= 0;
@@ -226,6 +226,17 @@ export const Travel = ({ socket }: TravelProps) => {
         <div className="flex justify-center">
           <Countdown seconds={seconds} total={totalSec} />
         </div>
+
+        {/* Map — shows the player's own chain as they build it. No arcs (no
+            reveals) during play; the target is hidden until results. */}
+        <TravelMap
+          startName={roundData.start}
+          endName={roundData.end}
+          relevantNames={roundData.relevantNames || []}
+          frontChain={frontChain}
+          backChain={backChain}
+          solved={solved}
+        />
 
         {/* Chain strip (replaces ChainList; meets in the middle) */}
         <Card>

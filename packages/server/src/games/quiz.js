@@ -439,10 +439,12 @@ export class QuizGame {
       finalLeaderboard: this.gameEngine.getLeaderboard()
     });
 
-    // End the game in game engine
-    this.trackTimeout(() => {
-      this.gameEngine.endGame();
-    }, 3000);
+    // End the game in the game engine immediately. The previous 3s gap caused the
+    // last question's results screen to briefly re-appear after the round
+    // leaderboard overlay dismissed and before the final leaderboard mounted
+    // (bug B1 / 2026-05-14). The round leaderboard overlay already gives a clean
+    // hand-off, so we transition straight to the final leaderboard here.
+    this.gameEngine.endGame();
   }
 
   /**

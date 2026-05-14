@@ -181,6 +181,9 @@ export class PointlessGame {
       duration: POINTLESS_ROUND_DURATION
     });
 
+    // Per §D1: prime the host tracker with everyone shown as still thinking.
+    this.broadcastProgress();
+
     // Auto-reveal after the answer window closes
     this.timer = new Timer(POINTLESS_ROUND_DURATION, null, () => {
       this.endRound();
@@ -287,21 +290,54 @@ export class PointlessGame {
         game: 'pointless'
       });
     }
+
+    // Per bug-report 2026-05-14 §D1: broadcast per-player progress so the host
+    // display can render the locked-in / still-thinking tracker live.
+    this.broadcastProgress();
   }
 
   /**
-   * End round (stop accepting answers)
+   * Per bug-report 2026-05-14 §D1/D2: emit a per-player status snapshot so the
+   * host display can render the player tracker live without polling.
+   *
+   * Status values:
+   *   - 'submitted': the player has locked in an answer for this round
+   *   - 'none':      no submission yet (or no submission by end of round)
+   */
+  broadcastProgress() {
+    if (!this.gameState.pointless) return;
+    const playerProgress = {};
+    for (const [playerId] of this.gameState.players) {
+      playerProgress[playerId] = {
+        status: this.gameState.pointless.answers.has(playerId) ? 'submitted' : 'none'
+      };
+    }
+    this.io.emit('pointless:progress', {
+      roundIndex: this.gameState.pointless.roundIndex,
+      submissionCount: this.gameState.pointless.answers.size,
+      playerProgress
+    });
+  }
+
+  /**
+   * End round (stop accepting answers).
+   *
+   * Per bug-report 2026-05-14 §D3: the host no longer has to click "Reveal" —
+   * the reveal animation auto-starts as soon as the 30s submission window
+   * closes. The 'reveal' case in host:control is kept as an optional
+   * "reveal early" shortcut (skips the remaining submission time by calling
+   * revealResults() directly), but the default flow does not require it.
    */
   endRound() {
     if (this.timer) this.timer.stop();
-    
+
     // Safety check
     if (!this.gameState.pointless || this.gameState.pointless.phase !== 'playing') {
       return;
     }
 
     this.gameState.pointless.phase = 'reveal';
-    console.log('[POINTLESS] Round ended. Waiting for host to reveal.');
+    console.log('[POINTLESS] Round ended. Auto-revealing results.');
 
     // Calculate scores for non-submitters (100 points)
     for (const [playerId, player] of this.gameState.players) {
@@ -320,8 +356,11 @@ export class PointlessGame {
       answerCount: this.gameState.pointless.answers.size
     });
 
-    // Notify host it's ready to reveal
+    // Notify host it's ready to reveal (kept for any consumers tracking phase)
     this.updateHost();
+
+    // Auto-reveal — no host action required.
+    this.revealResults();
   }
 
   /**

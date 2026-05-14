@@ -16,9 +16,13 @@ interface TilePoolProps {
 export const TilePool = ({
   tiles, originalTiles, selectedId, onTileClick, disabled,
 }: TilePoolProps) => {
-  // If we don't have the original pool, just render whatever is here.
-  const slots = originalTiles ?? tiles;
+  // Render every tile from the original draw (so consumed tiles can still be shown
+  // as "used"), then append any tiles in the current pool whose ids weren't in the
+  // original draw — these are operation results that must remain clickable.
   const aliveIds = new Set(tiles.map((t) => t.id));
+  const originalIds = new Set((originalTiles ?? []).map((t) => t.id));
+  const extras = tiles.filter((t) => !originalIds.has(t.id));
+  const slots = originalTiles ? [...originalTiles, ...extras] : tiles;
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">

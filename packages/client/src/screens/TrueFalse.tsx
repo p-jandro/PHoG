@@ -264,7 +264,6 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
                     animate="visible"
                   >
                     <Chip variant="streak">
-                      <span aria-hidden="true">🔥</span>
                       <span className="font-display text-base font-black">{currentStreak}×</span>
                       <span className="text-[0.65rem] tracking-[0.18em] uppercase">streak</span>
                     </Chip>

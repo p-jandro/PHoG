@@ -42,11 +42,15 @@ export const WordleBoard = ({ rows, current, maxGuesses, flippingRowIndex = null
   }
 
   return (
-    <div className="mx-auto grid grid-rows-6 gap-2">
+    <div className="mx-auto grid grid-rows-6 gap-2" style={{ perspective: '1000px' }}>
       {visible.map((row, ri) => {
         const isFlipping = ri === flippingRowIndex;
         return (
-          <div key={ri} className="grid grid-cols-5 gap-2">
+          <div
+            key={ri}
+            className="grid grid-cols-5 gap-2"
+            style={{ perspective: '1000px' }}
+          >
             {row.map((cell, ci) => (
               <Tile
                 key={ci}

@@ -353,13 +353,25 @@ io.on('connection', (socket) => {
           gameEngine.returnToLobby();
           break;
         case 'reveal':
-          if (gameState.currentGame === 'pointless' && gameState.pointless?.phase === 'reveal') {
+          // Per bug-report 2026-05-14 §D3: reveal auto-starts after the 30s
+          // submission window. This case is now an optional "reveal early"
+          // shortcut — if the round is still in 'playing' phase, end it
+          // immediately (which itself triggers revealResults()). If we're
+          // already in 'reveal' phase (the auto-call lost the race or this
+          // is a legacy host UI), call revealResults() directly; it is
+          // guarded against double-invocation.
+          if (gameState.currentGame === 'pointless') {
             const pointlessGame = gameEngine.currentGameModule;
-            if (pointlessGame && typeof pointlessGame.revealResults === 'function') {
+            if (gameState.pointless?.phase === 'playing' && typeof pointlessGame?.endRound === 'function') {
+              pointlessGame.endRound();
+            } else if (gameState.pointless?.phase === 'reveal' && typeof pointlessGame?.revealResults === 'function') {
               pointlessGame.revealResults();
+            } else {
+              socket.emit('error', { message: 'Pointless round is not in a revealable state' });
+              return;
             }
           } else {
-            socket.emit('error', { message: 'Pointless results are not ready to reveal yet' });
+            socket.emit('error', { message: 'No Pointless round to reveal' });
             return;
           }
           break;
@@ -707,6 +719,12 @@ io.on('connection', (socket) => {
             question: state.currentRound.question,
             duration: remaining
           });
+
+          // Per §D1/D2: rebroadcast progress so a re-mounted host display has
+          // the live tracker without waiting for the next submission.
+          if (typeof gameEngine.currentGameModule.broadcastProgress === 'function') {
+            gameEngine.currentGameModule.broadcastProgress();
+          }
         } else if (pointlessState.phase === 'reveal') {
           if (typeof gameEngine.currentGameModule.getDisplayRevealPayload === 'function') {
             const displayRevealPayload = gameEngine.currentGameModule.getDisplayRevealPayload();
@@ -723,6 +741,53 @@ io.on('connection', (socket) => {
             }
           }
         }
+      }
+
+      // Per bug-report 2026-05-14 §A5/§E8: re-emit playing-state events for
+      // other games so a host display that re-mounts mid-game (e.g. after
+      // toggling Dashboard ↔ Display) immediately repaints the active screen
+      // instead of being stuck on "Loading…". We emit best-effort using each
+      // module's getState() output — fields that aren't present simply mean
+      // the screen will resync on the next live event anyway.
+      const gameModule = gameEngine.currentGameModule;
+      try {
+        if (gameState.currentGame === 'quiz' && state.phase === 'question' && state.currentQuestion) {
+          socket.emit('quiz:question:start', {
+            ...state.currentQuestion,
+            questionNumber: state.questionNumber,
+            totalQuestions: state.totalQuestions,
+            endsAt: state.questionEndsAt
+          });
+        } else if (gameState.currentGame === 'quiz' && state.phase === 'voting' && state.currentRoundOptions) {
+          socket.emit('quiz:voting:start', {
+            options: state.currentRoundOptions,
+            questionNumber: state.questionNumber,
+            totalQuestions: state.totalQuestions,
+            endsAt: state.votingEndsAt
+          });
+        }
+
+        if (gameState.currentGame === 'trueFalse' && state.currentStatement) {
+          socket.emit('truefalse:statement', {
+            statementId: state.currentStatement.id,
+            statement: state.currentStatement.statement,
+            statementNumber: state.statementNumber,
+            totalStatements: state.totalStatements,
+            endsAt: state.statementEndsAt
+          });
+        }
+
+        // Themed-dle, numbers, wordle, travel: replay the playing-start event
+        // from the module's snapshot so the host display re-routes off
+        // "Loading…" immediately.
+        if (typeof gameModule?.getResyncEvents === 'function') {
+          const events = gameModule.getResyncEvents() || [];
+          for (const evt of events) {
+            socket.emit(evt.name, evt.payload);
+          }
+        }
+      } catch (resyncError) {
+        console.warn('[REQUEST:STATE] Resync emit failed:', resyncError?.message || resyncError);
       }
     }
   });

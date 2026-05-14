@@ -76,9 +76,49 @@ export const ThemedDleDisplay = ({ socket, currentGame, players }: ThemedDleDisp
   );
 
   if (phase !== 'playing' || !playData) {
+    // Per bug-report 2026-05-14 §E8: never show a bare "Loading…" mid-game.
+    // If we know the game is active (phase 'playing') but we don't yet have a
+    // play-data event payload (host display re-mounted after navigating away),
+    // render a player-tracker-first holding view so the TV is always useful.
+    const themeName = theme === 'pokemon' ? 'Pokédle' : 'HP-dle';
+    const connected = players.filter((p) => p.connected);
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-bg-base text-2xl text-ink">
-        <Card><p>Loading…</p></Card>
+      <div className="flex h-screen w-screen flex-col bg-bg-base px-10 py-8 text-ink">
+        <header className="flex items-baseline justify-between">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-streak">
+              {themeName}
+            </p>
+            <h1 className="font-serif text-5xl font-bold text-ink">In progress</h1>
+          </div>
+          <p className="font-display text-2xl font-extrabold tabular-nums text-ink-muted">—:—</p>
+        </header>
+        <main className="flex flex-1 flex-col items-center justify-center gap-4">
+          <p className="text-2xl font-semibold text-ink-muted">
+            Waiting for the next round event…
+          </p>
+        </main>
+        <footer className="w-full">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">Players</p>
+            <Chip variant="info">{connected.length} player{connected.length === 1 ? '' : 's'} connected</Chip>
+          </div>
+          {connected.length === 0 ? (
+            <Card><p className="text-center text-ink-muted">No players connected.</p></Card>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {connected.map((p) => (
+                <div
+                  key={p.id}
+                  className="rounded-2xl border-2 border-ink bg-bg-surface px-5 py-4 text-ink shadow-ink-sm"
+                >
+                  <p className="truncate text-2xl font-extrabold">{p.name}</p>
+                  <p className="mt-1 text-sm font-semibold text-ink-muted">In play</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </footer>
       </div>
     );
   }

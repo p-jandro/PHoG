@@ -21,6 +21,10 @@ export function ScoreDrop({
   const [dropPct, setDropPct] = useState(0);
   const [showPointless, setShowPointless] = useState(false);
   const rafRef = useRef<number | null>(null);
+  // Keep onLanded in a ref so parent re-renders don't restart the RAF loop.
+  // See bug-report 2026-05-14 §D4.
+  const onLandedRef = useRef(onLanded);
+  useEffect(() => { onLandedRef.current = onLanded; }, [onLanded]);
 
   useEffect(() => {
     if (!autoStart) return;
@@ -34,7 +38,7 @@ export function ScoreDrop({
       setDropPct(fullDrop);
       setDisplayScore(targetScore);
       if (targetScore === 0) setShowPointless(true);
-      setTimeout(() => onLanded?.(), 400);
+      setTimeout(() => onLandedRef.current?.(), 400);
       return;
     }
 
@@ -53,12 +57,12 @@ export function ScoreDrop({
       } else {
         if (targetScore === 0) setShowPointless(true);
         const pauseMs = targetScore === 0 ? pointlessDrop.landingPauseAtZeroMs : pointlessDrop.landingPauseMs;
-        setTimeout(() => onLanded?.(), pauseMs);
+        setTimeout(() => onLandedRef.current?.(), pauseMs);
       }
     };
     rafRef.current = requestAnimationFrame(frame);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [autoStart, targetScore, onLanded]);
+  }, [autoStart, targetScore]);
 
   return (
     <div className={`flex items-center gap-4 ${className}`}>

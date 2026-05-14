@@ -154,10 +154,42 @@ export const NumbersDisplay = ({ socket, players }: NumbersDisplayProps) => {
   }
 
   if (phase !== 'playing' || !roundData) {
+    // Per bug-report 2026-05-14 §A5: never show a bare "Loading…" mid-game.
+    // Fall back to a player-tracker holding view if the host display
+    // re-mounts before the next round-start event arrives.
+    const connected = players.filter((p) => p.connected);
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-bg-base text-2xl text-ink">
-        Loading…
-      </div>
+      <Skeleton
+        location="Numbers Round · In progress"
+        timeLeftDim
+        centre={
+          <p className="text-2xl font-semibold text-ink-muted">
+            Waiting for the next round event…
+          </p>
+        }
+        bottom={
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">Players</p>
+              <Chip variant="info">{connected.length} connected</Chip>
+            </div>
+            {connected.length === 0 ? (
+              <Card><p className="text-center text-ink-muted">No players connected.</p></Card>
+            ) : (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {connected.map((p) => (
+                  <div
+                    key={p.id}
+                    className="rounded-2xl border-2 border-ink bg-bg-surface px-5 py-4 text-ink shadow-ink-sm"
+                  >
+                    <p className="truncate text-xl font-extrabold">{p.name}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        }
+      />
     );
   }
 

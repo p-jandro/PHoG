@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
-import { Card, Button, Chip } from '../../ui';
+import { Button, Chip } from '../../ui';
 import { cellScalePop, reducedFade, stagger } from '../../lib/motion';
 
 type GridCellResult = {
@@ -128,7 +128,13 @@ export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
               onMouseDown={(e) => e.stopPropagation()}
               className="w-full max-w-md"
             >
-              <Card eyebrow={`${data.rows[activeCell.row]} × ${data.cols[activeCell.col]}`}>
+              {/* Inline card replacement — must NOT clip overflow so the
+                  AutocompletePicker dropdown can extend past the modal box.
+                  (The ui/Card uses overflow-hidden which truncates dropdowns.) */}
+              <div className="relative rounded-3xl border-2 border-ink bg-bg-surface p-6 shadow-ink-lg">
+                <div className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-streak">
+                  {`${data.rows[activeCell.row]} × ${data.cols[activeCell.col]}`}
+                </div>
                 <AutocompletePicker
                   roster={data.roster}
                   onSubmit={(name) => {
@@ -138,7 +144,7 @@ export const Grid3x3 = ({ data, cellEvents, onGuess }: Grid3x3Props) => {
                   placeholder="Pick a character…"
                 />
                 <Button variant="ghost" size="sm" className="mt-4 w-full" onClick={() => setActiveCell(null)}>Cancel</Button>
-              </Card>
+              </div>
             </motion.div>
           </motion.div>
         )}

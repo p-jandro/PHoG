@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Chip } from '../ui/Chip';
+import { ThemeToggle } from '../ui/ThemeToggle';
 
 interface GameStatusBarProps {
   gameLabel: string;
@@ -59,6 +60,10 @@ export const GameStatusBar = ({
             {placementContext && <span className="text-[0.65rem] tracking-[0.18em] uppercase">{placementContext}</span>}
           </Chip>
         )}
+
+        {/* Per bug-report 2026-05-14 §A1: theme toggle is always inline on every
+            screen — including mid-game — reversing the spec §5.6 ⋯-menu decision. */}
+        <ThemeToggle />
       </div>
     </div>
   </motion.div>

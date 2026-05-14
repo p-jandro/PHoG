@@ -21,6 +21,13 @@ export function ScoreDrop({
   const [dropPct, setDropPct] = useState(0);
   const [showPointless, setShowPointless] = useState(false);
   const rafRef = useRef<number | null>(null);
+  // Keep onLanded in a ref so re-renders of the parent don't restart the
+  // animation. Per bug-report 2026-05-14 §D4, including `onLanded` in the
+  // useEffect dep array caused the RAF loop to be cancelled and reset on
+  // every parent render (Display.tsx updates `now` every 250ms), so the bar
+  // never visibly progressed.
+  const onLandedRef = useRef(onLanded);
+  useEffect(() => { onLandedRef.current = onLanded; }, [onLanded]);
 
   useEffect(() => {
     if (!autoStart) return;
@@ -43,12 +50,12 @@ export function ScoreDrop({
       } else {
         if (targetScore === 0) setShowPointless(true);
         const pauseMs = targetScore === 0 ? pointlessDrop.landingPauseAtZeroMs : pointlessDrop.landingPauseMs;
-        setTimeout(() => onLanded?.(), pauseMs);
+        setTimeout(() => onLandedRef.current?.(), pauseMs);
       }
     };
     rafRef.current = requestAnimationFrame(frame);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [autoStart, targetScore, onLanded]);
+  }, [autoStart, targetScore]);
 
   return (
     <div className={`flex items-center gap-4 ${className}`}>

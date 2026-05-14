@@ -106,14 +106,20 @@ const SILHOUETTE_DURATION = 150000;
 const SPELL_DURATION = 180000;
 const GRID_DURATION = 240000;        // 4 min for grid
 const RESULTS_DURATION = 8000;
-const MAX_GUESSES = 6;
+// Players get 10 guesses total. Guesses 1-6 score on a sliding efficiency curve;
+// guesses 7-10 are still allowed but score zero (kept around so a player can
+// reveal the target for closure even after the scoring window closes).
+const MAX_GUESSES = 10;
+const SCORING_GUESS_CAP = 6;
 
 // ---------- Scoring ----------------------------------------------------------
 
 function scoreClassic(guessesUsed, solved, timeRemainingMs, totalMs) {
   if (!solved) return 0;
+  // Beyond the scoring window (guess 7-10), no points are awarded even if solved.
+  if (guessesUsed > SCORING_GUESS_CAP) return 0;
   const base = 100;
-  const efficiency = (MAX_GUESSES - guessesUsed) * 20; // 0..120
+  const efficiency = (SCORING_GUESS_CAP - guessesUsed) * 20; // 0..100 (guess 1=100, guess 6=0)
   const speed = Math.max(0, Math.floor(30 * (timeRemainingMs / totalMs)));
   return base + efficiency + speed;
 }
@@ -130,8 +136,9 @@ function scoreEmoji(emojisRevealed, solved, timeRemainingMs, totalMs) {
 
 function scoreSilhouette(guessesUsed, solved, timeRemainingMs, totalMs) {
   if (!solved) return 0;
+  if (guessesUsed > SCORING_GUESS_CAP) return 0;
   const base = 120; // harder mode, slightly higher base
-  const efficiency = (MAX_GUESSES - guessesUsed) * 20;
+  const efficiency = (SCORING_GUESS_CAP - guessesUsed) * 20; // 0..100
   const speed = Math.max(0, Math.floor(30 * (timeRemainingMs / totalMs)));
   return base + efficiency + speed;
 }
@@ -773,6 +780,27 @@ export class ThemedDleGame {
       });
     }
     this._broadcastProgress();
+    // E7: auto-advance the round the moment every connected player has all
+    // 9 cells filled with a valid placement — no point burning the rest of
+    // the clock if everyone's done.
+    this._checkGridAllSolved();
+  }
+
+  _checkGridAllSolved() {
+    if (this.mode !== 'grid') return;
+    const everyone = [...this.gameState.players.keys()];
+    if (everyone.length === 0) return;
+    const allFilled = everyone.every((pid) => {
+      const ps = this.playerState.get(pid);
+      if (!ps) return false;
+      const validCells = Object.values(ps.cellAnswers || {}).filter((n) => !!n).length;
+      return validCells >= 9;
+    });
+    if (allFilled) {
+      console.log(`[${this.gameName}/grid] All players filled 9 cells — ending round early`);
+      if (this.timer) { this.timer.stop(); this.timer = null; }
+      this._endRound();
+    }
   }
 
   _checkRoundComplete() {

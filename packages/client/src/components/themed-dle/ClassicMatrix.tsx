@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AutocompletePicker, RosterEntry } from './AutocompletePicker';
 import { Tile, Chip } from '../../ui';
-import { stagger, duration } from '../../lib/motion';
+import { stagger } from '../../lib/motion';
 
 type Cell = { key: string; label: string; value: any; color: 'green' | 'yellow' | 'red' };
 type GuessResult = {
@@ -24,72 +24,82 @@ interface ClassicMatrixProps {
   onGuess: (payload: { name: string }) => void;
 }
 
+// 2×3 layout: render each guess as a header "name" chip plus a 2-row × 3-col
+// block of attribute tiles. Each tile flips (rotateX 0→90→0 ≈250ms) on the
+// newly-arrived row, staggered by 180ms per cell — matching Wordle.
 export const ClassicMatrix = ({ data, guesses, onGuess }: ClassicMatrixProps) => {
   const solved = guesses.some((g) => g.solved);
   const used = guesses.length;
-  const headerRow = guesses[0]?.feedback?.map((c) => c.label) ?? [];
-  const colCount = headerRow.length;
 
-  // Track which guess rows have already completed their flip animation
-  const flippedRows = useRef<Set<number>>(new Set());
-  const latestIdx = used - 1;
+  // State-driven flip trigger (Wordle pattern). Holds the guess index that is
+  // currently animating; null when no row is flipping.
+  const [flippingIdx, setFlippingIdx] = useState<number | null>(null);
+  const lastSeenLength = useRef(0);
 
-  // Mark the latest row as "done flipping" after the cascade completes
   useEffect(() => {
-    if (latestIdx < 0 || flippedRows.current.has(latestIdx)) return;
-    const totalFlipMs = ((colCount * stagger.tile) + duration.reveal) * 1000;
-    const t = setTimeout(() => {
-      flippedRows.current.add(latestIdx);
-    }, totalFlipMs);
-    return () => clearTimeout(t);
-  }, [latestIdx, colCount]);
+    if (guesses.length > lastSeenLength.current) {
+      const newIdx = guesses.length - 1;
+      setFlippingIdx(newIdx);
+      // 6 cells × 0.18s stagger + 0.25s flip ≈ 1.33s. Add a tiny safety margin.
+      const totalMs = (6 * stagger.tile + 0.25) * 1000 + 80;
+      const t = setTimeout(() => {
+        setFlippingIdx((cur) => (cur === newIdx ? null : cur));
+      }, totalMs);
+      lastSeenLength.current = guesses.length;
+      return () => clearTimeout(t);
+    }
+    lastSeenLength.current = guesses.length;
+  }, [guesses.length]);
 
   return (
     <div className="space-y-4">
-      {headerRow.length > 0 && (
-        <div className="overflow-x-auto">
-          <div
-            className="grid gap-1"
-            style={{ gridTemplateColumns: `minmax(7rem, 1.5fr) repeat(${colCount}, minmax(0, 1fr))` }}
-          >
-            {/* Header row */}
-            <div /> {/* empty top-left corner */}
-            {headerRow.map((label) => (
-              <div key={label} className="flex justify-center">
-                <Chip variant="muted">{label}</Chip>
+      <div className="space-y-3">
+        {guesses.map((g, idx) => {
+          const isFlipping = idx === flippingIdx;
+          return (
+            <div
+              key={`guess-${idx}`}
+              className="rounded-2xl border-2 border-ink bg-bg-surface p-3 shadow-ink-sm"
+            >
+              {/* Guess label */}
+              <div className="mb-2 flex justify-center">
+                <Chip variant="default">{g.guess}</Chip>
               </div>
-            ))}
-
-            {/* Guess rows */}
-            {guesses.map((g, idx) => {
-              const isLatest = idx === latestIdx;
-              const shouldFlip = isLatest && !flippedRows.current.has(idx);
-              return (
-                <>
-                  <div key={`name-${idx}`} className="flex items-center">
-                    <Chip variant="default">{g.guess}</Chip>
-                  </div>
-                  {g.feedback.map((c, cellIdx) => {
-                    const v = Array.isArray(c.value) ? c.value.join(', ') : (c.value ?? '—');
-                    const state = c.color === 'green' ? 'correct' : c.color === 'yellow' ? 'partial' : 'wrong';
-                    return (
+              {/* 2 rows × 3 cols attribute grid */}
+              <div
+                className="grid gap-2"
+                style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}
+              >
+                {g.feedback.map((c, cellIdx) => {
+                  const v = Array.isArray(c.value) ? c.value.join(', ') : (c.value ?? '—');
+                  const state =
+                    c.color === 'green' ? 'correct' : c.color === 'yellow' ? 'partial' : 'wrong';
+                  return (
+                    <div key={c.key} className="flex flex-col items-stretch gap-1">
+                      {/* Header label above the tile — roomy, allowed to wrap to 2 lines */}
+                      <div className="flex min-h-[2.25rem] items-center justify-center px-1">
+                        <span className="block text-center text-[10px] font-extrabold uppercase leading-tight tracking-[0.08em] text-ink-muted">
+                          {c.label}
+                        </span>
+                      </div>
                       <Tile
-                        key={c.key}
                         state={state}
-                        flipping={shouldFlip}
+                        flipping={isFlipping}
                         flipDelaySec={cellIdx * stagger.tile}
-                        className="w-full aspect-square min-h-[3rem]"
+                        className="min-h-[3.25rem] w-full px-2 py-2"
                       >
-                        <span className="px-1 text-center text-[10px] leading-tight font-extrabold">{String(v)}</span>
+                        <span className="block w-full whitespace-normal break-words px-1 text-center text-[11px] font-extrabold leading-tight">
+                          {String(v)}
+                        </span>
                       </Tile>
-                    );
-                  })}
-                </>
-              );
-            })}
-          </div>
-        </div>
-      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       {!solved && used < data.maxGuesses && (
         <AutocompletePicker
