@@ -37,7 +37,8 @@ const ANSWER_BG_CLASS: Record<string, string> = {
 };
 
 export const Quiz = ({ socket }: QuizProps) => {
-  const [phase, setPhase] = useState<'intro' | 'voting' | 'votingResults' | 'question' | 'results'>('intro');
+  const [phase, setPhase] = useState<'intro' | 'voting' | 'votingResults' | 'question' | 'results' | 'leaderboard'>('intro');
+  const [interRoundBoard, setInterRoundBoard] = useState<any>(null);
   const [introData, setIntroData] = useState<any>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -163,6 +164,11 @@ export const Quiz = ({ socket }: QuizProps) => {
       }
     });
 
+    socket.on('quiz:leaderboard:show', (data) => {
+      setPhase('leaderboard');
+      setInterRoundBoard(data);
+    });
+
     socket.on('quiz:end', (data) => {
       console.log('[Quiz] Quiz ended', data);
       // B1 fix (2026-05-14): clear out the last question/results so this screen
@@ -187,6 +193,7 @@ export const Quiz = ({ socket }: QuizProps) => {
       socket.off('quiz:question:start');
       socket.off('quiz:answer:received');
       socket.off('quiz:question:end');
+      socket.off('quiz:leaderboard:show');
       socket.off('quiz:end');
 
       if (questionTimer) {
@@ -607,6 +614,45 @@ export const Quiz = ({ socket }: QuizProps) => {
               })}
             </div>
           </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Inter-round leaderboard overlay
+  if (phase === 'leaderboard' && interRoundBoard) {
+    const board: Array<{ id: string; name: string; score: number; rank: number }> = interRoundBoard.leaderboard || [];
+    const top = board.slice(0, 5);
+    const me = board.find((p) => p.id === playerId);
+    return (
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="mx-auto max-w-2xl space-y-4"
+        >
+          <h2 className="text-center font-display text-4xl font-black tracking-tight">Leaderboard</h2>
+          <ul className="space-y-2">
+            {top.map((p) => (
+              <li
+                key={p.id}
+                className={[
+                  'flex items-center justify-between rounded-2xl border-2 border-ink px-4 py-3 shadow-ink-sm',
+                  p.id === playerId ? 'bg-streak text-on-streak' : 'bg-bg-surface text-ink'
+                ].join(' ')}
+              >
+                <span className="flex items-center gap-3">
+                  <span className="font-display text-xl font-extrabold tabular-nums">{p.rank}.</span>
+                  <span className="font-bold">{p.name}</span>
+                </span>
+                <span className="font-display text-xl font-extrabold tabular-nums">{p.score}</span>
+              </li>
+            ))}
+          </ul>
+          {me && me.rank > 5 && (
+            <p className="text-center text-sm text-ink-muted">You: {me.rank}{getOrdinalSuffix(me.rank)} · {me.score} pts</p>
+          )}
         </motion.div>
       </div>
     );

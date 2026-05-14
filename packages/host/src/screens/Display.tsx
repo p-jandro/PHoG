@@ -103,11 +103,13 @@ export const Display = () => {
   const [quizVotingResults, setQuizVotingResults] = useState<any>(null);
   const [quizQuestion, setQuizQuestion] = useState<any>(null);
   const [quizResults, setQuizResults] = useState<any>(null);
+  const [quizInterRound, setQuizInterRound] = useState<any>(null);
 
   // True/False state
   const [trueFalseIntro, setTrueFalseIntro] = useState<IntroState | null>(null);
   const [tfStatement, setTfStatement] = useState<any>(null);
   const [tfReveal, setTfReveal] = useState<TrueFalseRevealState | null>(null);
+  const [tfInterRound, setTfInterRound] = useState<any>(null);
 
   // Countdown state
   const [countdownRound, setCountdownRound] = useState<any>(null);
@@ -256,6 +258,12 @@ export const Display = () => {
 
     newSocket.on('quiz:question:end', (data) => {
       setQuizResults(data);
+      setQuizInterRound(null);
+    });
+
+    newSocket.on('quiz:leaderboard:show', (data) => {
+      setQuizInterRound(data);
+      setQuizResults(null);
     });
 
     // True/False events
@@ -273,6 +281,12 @@ export const Display = () => {
 
     newSocket.on('truefalse:answer', (data) => {
       setTfReveal(data);
+      setTfInterRound(null);
+    });
+
+    newSocket.on('truefalse:leaderboard:show', (data) => {
+      setTfInterRound(data);
+      setTfReveal(null);
     });
 
     // Countdown events
@@ -911,6 +925,38 @@ export const Display = () => {
         </div>
         {displayControl}
       </>
+    );
+  }
+
+  // Inter-round leaderboard overlay (Quiz / T-F). Per QA 2026-05-14 §16.
+  if ((currentGame === 'quiz' && quizInterRound) || (currentGame === 'trueFalse' && tfInterRound)) {
+    const data = currentGame === 'quiz' ? quizInterRound : tfInterRound;
+    const board: Array<{ id: string; name: string; score: number; rank: number; connected?: boolean }> = data?.leaderboard || [];
+    const top = board.slice(0, 8);
+    return (
+      <div className="flex h-screen w-screen flex-col bg-bg-base px-10 py-8 text-ink">
+        <header className="flex items-start justify-between">
+          <div className="font-display text-2xl font-extrabold tracking-tight">
+            {currentGame === 'quiz' ? 'Quiz · Leaderboard' : 'True or False · Leaderboard'}
+          </div>
+        </header>
+        <section className="flex flex-1 items-center justify-center">
+          <ol className="w-full max-w-3xl space-y-2">
+            {top.map((p) => (
+              <li
+                key={p.id}
+                className="flex items-center justify-between rounded-2xl border-2 border-ink bg-bg-surface px-6 py-4 shadow-ink-sm"
+              >
+                <span className="flex items-center gap-4">
+                  <span className="font-display text-3xl font-extrabold tabular-nums">{p.rank}.</span>
+                  <span className="font-display text-2xl font-extrabold">{p.name}</span>
+                </span>
+                <span className="font-display text-3xl font-extrabold tabular-nums">{p.score}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
     );
   }
 

@@ -16,6 +16,7 @@ const statementsPath = join(__dirname, '../data/statements.json');
 const allStatements = JSON.parse(readFileSync(statementsPath, 'utf-8'));
 const INTRO_DURATION = 30000;
 const ANSWER_REVEAL_DURATION = 5000;
+const INTER_ROUND_LEADERBOARD_DURATION = 5000;
 
 export class TrueFalseGame {
   constructor(gameState, io, gameEngine) {
@@ -282,11 +283,23 @@ export class TrueFalseGame {
 
     this.gameEngine.broadcastPlayerList();
 
-    // Per bug-report 2026-05-14 §A4: drop the inter-statement leaderboard pop
-    // and chain straight to the next statement after the answer-reveal window.
-    this.trackTimeout(() => {
-      this.nextStatement();
-    }, ANSWER_REVEAL_DURATION);
+    // Per QA 2026-05-14 §16: re-introduce an inter-statement leaderboard
+    // between rounds. Skipped after the final statement, which hands off to
+    // endGame().
+    const isFinal = this.gameState.trueFalse.statementNumber >= this.gameState.trueFalse.totalStatements;
+    if (isFinal) {
+      this.trackTimeout(() => this.nextStatement(), ANSWER_REVEAL_DURATION);
+    } else {
+      this.trackTimeout(() => {
+        const board = this.gameEngine.getLeaderboard();
+        this.io.emit('truefalse:leaderboard:show', {
+          leaderboard: board,
+          duration: INTER_ROUND_LEADERBOARD_DURATION,
+          endsAt: Date.now() + INTER_ROUND_LEADERBOARD_DURATION
+        });
+        this.trackTimeout(() => this.nextStatement(), INTER_ROUND_LEADERBOARD_DURATION);
+      }, ANSWER_REVEAL_DURATION);
+    }
   }
 
   /**

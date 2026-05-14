@@ -20,7 +20,8 @@ interface Statement {
 }
 
 export const TrueFalse = ({ socket }: TrueFalseProps) => {
-  const [phase, setPhase] = useState<'intro' | 'playing' | 'results'>('intro');
+  const [phase, setPhase] = useState<'intro' | 'playing' | 'results' | 'leaderboard'>('intro');
+  const [interRoundBoard, setInterRoundBoard] = useState<any>(null);
   const [introData, setIntroData] = useState<any>(null);
   const [currentStatement, setCurrentStatement] = useState<Statement | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
@@ -124,6 +125,11 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
       }
     });
 
+    socket.on('truefalse:leaderboard:show', (data) => {
+      setPhase('leaderboard');
+      setInterRoundBoard(data);
+    });
+
     socket.on('truefalse:end', (data) => {
       console.log('[TrueFalse] Game ended', data);
       setPhase('results');
@@ -135,6 +141,7 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
       socket.off('truefalse:statement');
       socket.off('truefalse:answer:received');
       socket.off('truefalse:answer');
+      socket.off('truefalse:leaderboard:show');
       socket.off('truefalse:end');
 
       if (timer) {
@@ -383,6 +390,41 @@ export const TrueFalse = ({ socket }: TrueFalseProps) => {
               </p>
             </div>
           )}
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Inter-statement leaderboard overlay
+  if (phase === 'leaderboard' && interRoundBoard) {
+    const board: Array<{ id: string; name: string; score: number; rank: number }> = interRoundBoard.leaderboard || [];
+    const top = board.slice(0, 5);
+    return (
+      <div className="min-h-screen bg-bg-base px-4 py-8 text-ink">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="mx-auto max-w-2xl space-y-4"
+        >
+          <h2 className="text-center font-display text-4xl font-black tracking-tight">Leaderboard</h2>
+          <ul className="space-y-2">
+            {top.map((p) => (
+              <li
+                key={p.id}
+                className={[
+                  'flex items-center justify-between rounded-2xl border-2 border-ink px-4 py-3 shadow-ink-sm',
+                  p.id === playerId ? 'bg-streak text-on-streak' : 'bg-bg-surface text-ink'
+                ].join(' ')}
+              >
+                <span className="flex items-center gap-3">
+                  <span className="font-display text-xl font-extrabold tabular-nums">{p.rank}.</span>
+                  <span className="font-bold">{p.name}</span>
+                </span>
+                <span className="font-display text-xl font-extrabold tabular-nums">{p.score}</span>
+              </li>
+            ))}
+          </ul>
         </motion.div>
       </div>
     );

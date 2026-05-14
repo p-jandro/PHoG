@@ -17,6 +17,7 @@ const __dirname = dirname(__filename);
 const quizRoundsPath = join(__dirname, '../data/quizRounds.json');
 const quizRounds = JSON.parse(readFileSync(quizRoundsPath, 'utf-8'));
 const QUESTION_RESULTS_DURATION = 3000;
+const INTER_ROUND_LEADERBOARD_DURATION = 5000;
 
 export class QuizGame {
   constructor(gameState, io, gameEngine) {
@@ -411,16 +412,23 @@ export class QuizGame {
     // Broadcast updated player list
     this.gameEngine.broadcastPlayerList();
 
-    // Per bug-report 2026-05-14 §A4: the inter-round leaderboard overlay is
-    // gone, so we transition directly from the question-results screen to the
-    // next voting round (or the final leaderboard) after the results window.
-    this.trackTimeout(() => {
-      if (this.gameState.quiz.questionNumber >= this.gameState.quiz.totalQuestions) {
-        this.endQuiz();
-      } else {
-        this.startVoting();
-      }
-    }, QUESTION_RESULTS_DURATION);
+    // Per QA 2026-05-14 §16: re-introduce an inter-round leaderboard between
+    // questions (skipped after the final question, which hands off to the
+    // championship final-leaderboard).
+    const isFinal = this.gameState.quiz.questionNumber >= this.gameState.quiz.totalQuestions;
+    if (isFinal) {
+      this.trackTimeout(() => this.endQuiz(), QUESTION_RESULTS_DURATION);
+    } else {
+      this.trackTimeout(() => {
+        const board = this.gameEngine.getLeaderboard();
+        this.io.emit('quiz:leaderboard:show', {
+          leaderboard: board,
+          duration: INTER_ROUND_LEADERBOARD_DURATION,
+          endsAt: Date.now() + INTER_ROUND_LEADERBOARD_DURATION
+        });
+        this.trackTimeout(() => this.startVoting(), INTER_ROUND_LEADERBOARD_DURATION);
+      }, QUESTION_RESULTS_DURATION);
+    }
   }
 
   /**
