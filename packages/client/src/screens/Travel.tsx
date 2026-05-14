@@ -6,7 +6,7 @@ import { CountryAutocomplete, Country } from '../components/travel/CountryAutoco
 import { ChainStrip } from '../components/travel/ChainStrip';
 import { ChainPill } from '../components/travel/ChainPill';
 import { TravelMap, MapGuess } from '../components/travel/TravelMap';
-import { Card, Chip, Countdown } from '../ui';
+import { Card, Chip } from '../ui';
 import { screenEnter, reducedFade } from '../lib/motion';
 
 type Phase = 'intro' | 'playing' | 'results';
@@ -200,7 +200,6 @@ export const Travel = ({ socket }: TravelProps) => {
   const guessesLeft = Math.max(0, roundData.maxGuesses - guessesUsed);
   const noBudget = guessesLeft <= 0;
   const seconds = Math.ceil(timerMs / 1000);
-  const totalSec = Math.max(1, Math.ceil((roundData.duration || 90000) / 1000));
 
   return (
     <div className="min-h-screen flex flex-col items-center px-4 py-4">
@@ -219,13 +218,11 @@ export const Travel = ({ socket }: TravelProps) => {
             <span className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink px-2.5 py-1 text-xs font-extrabold shadow-ink-sm bg-bg-surface text-ink">
               {guessesLeft} guesses left
             </span>
+            <span className={`inline-flex items-center gap-1.5 rounded-lg border-2 border-ink px-2.5 py-1 text-xs font-extrabold shadow-ink-sm tabular-nums ${seconds <= 10 ? 'bg-danger text-on-danger' : 'bg-bg-surface text-ink'}`}>
+              {seconds}s
+            </span>
           </div>
         </Card>
-
-        {/* Countdown */}
-        <div className="flex justify-center">
-          <Countdown seconds={seconds} total={totalSec} />
-        </div>
 
         {/* Map — shows the player's own chain as they build it. No arcs (no
             reveals) during play; the target is hidden until results. */}
