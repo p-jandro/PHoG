@@ -13,11 +13,12 @@ interface TravelDisplayProps {
   players: Player[];
 }
 
-type Phase = 'intro' | 'playing' | 'results';
+type Phase = 'intro' | 'modeIntro' | 'playing' | 'results';
 
 export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
   const [phase, setPhase] = useState<Phase>('intro');
   const [introData, setIntroData] = useState<any>(null);
+  const [modeIntroData, setModeIntroData] = useState<any>(null);
   const [roundData, setRoundData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
   const [progress, setProgress] = useState<Record<string, any>>({});
@@ -26,15 +27,18 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
   useEffect(() => {
     if (!socket) return;
     const onIntro = (d: any) => { setPhase('intro'); setIntroData(d); setProgress({}); };
+    const onModeIntro = (d: any) => { setPhase('modeIntro'); setModeIntroData(d); setProgress({}); };
     const onStart = (d: any) => { setPhase('playing'); setRoundData(d); setProgress({}); };
     const onProgress = (d: any) => setProgress(d.playerProgress || {});
     const onResults = (d: any) => { setPhase('results'); setResultsData(d); };
     socket.on('travel:intro', onIntro);
+    socket.on('travel:mode:intro', onModeIntro);
     socket.on('travel:round:start', onStart);
     socket.on('travel:progress', onProgress);
     socket.on('travel:round:results', onResults);
     return () => {
       socket.off('travel:intro', onIntro);
+      socket.off('travel:mode:intro', onModeIntro);
       socket.off('travel:round:start', onStart);
       socket.off('travel:progress', onProgress);
       socket.off('travel:round:results', onResults);
@@ -82,9 +86,33 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
     );
   }
 
+  // ── MODE INTRO ─────────────────────────────────────────────────────────
+  if (phase === 'modeIntro' && modeIntroData) {
+    const modeIdx = (modeIntroData.modeIndex ?? 0) + 1;
+    const totalModes = modeIntroData.totalModes ?? 2;
+    const multLabel = modeIntroData.multiplier === 1 ? 'Full points' : `×${modeIntroData.multiplier} points`;
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-bg-base px-10 py-8 text-ink">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-3xl">
+          <Card>
+            <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-streak">
+              Round {modeIdx} of {totalModes}
+            </p>
+            <h1 className="mt-2 font-display text-7xl font-extrabold text-ink">{modeIntroData.modeLabel}</h1>
+            <p className="mt-4 text-2xl font-extrabold text-ink-muted">{multLabel}</p>
+            <p className="mt-3 text-lg text-ink-muted">
+              {modeIntroData.mode === 'europe' ? 'Pairs and paths stay inside Europe.' : 'Any country in play — go global.'}
+            </p>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
   // ── RESULTS ────────────────────────────────────────────────────────────
   if (phase === 'results' && resultsData) {
-    const sorted = [...(resultsData.results || [])].sort((a: any, b: any) => b.score - a.score);
+    const rankBy = (r: any) => r.cumulativeScore ?? r.score ?? 0;
+    const sorted = [...(resultsData.results || [])].sort((a: any, b: any) => rankBy(b) - rankBy(a));
     const top = sorted.slice(0, 5);
     const solvedCount = (resultsData.results || []).filter((r: any) => r.solved).length;
     const totalPlayers = (resultsData.results || []).length;
@@ -104,7 +132,10 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
         {/* Top row */}
         <header className="flex items-start justify-between">
           <div className="font-display text-2xl font-extrabold tracking-tight">
-            Travel — Reveal
+            Travel — {resultsData.modeLabel || 'Reveal'}
+            {!resultsData.isLastMode && resultsData.totalModes
+              ? ` · Round ${(resultsData.modeIndex ?? 0) + 1}/${resultsData.totalModes}`
+              : ''}
           </div>
           <div className="text-right">
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">
@@ -152,7 +183,7 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
                     key={r.playerId}
                     rank={i + 1}
                     name={r.playerName + (r.firstSolver ? ' ⭐' : '')}
-                    score={r.score}
+                    score={r.cumulativeScore ?? r.score}
                   />
                 ))}
               </div>
@@ -218,7 +249,11 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
       {/* Top row: location top-left, countdown top-right */}
       <header className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">Travel · Round in progress</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-ink-muted">
+            Travel · {roundData.modeLabel || 'Round'}
+            {roundData.totalModes ? ` · Round ${(roundData.modeIndex ?? 0) + 1}/${roundData.totalModes}` : ''}
+            {roundData.multiplier != null && roundData.multiplier !== 1 ? ` · ×${roundData.multiplier} points` : ''}
+          </p>
           <p className="mt-1 break-words font-display text-5xl font-black leading-tight tracking-tight">
             {roundData.start} <span className="text-ink-muted">→ ??? →</span> {roundData.end}
           </p>

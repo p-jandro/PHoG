@@ -40,10 +40,33 @@ export function neighbors(canonicalName) {
   return entry ? entry.borders : [];
 }
 
+function neighborsInPool(canonicalName, pool) {
+  const all = neighbors(canonicalName);
+  if (!pool) return all;
+  return all.filter((n) => pool.has(n));
+}
+
 export function isAdjacent(a, b) {
   const entry = COUNTRIES.get(a);
   return !!entry && entry.borders.includes(b);
 }
+
+/**
+ * Restricted pool for the European travel mode. Countries are included if they
+ * sit on the European continental landmass per common geographical usage —
+ * trans-continental states (Russia, Turkey) are included because they share
+ * European land borders. Only names that exist in the dataset are listed.
+ */
+export const EUROPE_POOL = new Set([
+  'Albania', 'Andorra', 'Austria', 'Belarus', 'Belgium',
+  'Bosnia and Herzegovina', 'Bulgaria', 'Croatia', 'Czech Republic',
+  'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece',
+  'Hungary', 'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania',
+  'Luxembourg', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands',
+  'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania',
+  'Russia', 'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden',
+  'Switzerland', 'Turkey', 'Ukraine'
+]);
 
 /**
  * BFS shortest path between two canonical country names. Returns:
@@ -55,9 +78,10 @@ export function isAdjacent(a, b) {
  * so a single function handles both the distance lookup AND green-vs-orange
  * coloring.
  */
-export function shortestPathInfo(start, end) {
+export function shortestPathInfo(start, end, pool = null) {
   if (start === end) return { distance: 0, nextOnShortestPath: new Set() };
   if (!COUNTRIES.has(start) || !COUNTRIES.has(end)) return null;
+  if (pool && (!pool.has(start) || !pool.has(end))) return null;
 
   // BFS forward from start
   const distFromStart = new Map();
@@ -66,7 +90,7 @@ export function shortestPathInfo(start, end) {
   while (queue.length) {
     const node = queue.shift();
     const d = distFromStart.get(node);
-    for (const nb of neighbors(node)) {
+    for (const nb of neighborsInPool(node, pool)) {
       if (!distFromStart.has(nb)) {
         distFromStart.set(nb, d + 1);
         queue.push(nb);
@@ -83,7 +107,7 @@ export function shortestPathInfo(start, end) {
   while (q2.length) {
     const node = q2.shift();
     const d = distFromEnd.get(node);
-    for (const nb of neighbors(node)) {
+    for (const nb of neighborsInPool(node, pool)) {
       if (!distFromEnd.has(nb)) {
         distFromEnd.set(nb, d + 1);
         q2.push(nb);
@@ -94,7 +118,7 @@ export function shortestPathInfo(start, end) {
   // A neighbor of `start` is "on a shortest path" iff distFromStart(nb)+distFromEnd(nb)+1 == totalDistance
   // Actually the simpler invariant: nb is the first step on SOME shortest path iff distFromEnd(nb) == totalDistance - 1.
   const nextOnShortestPath = new Set();
-  for (const nb of neighbors(start)) {
+  for (const nb of neighborsInPool(start, pool)) {
     if ((distFromEnd.get(nb) ?? Infinity) === totalDistance - 1) {
       nextOnShortestPath.add(nb);
     }
@@ -106,14 +130,15 @@ export function shortestPathInfo(start, end) {
  * Verify that you can still reach `end` from the new chain head.
  * Returns true if a path exists (any path, not necessarily shortest).
  */
-export function canReach(start, end) {
+export function canReach(start, end, pool = null) {
   if (start === end) return true;
   if (!COUNTRIES.has(start) || !COUNTRIES.has(end)) return false;
+  if (pool && (!pool.has(start) || !pool.has(end))) return false;
   const visited = new Set([start]);
   const queue = [start];
   while (queue.length) {
     const node = queue.shift();
-    for (const nb of neighbors(node)) {
+    for (const nb of neighborsInPool(node, pool)) {
       if (nb === end) return true;
       if (!visited.has(nb)) {
         visited.add(nb);
@@ -128,15 +153,16 @@ export function canReach(start, end) {
  * Return one example shortest path from start to end (canonical names),
  * including both endpoints. Used at the round-results reveal.
  */
-export function shortestPathChain(start, end) {
+export function shortestPathChain(start, end, pool = null) {
   if (start === end) return [start];
+  if (pool && (!pool.has(start) || !pool.has(end))) return null;
   const parent = new Map();
   parent.set(start, null);
   const queue = [start];
   while (queue.length) {
     const node = queue.shift();
     if (node === end) break;
-    for (const nb of neighbors(node)) {
+    for (const nb of neighborsInPool(node, pool)) {
       if (!parent.has(nb)) {
         parent.set(nb, node);
         queue.push(nb);
@@ -157,13 +183,20 @@ export function shortestPathChain(start, end) {
  * Pick a random valid (start, end) pair with shortest-path distance in [minHops, maxHops].
  * Tries up to `maxAttempts` random pairs; returns null on failure.
  */
-export function pickRandomPair(minHops = 2, maxHops = 7, maxAttempts = 200) {
-  const names = Array.from(COUNTRIES.keys()).filter((n) => COUNTRIES.get(n).borders.length > 0);
+export function pickRandomPair(minHops = 2, maxHops = 7, maxAttempts = 200, pool = null) {
+  const names = Array.from(COUNTRIES.keys()).filter((n) => {
+    if (pool && !pool.has(n)) return false;
+    const borders = COUNTRIES.get(n).borders;
+    if (!pool) return borders.length > 0;
+    // In a restricted pool, a country is only useful if it has at least one
+    // in-pool neighbour — otherwise it's an isolated node in the subgraph.
+    return borders.some((b) => pool.has(b));
+  });
   for (let i = 0; i < maxAttempts; i++) {
     const a = names[Math.floor(Math.random() * names.length)];
     const b = names[Math.floor(Math.random() * names.length)];
     if (a === b) continue;
-    const info = shortestPathInfo(a, b);
+    const info = shortestPathInfo(a, b, pool);
     if (info && info.distance >= minHops && info.distance <= maxHops) {
       return { start: a, end: b, distance: info.distance };
     }

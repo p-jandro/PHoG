@@ -9,7 +9,7 @@ import { TravelMap, MapGuess } from '../components/travel/TravelMap';
 import { Card, Chip } from '../ui';
 import { screenEnter, reducedFade } from '../lib/motion';
 
-type Phase = 'intro' | 'playing' | 'results';
+type Phase = 'intro' | 'modeIntro' | 'playing' | 'results';
 
 interface TravelProps { socket: Socket | null; }
 
@@ -18,6 +18,7 @@ export const Travel = ({ socket }: TravelProps) => {
   const { playerId } = useGameStore();
   const [phase, setPhase] = useState<Phase>('intro');
   const [introData, setIntroData] = useState<any>(null);
+  const [modeIntroData, setModeIntroData] = useState<any>(null);
   const [roundData, setRoundData] = useState<any>(null);
   const [resultsData, setResultsData] = useState<any>(null);
   const [frontChain, setFrontChain] = useState<Array<{ name: string; color?: 'green'|'orange'|'red' }>>([]);
@@ -45,6 +46,11 @@ export const Travel = ({ socket }: TravelProps) => {
       setCountries(d.countries || []);
       setFrontChain([]); setBackChain([]); setSolved(false);
     };
+    const onModeIntro = (d: any) => {
+      setPhase('modeIntro');
+      setModeIntroData(d);
+      setFrontChain([]); setBackChain([]); setSolved(false);
+    };
     const onStart = (d: any) => {
       setPhase('playing'); setRoundData(d);
       setFrontChain([{ name: d.start }]); setBackChain([{ name: d.end }]);
@@ -61,12 +67,14 @@ export const Travel = ({ socket }: TravelProps) => {
     };
     const onResults = (d: any) => { setPhase('results'); setResultsData(d); };
     socket.on('travel:intro', onIntro);
+    socket.on('travel:mode:intro', onModeIntro);
     socket.on('travel:round:start', onStart);
     socket.on('travel:guess:result', onResult);
     socket.on('travel:guess:invalid', onInvalid);
     socket.on('travel:round:results', onResults);
     return () => {
       socket.off('travel:intro', onIntro);
+      socket.off('travel:mode:intro', onModeIntro);
       socket.off('travel:round:start', onStart);
       socket.off('travel:guess:result', onResult);
       socket.off('travel:guess:invalid', onInvalid);
@@ -169,11 +177,22 @@ export const Travel = ({ socket }: TravelProps) => {
           </Card>
 
           <Card>
-            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink-muted">Your result</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink-muted">
+              Your result
+              {resultsData.modeLabel ? ` — ${resultsData.modeLabel}` : ''}
+              {!resultsData.isLastMode && resultsData.totalModes
+                ? ` (round ${(resultsData.modeIndex ?? 0) + 1}/${resultsData.totalModes})`
+                : ''}
+            </p>
             {me ? (
               <div className="mt-2 text-center">
                 <p className="text-lg text-ink">{me.solved ? 'Solved' : 'Not solved'}</p>
-                <p className="mt-1 font-display text-4xl font-black text-action">+{me.score} pts</p>
+                <p className="mt-1 font-display text-4xl font-black text-action">+{me.modeScore ?? me.score} pts</p>
+                {me.cumulativeScore != null && resultsData.totalModes > 1 && (
+                  <p className="mt-1 text-sm text-ink-muted">
+                    {resultsData.isLastMode ? 'Final total' : 'Running total'}: {me.cumulativeScore} pts
+                  </p>
+                )}
                 {me.firstSolver && (
                   <Chip variant="streak" className="mt-2">First solver</Chip>
                 )}
@@ -181,6 +200,29 @@ export const Travel = ({ socket }: TravelProps) => {
             ) : (
               <p className="mt-2 text-ink-muted">No result.</p>
             )}
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ── MODE INTRO ─────────────────────────────────────────────────────────
+  if (phase === 'modeIntro' && modeIntroData) {
+    const modeIdx = (modeIntroData.modeIndex ?? 0) + 1;
+    const totalModes = modeIntroData.totalModes ?? 2;
+    const multLabel = modeIntroData.multiplier === 1 ? 'Full points' : `×${modeIntroData.multiplier} points`;
+    return (
+      <div className="min-h-screen px-4 py-6 sm:py-8 flex flex-col items-center justify-center">
+        <motion.div variants={reduce ? reducedFade : screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl">
+          <Card>
+            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-streak">
+              Round {modeIdx} of {totalModes}
+            </p>
+            <h1 className="mt-2 font-serif text-5xl font-extrabold text-ink">{modeIntroData.modeLabel}</h1>
+            <p className="mt-3 text-lg text-ink-muted">{multLabel}</p>
+            <p className="mt-4 text-sm text-ink-muted">
+              {modeIntroData.mode === 'europe' ? 'Pairs and paths stay inside Europe.' : 'Any country in play.'}
+            </p>
           </Card>
         </motion.div>
       </div>
@@ -210,7 +252,10 @@ export const Travel = ({ socket }: TravelProps) => {
       <motion.div variants={reduce ? reducedFade : screenEnter} initial="hidden" animate="visible" className="w-full max-w-2xl space-y-4">
         {/* Challenge banner */}
         <Card>
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-streak">Travel</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-streak">
+            Travel{roundData.modeLabel ? ` · ${roundData.modeLabel}` : ''}
+            {roundData.totalModes ? ` · Round ${(roundData.modeIndex ?? 0) + 1}/${roundData.totalModes}` : ''}
+          </p>
           <p className="mt-2 break-words text-3xl font-extrabold text-ink">
             {roundData.start}{' '}
             <span className="text-ink-muted">→ ??? →</span>{' '}
@@ -219,6 +264,9 @@ export const Travel = ({ socket }: TravelProps) => {
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
             <Chip variant="info">Optimal {roundData.optimalDistance} hops</Chip>
             <Chip variant="muted">Budget {roundData.maxGuesses}</Chip>
+            {roundData.multiplier != null && roundData.multiplier !== 1 && (
+              <Chip variant="streak">×{roundData.multiplier} points</Chip>
+            )}
             <span className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink px-2.5 py-1 text-xs font-extrabold shadow-ink-sm bg-bg-surface text-ink">
               {guessesLeft} guesses left
             </span>
