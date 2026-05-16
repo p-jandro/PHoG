@@ -1345,7 +1345,7 @@ export const Display = () => {
             </Card>
 
             <p className="mt-6 text-lg font-semibold uppercase tracking-[0.18em] text-ink-muted sm:text-xl">
-              Players have {Math.ceil((pointlessRound.duration || 60000) / 1000)} seconds · Lowest valid answer wins
+              Players have {Math.ceil((pointlessRound.duration || 120000) / 1000)} seconds · Lowest valid answer wins
             </p>
 
             {/* Per bug-report 2026-05-14 §D1/§D2: live per-player tracker chips. */}

@@ -28,9 +28,9 @@ import {
 } from './travel/graph.js';
 
 const INTRO_DURATION = 8000;
-const MODE_INTRO_DURATION = 6000;
-const PLAY_DURATION = 120000;
-const RESULTS_DURATION = 8000;
+const MODE_INTRO_DURATION = 10000;
+const PLAY_DURATION = 180000;
+const RESULTS_DURATION = 12000;
 const MIN_HOPS = 4;
 const MAX_HOPS = 7;
 

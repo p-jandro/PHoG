@@ -221,7 +221,7 @@ export const Wordle = ({ socket }: WordleProps) => {
     );
   }
 
-  const totalMs = roundData.duration || 150000;
+  const totalMs = roundData.duration || 210000;
   const progress = totalMs > 0 ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : 0;
 
   return (

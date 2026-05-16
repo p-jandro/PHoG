@@ -17,8 +17,8 @@ import { Timer } from '../utils/timer.js';
 import { colorGuess, isAllowedGuess, pickRandomAnswer } from './wordle/coloring.js';
 
 const INTRO_DURATION = 8000;
-const PLAY_DURATION = 150000;
-const RESULTS_DURATION = 8000;
+const PLAY_DURATION = 210000;
+const RESULTS_DURATION = 12000;
 const MAX_GUESSES = 6;
 
 function uniqueColored(history, color) {

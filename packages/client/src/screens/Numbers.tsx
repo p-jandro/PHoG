@@ -97,7 +97,7 @@ export const Numbers = ({ socket }: NumbersProps) => {
   }, [socket]);
 
   const target = roundData?.target;
-  const totalMs = roundData?.duration || 60000;
+  const totalMs = roundData?.duration || 90000;
   const progress = totalMs > 0 ? Math.max(0, Math.min(100, (timerMs / totalMs) * 100)) : 0;
   const aTile = pool.find((t) => t.id === selectedAId) || null;
 

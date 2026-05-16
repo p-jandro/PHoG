@@ -7,8 +7,8 @@ import { Timer } from '../utils/timer.js';
 import { calculateQuizScore, getLeader } from '../utils/scoring.js';
 import { contentStore } from '../contentStore.js';
 
-const QUESTION_RESULTS_DURATION = 3000;
-const INTER_ROUND_LEADERBOARD_DURATION = 5000;
+const QUESTION_RESULTS_DURATION = 7000;
+const INTER_ROUND_LEADERBOARD_DURATION = 10000;
 
 export class QuizGame {
   constructor(gameState, io, gameEngine) {
@@ -250,7 +250,7 @@ export class QuizGame {
     console.log(`[QUIZ] Question ${this.gameState.quiz.questionNumber}/${this.gameState.quiz.totalQuestions}: ${questionOption.question}`);
 
     // Emit question to all players (without correct answer)
-    const duration = 17000;
+    const duration = 25000;
     this.gameState.quiz.questionEndsAt = Date.now() + duration;
     this.io.emit('quiz:question:start', {
       questionId: questionOption.id,
@@ -265,7 +265,7 @@ export class QuizGame {
       endsAt: Date.now() + duration
     });
 
-    // Auto-advance after 17 seconds
+    // Auto-advance after 25 seconds
     this.timer = new Timer(duration, null, () => {
       this.endQuestion();
     });
@@ -300,8 +300,8 @@ export class QuizGame {
     });
 
     // Update total response time for tiebreaker
-    // Default duration is 17000ms
-    const responseTime = 17000 - timeRemaining;
+    // Default duration is 25000ms
+    const responseTime = 25000 - timeRemaining;
     player.totalResponseTime = (player.totalResponseTime || 0) + responseTime;
 
     console.log(`[QUIZ] ✓ Answer recorded for ${player.name}: ${answer} (${Math.ceil(timeRemaining / 1000)}s remaining)`);
@@ -339,7 +339,7 @@ export class QuizGame {
     const question = this.gameState.quiz.currentQuestion;
     const correctAnswer = question.correct;
     const difficulty = question.difficulty;
-    const totalTime = 17000;
+    const totalTime = 25000;
     this.gameState.quiz.questionEndsAt = null;
 
     console.log(`[QUIZ] ========== ENDING QUESTION ==========`);

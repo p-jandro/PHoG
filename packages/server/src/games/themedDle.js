@@ -161,12 +161,12 @@ const ANIME_REGULAR_POKEMON = new Set([
 // ---------- Phase / timing constants -----------------------------------------
 
 const INTRO_DURATION = 8000;
-const CLASSIC_DURATION = 130000;
-const EMOJI_DURATION = 130000;
-const SILHOUETTE_DURATION = 130000;
-const SPELL_DURATION = 130000;
-const GRID_DURATION = 130000;
-const RESULTS_DURATION = 8000;
+const CLASSIC_DURATION = 180000;
+const EMOJI_DURATION = 180000;
+const SILHOUETTE_DURATION = 180000;
+const SPELL_DURATION = 180000;
+const GRID_DURATION = 180000;
+const RESULTS_DURATION = 12000;
 // Players get 10 guesses total. Guesses 1-6 score on a sliding efficiency curve;
 // guesses 7-10 are still allowed but score zero (kept around so a player can
 // reveal the target for closure even after the scoring window closes).

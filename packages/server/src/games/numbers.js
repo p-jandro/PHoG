@@ -20,8 +20,8 @@ import { canHitTarget, findOptimal, classifyDifficulty } from './numbers/solver.
 const TOTAL_ROUNDS = 3;
 const DIFFICULTIES = ['easy', 'medium', 'difficult'];
 const INTRO_DURATION = 8000;
-const PLAY_DURATION = 60000;          // step-by-step is slower than free-text
-const RESULTS_DURATION = 8000;
+const PLAY_DURATION = 90000;          // step-by-step is slower than free-text
+const RESULTS_DURATION = 12000;
 const MAX_PUZZLE_GEN_ATTEMPTS = 500;  // higher: we filter by exact difficulty
 
 function generateRound(targetDifficulty) {
