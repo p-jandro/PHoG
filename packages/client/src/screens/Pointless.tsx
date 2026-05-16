@@ -123,7 +123,7 @@ export const Pointless = ({ socket }: PointlessProps) => {
       setError('');
       setRevealData(null);
       setRevealDetailsVisible(false);
-      setTimeRemaining(data.duration || 20000);
+      setTimeRemaining(data.duration || 60000);
 
       // Reset score at start of first round only
       if (data.roundIndex === 0) {
@@ -278,7 +278,7 @@ export const Pointless = ({ socket }: PointlessProps) => {
                 <div className="h-2 overflow-hidden rounded-full border-2 border-ink bg-bg-sunken">
                   <motion.div
                     className="h-full bg-action"
-                    animate={{ width: `${Math.max(0, Math.min(100, (timeRemaining / (roundData?.duration || 30000)) * 100))}%` }}
+                    animate={{ width: `${Math.max(0, Math.min(100, (timeRemaining / (roundData?.duration || 60000)) * 100))}%` }}
                     transition={{ duration: 0.1, ease: 'linear' }}
                   />
                 </div>

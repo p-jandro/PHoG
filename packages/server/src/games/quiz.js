@@ -250,7 +250,7 @@ export class QuizGame {
     console.log(`[QUIZ] Question ${this.gameState.quiz.questionNumber}/${this.gameState.quiz.totalQuestions}: ${questionOption.question}`);
 
     // Emit question to all players (without correct answer)
-    const duration = 12000;
+    const duration = 17000;
     this.gameState.quiz.questionEndsAt = Date.now() + duration;
     this.io.emit('quiz:question:start', {
       questionId: questionOption.id,
@@ -265,7 +265,7 @@ export class QuizGame {
       endsAt: Date.now() + duration
     });
 
-    // Auto-advance after 12 seconds
+    // Auto-advance after 17 seconds
     this.timer = new Timer(duration, null, () => {
       this.endQuestion();
     });
@@ -300,8 +300,8 @@ export class QuizGame {
     });
 
     // Update total response time for tiebreaker
-    // Default duration is 12000ms
-    const responseTime = 12000 - timeRemaining;
+    // Default duration is 17000ms
+    const responseTime = 17000 - timeRemaining;
     player.totalResponseTime = (player.totalResponseTime || 0) + responseTime;
 
     console.log(`[QUIZ] ✓ Answer recorded for ${player.name}: ${answer} (${Math.ceil(timeRemaining / 1000)}s remaining)`);
@@ -339,7 +339,7 @@ export class QuizGame {
     const question = this.gameState.quiz.currentQuestion;
     const correctAnswer = question.correct;
     const difficulty = question.difficulty;
-    const totalTime = 12000;
+    const totalTime = 17000;
     this.gameState.quiz.questionEndsAt = null;
 
     console.log(`[QUIZ] ========== ENDING QUESTION ==========`);

@@ -211,7 +211,7 @@ export const TravelDisplay = ({ socket, players }: TravelDisplayProps) => {
   const maxGuesses = roundData.maxGuesses;
   const solvedCount = connected.filter((p) => progress[p.id]?.solved).length;
   const seconds = Math.ceil(timerMs / 1000);
-  const totalSec = Math.max(1, Math.ceil((roundData.duration || 90000) / 1000));
+  const totalSec = Math.max(1, Math.ceil((roundData.duration || 120000) / 1000));
 
   return (
     <div className="flex h-screen w-screen flex-col bg-bg-base px-10 py-8 text-ink">

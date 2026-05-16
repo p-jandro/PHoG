@@ -77,7 +77,7 @@ export class TrueFalseGame {
       ],
       placementInfo: 'Your rank in this game determines your placement score',
       totalStatements: this.gameState.trueFalse.totalStatements,
-      timePerStatement: 5000,
+      timePerStatement: 15000,
       duration: INTRO_DURATION,
       endsAt: this.gameState.trueFalse.introEndsAt
     });
@@ -129,11 +129,11 @@ export class TrueFalseGame {
       statement: statement.statement,
       statementNumber: this.gameState.trueFalse.statementNumber,
       totalStatements: this.gameState.trueFalse.totalStatements,
-      duration: 5000 // 5 seconds to answer
+      duration: 15000 // 15 seconds to answer
     });
 
-    // Auto-advance after 5 seconds
-    this.statementTimer = new Timer(5000, null, () => {
+    // Auto-advance after 15 seconds
+    this.statementTimer = new Timer(15000, null, () => {
       this.showAnswer();
     });
     this.statementTimer.start();
@@ -448,7 +448,7 @@ export class TrueFalseGame {
           ],
           placementInfo: 'Your rank in this game determines your placement score',
           totalStatements: tf.totalStatements,
-          timePerStatement: 5000,
+          timePerStatement: 15000,
           duration: remaining,
           endsAt: tf.introEndsAt
         }
@@ -461,7 +461,7 @@ export class TrueFalseGame {
           statement: tf.currentStatement.statement,
           statementNumber: tf.statementNumber,
           totalStatements: tf.totalStatements,
-          duration: 5000
+          duration: 15000
         }
       });
     }

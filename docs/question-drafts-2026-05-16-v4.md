@@ -172,7 +172,7 @@ Format: ID — *statement* → **answer** + short explanation. Suggested `id` pr
 
 ---
 
-## POINTLESS ROUNDS — 11 new rounds
+## POINTLESS ROUNDS — 5 new rounds
 
 Pointless scoring: lower score = more obscure. Scores assume a Hungarian audience in their 30s. Tune on playtest.
 
@@ -323,211 +323,31 @@ None of the answer-lists below contains a fact that is also the answer of a TF s
 
 ---
 
-### P25 — Hungarian Football Clubs in the 2024–25 NB I Season
-
-*Name any club that played in the Hungarian NB I (top flight) during the 2024–25 season.*
-
-12 valid answers.
-
-| Club | City | Score |
-|---|---|--:|
-| Ferencvárosi TC | Budapest | 100 |
-| Újpest FC | Budapest | 92 |
-| Debreceni VSC | Debrecen | 90 |
-| MTK Budapest | Budapest | 80 |
-| Diósgyőri VTK | Miskolc | 76 |
-| Fehérvár FC (MOL Fehérvár) | Székesfehérvár | 72 |
-| Zalaegerszegi TE | Zalaegerszeg | 64 |
-| Paksi FC | Paks | 56 |
-| Puskás Akadémia FC | Felcsút | 50 |
-| Kecskeméti TE | Kecskemét | 38 |
-| Kisvárda Master Good | Kisvárda | 18 |
-| Nyíregyháza Spartacus | Nyíregyháza | 8 |
-
-**Acceptance notes:**
-- "MOL Vidi" / "Videoton" / "MOL Fehérvár" → all accept as Fehérvár FC.
-- "Honvéd" → reject (relegated before 2024-25).
-- "Budapest Honvéd" → reject (NB II in 2024-25).
-- Accept clubs by either short or sponsor name.
-
----
-
-### P26 — UEFA Champions League Final Host Cities, 2014–2025
-
-*Name any city that hosted the UEFA Champions League final between the 2013-14 final and the 2024-25 final inclusive.*
-
-11 unique host cities (12 finals; Lisbon hosted twice — 2014 and 2020).
-
-| Year | City | Stadium | Score |
-|--:|---|---|--:|
-| 2014 | Lisbon | Estádio da Luz | 78 |
-| 2015 | Berlin | Olympiastadion | 84 |
-| 2016 | Milan | San Siro | 90 |
-| 2017 | Cardiff | Principality Stadium | 72 |
-| 2018 | Kyiv | NSC Olimpiyskiy | 38 |
-| 2019 | Madrid | Wanda Metropolitano | 80 |
-| 2020 | Lisbon | Estádio da Luz | (counted once) |
-| 2021 | Porto | Estádio do Dragão | 56 |
-| 2022 | Paris | Stade de France | 100 |
-| 2023 | Istanbul | Atatürk Olympic Stadium | 64 |
-| 2024 | London | Wembley | 96 |
-| 2025 | Munich | Allianz Arena | 44 |
-
-**Acceptance notes:**
-- Lisbon: one valid answer regardless of which year the guesser is thinking of.
-- "Wembley" → accept as London (it's iconic enough to score the same).
-- "Saint-Denis" → accept as Paris.
-- Reject the 2013 Wembley final (was the 2012-13 cycle, not in window) unless guesser specifies "Wembley 2024."
-
----
-
-### P27 — Hungary's Official Wine Regions (Borvidékek)
-
-*Name any one of Hungary's 22 officially recognised wine regions (borvidék).*
-
-22 valid answers.
-
-| Wine Region | Score |
-|---|--:|
-| Tokaj (Tokaj-Hegyalja) | 100 |
-| Eger | 96 |
-| Villány | 92 |
-| Szekszárd | 80 |
-| Sopron | 76 |
-| Badacsony | 72 |
-| Balatonfüred-Csopak | 64 |
-| Etyek-Buda | 58 |
-| Mátra (Mátrai) | 54 |
-| Pannonhalma | 50 |
-| Balaton-felvidék | 44 |
-| Pécs | 40 |
-| Tolna | 36 |
-| Balatonboglár | 30 |
-| Mór | 24 |
-| Nagy-Somló | 22 |
-| Neszmély | 18 |
-| Kunság | 14 |
-| Bükk | 10 |
-| Csongrád | 6 |
-| Zala | 4 |
-| Hajós-Baja | 0 |
-
-**Acceptance notes:**
-- Accept either the bare name or the *-i* adjective form ("Tokaji", "Egri", etc).
-- "Aszú" → reject (a wine style, not a region).
-- "Furmint" / "Kadarka" → reject (grape varieties, not regions).
-- "Szatmár" / "Hegyalja" alone → ambiguous; accept Hegyalja as Tokaj.
-
----
-
-### P28 — Common Pálinka Base Fruits
-
-*Name any fruit that is commonly used to distil pálinka in Hungary. Anything that has been commercially produced as pálinka under that fruit's name counts.*
-
-11 valid answers (the canonical list).
-
-| Fruit (Hungarian / English) | Score |
-|---|--:|
-| Szilva (plum) | 100 |
-| Barack — őszibarack / kajszi (peach / apricot) | 96 |
-| Körte (pear) | 84 |
-| Alma (apple) | 76 |
-| Meggy (sour cherry) | 64 |
-| Cseresznye (sweet cherry) | 56 |
-| Eper / szamóca (strawberry) | 38 |
-| Birsalma (quince) | 30 |
-| Bodza (elderberry) | 20 |
-| Törköly (grape marc — technically a by-product, but legally a pálinka type) | 12 |
-| Csipke / csipkebogyó (rosehip) | 0 |
-
-**Acceptance notes:**
-- "Vilmos" → accept as Körte (Pear) — Vilmos pear pálinka is the most famous pear pálinka.
-- "Fütyülős" → reject (a brand, not a fruit).
-- "Whisky" / "Vodka" / "Gin" → reject (not pálinka).
-- Törköly is a borderline category: legally pálinka in Hungary but technically made from grape pomace, not whole fruit. Accept by default.
-
----
-
-### P29 — Cabal Online Playable Classes (current roster)
-
-*Name any class playable in Cabal Online as of the current global servers (2026).*
-
-9 valid answers.
-
-| Class | Year Added | Score |
-|---|--:|--:|
-| Warrior | 2005 (launch) | 100 |
-| Wizard | 2005 (launch) | 92 |
-| Blader | 2005 (launch) | 84 |
-| Force Archer | 2005 (launch) | 76 |
-| Force Shielder | 2005 (launch) | 60 |
-| Force Blader | 2005 (launch) | 48 |
-| Force Gunner | 2014 | 24 |
-| Gladiator | 2016 | 10 |
-| Dark Mage | 2019 | 0 |
-
-**Acceptance notes:**
-- Accept "FA" / "FS" / "FB" / "FG" abbreviations.
-- "Battle Mode" → reject (a mechanic, not a class).
-- "Paladin" / "Mage" alone → reject (need correct Cabal class name; Wizard ≠ Mage).
-
----
-
-### P30 — World of Warcraft: Vanilla Playable Races (2004)
-
-*Name any race that was playable at the November 2004 launch of World of Warcraft, before any expansion.*
-
-8 valid answers — short round, good as a bonus/sprint Pointless.
-
-| Race | Faction | Score |
-|---|---|--:|
-| Human | Alliance | 100 |
-| Orc | Horde | 96 |
-| Night Elf | Alliance | 88 |
-| Dwarf | Alliance | 80 |
-| Undead (Forsaken) | Horde | 68 |
-| Troll | Horde | 56 |
-| Tauren | Horde | 38 |
-| Gnome | Alliance | 0 |
-
-**Acceptance notes:**
-- "Forsaken" / "Scourge" → accept as Undead (Forsaken is canonically correct).
-- Blood Elf / Draenei → reject (Burning Crusade, 2007).
-- Worgen / Goblin → reject (Cataclysm, 2010).
-- Pandaren / Allied Races → reject.
-
----
-
 ## DESIGN NOTES & VERIFICATION FLAGS
 
 ### TF / Pointless cross-check
-Each Pointless round has been checked against the 55 TF statements. No TF "reveals" an answer to any Pointless round:
-- TF #056 / #057 / #058 / #059 / #060 (Age of Empires) mention units, campaigns, dates — none names one of the 13 original civilisations.
-- TF #064 (Eevee evolutions) and #061-#065 do not name any of the 18 elemental types.
-- TF #073-#077 (WoW) name **classes** and **races**, not expansions; the Vanilla-races Pointless overlaps thematically but the TF only references nine *classes* — it never enumerates races.
-- TF #066-#069 (Yu-Gi-Oh!) name the Egyptian Gods, Dark Magician, Kazuki Takahashi — none names a Millennium Item.
-- TF #091-#095 (dogs) reference Vizsla, Komondor, Dachshund, Border Collie, Wirehaired Vizsla. ⚠ **Three Hungarian breeds are named in TF.** The user's rule is "no same question in both"; the same *fact* (e.g. "Komondor coat takes 2 yrs") is not asked in Pointless P24 — P24 just asks players to name the breed. The TF can still tip a player off that Komondor / Vizsla / Wirehaired Vizsla are Hungarian. If stricter separation is desired, swap TF #093 (Komondor) for a different breed (e.g. Doberman, German Shepherd) and TF #094 (Wirehaired Vizsla).
-- TF #106-#110 (Hungarian football) — Marco Rossi, Szoboszlai, Sallai — do not name any of the 12 NB I clubs of P25.
-- TF #111-#115 (UCL) — Ronaldo, PSG, Tony Britten, league-phase, Real Madrid — none names a *host city* from P26 (PSG's 2025 final at Munich is mentioned, which is one of the 11 host cities). ⚠ **TF #112 names Munich** as the 2025 host. The user may consider this a soft overlap. Suggested swap: phrase TF #112 as *"PSG beat Inter 5–0 in the 2024-25 UCL final"* without naming the venue.
-- TF #103-#105 (drinking) — Tokaji Aszú, Egri Bikavér — both names also appear in P27 wine regions (Tokaj, Eger). ⚠ Same as above: factually different questions, but the wine-region answer is exposed. Swap suggestion: replace TF #103 with a Sopron/Villány fact, or replace P27 with a non-wine-region drinking topic.
+Each of the 5 Pointless rounds has been checked against the 55 TF statements. No TF "reveals" an answer to any Pointless round:
+- TF #055–#060 (Age of Empires) mention units, campaigns, release dates, and the Aztecs / Magyars (both *not* in the original 13). None names a civilisation that **is** in P20's answer list.
+- TF #061–#065 (Pokémon) name Charmander/Charmeleon/Charizard, Mew, Eevee, Paldea — none names one of the 18 elemental types in P21.
+- TF #073–#077 (WoW) name **classes** (Druid/Hunter/Mage/etc.) and **races** (Draenei, Blood Elves) — never an expansion name. P22 (expansions) is clean.
+- TF #066–#069 (Yu-Gi-Oh!) name the Egyptian Gods, Dark Magician, Kazuki Takahashi — none names a Millennium Item in P23.
+- TF #091–#095 (dogs) reference Vizsla, Komondor, Dachshund, Border Collie, Wirehaired Vizsla. ⚠ **Three Hungarian breeds are named in TF** and they also appear in P24's answer list. The user's rule was "no same *question* in both"; same *fact* is not asked twice — P24 just asks players to *name* the breed. But the TF can still tip a player off that Komondor / Vizsla / Wirehaired Vizsla are Hungarian. If stricter separation is desired, swap TF #093 (Komondor) and TF #094 (Wirehaired Vizsla) for breeds outside the P24 list (e.g. Doberman, German Shepherd).
 
 ### Items needing human verification (⚠ flagged)
 - `tf072` Cabal "BM3 bundled with Force Gunner release" — verify with Cabal patch notes; I'm 80% confident, not 100%.
 - `tf110` Roland Sallai — verify he is still at Bundesliga club (SC Freiburg) as of season opening. If transferred to a non-Bundesliga side, rewrite or mark FALSE.
-- P22 "Midnight" exclusion — confirm Midnight is not live yet on the date the round is used.
-- P25 NB I 2024-25 — verify final 12-club list (relegation/promotion at end of 2023-24); the list above reflects best knowledge as of mid-May 2026.
-- P26 UCL final scoring — 2025 Munich final happened only ~12 months before the question is played; score may be higher than 44 given recency.
+- P22 "Midnight" exclusion — confirm Midnight has not yet released on the date the round is used.
 
 ### Audience calibration reminders
 Pointless scores reflect "out of 100 Hungarians in their 30s, how many would guess this." Tune especially:
-- P21 Pokémon types — easy-medium audience: Fire/Water at 100 is right; Fairy may even score lower than 4 since Gen 6 was 2013 and many casual fans have not played since.
-- P29 Cabal classes — Cabal Online's Hungarian community was large around 2006–2010; classic-six classes score high, post-2014 classes (FG, Gladiator, Dark Mage) score low unless the audience are still active players.
-- P30 vanilla WoW races — 8-answer round is short; recommend pairing with a second short round (e.g. P23 Millennium Items) as a sprint pair.
+- **P21 Pokémon types** — Fire/Water at 100 is right; Fairy may even score lower than 4 since Gen 6 was 2013 and many casual fans have not played since.
+- **P23 Millennium Items** — 7-answer round is short; recommend pairing with another short round as a sprint pair.
+- **P24 Hungarian dog breeds** — Vizsla/Puli/Komondor saturate the top; Pumi, Mudi, Magyar Agár, Erdélyi Kopó score low for a Hungarian crowd that knows only the famous breeds.
 
 ---
 
 ## INTEGRATION NOTES
 
 - **TF additions** can be appended to `packages/server/src/data/statements.json` with `id: tf051`–`tf105` (continuing the existing numeric scheme). Strip the leading "### Category" headers — just use `statement`, `answer`, `explanation`.
-- **Pointless additions** can be appended to `packages/server/src/data/pointless.json` with `id: round_10_*` upward, using the **labeled** form (`"answer": { "label": "...", "score": N }`) for the rounds with multi-word labels (P22, P25, P26, P27, P29) and the bare form (`"answer": score`) for the shorter ones (P21, P30) if preferred.
+- **Pointless additions** can be appended to `packages/server/src/data/pointless.json` with `id: round_10_*` upward, using the **labeled** form (`"answer": { "label": "...", "score": N }`) for P22 and P24 (multi-word labels), and the bare form (`"answer": score`) for P20, P21, P23 if preferred.
 - Once approved by playtest, fold these into the production JSON via a follow-up PR — keeping this v4 draft file as the audit trail.

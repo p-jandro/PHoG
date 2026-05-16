@@ -2,7 +2,7 @@ import stringSimilarity from 'string-similarity';
 import { Timer } from '../utils/timer.js';
 import { contentStore } from '../contentStore.js';
 
-export const POINTLESS_ROUND_DURATION = 30000;
+export const POINTLESS_ROUND_DURATION = 60000;
 const POINTLESS_INTRO_DURATION = 30000;
 const POINTLESS_REVEAL_DURATION = 8000;
 const ANSWER_LABEL_OVERRIDES = {
