@@ -17,8 +17,10 @@ function makeGame(theme, mode) {
   const gameEngine = { broadcastPlayerList: () => {}, endGame: () => {} };
   const g = new ThemedDleGame(gameState, io, gameEngine, { theme, modes: [mode] });
   g.mode = mode;
-  // Set phaseEndsAt so timeRemainingMs == totalMs (full speed bonus).
-  const dur = mode === 'spell' ? 100000 : 100000;
+  // Set phaseEndsAt so timeRemainingMs == totalMs (full speed bonus). Must
+  // match the production mode duration — see CLASSIC/SILHOUETTE/etc. _DURATION
+  // constants in themedDle.js.
+  const dur = g._modeDuration();
   g.phaseStartAt = Date.now();
   g.phaseEndsAt = g.phaseStartAt + dur;
   return g;

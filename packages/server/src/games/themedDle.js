@@ -61,31 +61,92 @@ function nameOf(entry, theme) {
 
 // ---------- Locked friend-night grids (Mode 4) -------------------------------
 
-const FRIEND_NIGHT_GRID = {
-  pokemon: {
-    rows: [
-      { label: 'Fire-type',    test: p => p.types.includes('Fire') },
-      { label: 'Color: Pink',  test: p => p.color === 'Pink' },
-      { label: 'Cave habitat', test: p => p.habitat === 'Cave' }
-    ],
-    cols: [
-      { label: 'Used by a Gym Leader',   test: p => p.gymLeader !== null && p.gymLeader !== undefined },
-      { label: 'Final evolution',        test: p => p.evolutionStage === 'Final' },
-      { label: 'Owned by an anime regular', test: p => ANIME_REGULAR_POKEMON.has(p.name) }
-    ]
-  },
-  hp: {
-    rows: [
-      { label: 'Gryffindor', test: c => c.house === 'Gryffindor' },
-      { label: 'Slytherin',  test: c => c.house === 'Slytherin' },
-      { label: 'Female',     test: c => c.gender === 'F' }
-    ],
-    cols: [
-      { label: 'Order of the Phoenix', test: c => (c.affiliations || []).some(a => /order of the phoenix/i.test(a)) },
-      { label: 'Hogwarts staff',       test: c => c.school === 'Hogwarts' && (c.roles || []).some(r => /teacher|headmaster|professor|head of house|staff/i.test(r)) && !(c.roles || []).includes('Student') },
-      { label: 'Death Eater',          test: c => ['yes', 'former', 'leader'].includes(c.deathEaterStatus) }
-    ]
-  }
+// Each theme exposes a pool of 3×3 grids; one is picked at random per game.
+// Every cell of every grid below was sanity-checked to have ≥2 valid answers
+// against the production roster (see tests/themed-dle/grid-cell-feasibility.test.mjs).
+const THEMED_GRIDS = {
+  pokemon: [
+    {
+      id: 'friend-night-v1',
+      rows: [
+        { label: 'Fire-type',    test: p => p.types.includes('Fire') },
+        { label: 'Color: Pink',  test: p => p.color === 'Pink' },
+        { label: 'Cave habitat', test: p => p.habitat === 'Cave' }
+      ],
+      cols: [
+        { label: 'Used by a Gym Leader',      test: p => p.gymLeader !== null && p.gymLeader !== undefined },
+        { label: 'Final evolution',           test: p => p.evolutionStage === 'Final' },
+        { label: 'Owned by an anime regular', test: p => ANIME_REGULAR_POKEMON.has(p.name) }
+      ]
+    },
+    {
+      id: 'habitats-and-power',
+      rows: [
+        { label: 'Cave habitat',      test: p => p.habitat === 'Cave' },
+        { label: 'Sea habitat',       test: p => p.habitat === 'Sea' },
+        { label: 'Grassland habitat', test: p => p.habitat === 'Grassland' }
+      ],
+      cols: [
+        { label: 'Final evolution',     test: p => p.evolutionStage === 'Final' },
+        { label: 'Poison-type',         test: p => p.types.includes('Poison') },
+        { label: 'High base-stat total', test: p => p.bstBucket === 'High' || p.bstBucket === 'Very high' }
+      ]
+    },
+    {
+      id: 'types-and-identity',
+      rows: [
+        { label: 'Water-type',   test: p => p.types.includes('Water') },
+        { label: 'Psychic-type', test: p => p.types.includes('Psychic') },
+        { label: 'Flying-type',  test: p => p.types.includes('Flying') }
+      ],
+      cols: [
+        { label: 'Final evolution',           test: p => p.evolutionStage === 'Final' },
+        { label: 'Iconic Tier-1 fan favourite', test: p => p.iconicStatus === 'tier1' },
+        { label: 'Dual-type Pokémon',         test: p => Array.isArray(p.types) && p.types.length >= 2 }
+      ]
+    }
+  ],
+  hp: [
+    {
+      id: 'friend-night-v1',
+      rows: [
+        { label: 'Gryffindor', test: c => c.house === 'Gryffindor' },
+        { label: 'Slytherin',  test: c => c.house === 'Slytherin' },
+        { label: 'Female',     test: c => c.gender === 'F' }
+      ],
+      cols: [
+        { label: 'Order of the Phoenix', test: c => (c.affiliations || []).some(a => /order of the phoenix/i.test(a)) },
+        { label: 'Hogwarts staff',       test: c => c.school === 'Hogwarts' && (c.roles || []).some(r => /teacher|headmaster|professor|head of house|staff/i.test(r)) && !(c.roles || []).includes('Student') },
+        { label: 'Death Eater',          test: c => ['yes', 'former', 'leader'].includes(c.deathEaterStatus) }
+      ]
+    },
+    {
+      id: 'allegiance-and-trait',
+      rows: [
+        { label: 'Death Eater (past or present)', test: c => ['yes', 'former', 'leader'].includes(c.deathEaterStatus) },
+        { label: 'Order of the Phoenix',          test: c => (c.affiliations || []).some(a => /order of the phoenix/i.test(a)) },
+        { label: 'Hogwarts staff',                test: c => c.school === 'Hogwarts' && (c.roles || []).some(r => /teacher|professor|headmaster|head of house|staff/i.test(r)) }
+      ],
+      cols: [
+        { label: 'Pure-blood',  test: c => c.bloodStatus === 'Pure-blood' },
+        { label: 'Male',         test: c => c.gender === 'M' },
+        { label: 'Died in canon', test: c => c.diedInCanon }
+      ]
+    },
+    {
+      id: 'blood-and-story',
+      rows: [
+        { label: 'Half-blood',  test: c => c.bloodStatus === 'Half-blood' },
+        { label: 'Pure-blood',  test: c => c.bloodStatus === 'Pure-blood' },
+        { label: 'Muggle-born', test: c => c.bloodStatus === 'Muggle-born' }
+      ],
+      cols: [
+        { label: 'Gryffindor',           test: c => c.house === 'Gryffindor' },
+        { label: 'Died in canon',        test: c => c.diedInCanon },
+        { label: 'Order of the Phoenix', test: c => (c.affiliations || []).some(a => /order of the phoenix/i.test(a)) }
+      ]
+    }
+  ]
 };
 
 const ANIME_REGULAR_POKEMON = new Set([
@@ -495,10 +556,15 @@ export class ThemedDleGame {
   }
 
   _setupGrid() {
-    // Friend-night locked grid (Mode 4 v1). Future: a generator.
-    this.grid = FRIEND_NIGHT_GRID[this.theme];
+    // Mode 4: 3×3 cross-attribute grid. We keep a small pool per theme and
+    // pick one at random each game so the puzzle isn't the same every night.
+    const pool = THEMED_GRIDS[this.theme] || [];
+    if (pool.length === 0) {
+      throw new Error(`[${this.gameName}/grid] no grids registered for theme ${this.theme}`);
+    }
+    this.grid = pickRandom(pool);
     this.targetName = null; // grid has no single answer
-    console.log(`[${this.gameName}/grid] Using friend-night locked grid`);
+    console.log(`[${this.gameName}/grid] Selected grid: ${this.grid.id || '(unnamed)'}`);
   }
 
   // -------- Mode-specific public hints --------
