@@ -1,0 +1,609 @@
+[
+  {
+    "id": "round_1_south_america",
+    "category": "South American Countries",
+    "question": "Name any country in South America",
+    "answers": {
+      "brazil": 100,
+      "argentina": 92,
+      "chile": 78,
+      "peru": 74,
+      "colombia": 72,
+      "ecuador": 52,
+      "bolivia": 48,
+      "venezuela": 46,
+      "uruguay": 34,
+      "paraguay": 28,
+      "guyana": 6,
+      "suriname": 0
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_3_nintendo_home_consoles",
+    "category": "Nintendo Home Consoles",
+    "question": "Name any Nintendo home console",
+    "answers": {
+      "switch 2": {
+        "label": "Nintendo Switch 2",
+        "score": 100
+      },
+      "switch": {
+        "label": "Nintendo Switch",
+        "score": 96
+      },
+      "wii": {
+        "label": "Wii",
+        "score": 88
+      },
+      "nintendo 64": {
+        "label": "Nintendo 64",
+        "score": 74
+      },
+      "gamecube": {
+        "label": "GameCube",
+        "score": 50
+      },
+      "snes": {
+        "label": "SNES",
+        "score": 34
+      },
+      "nes": {
+        "label": "NES",
+        "score": 18
+      },
+      "wii u": {
+        "label": "Wii U",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_4_premier_league_winners",
+    "category": "Premier League Title-Winning Clubs",
+    "question": "Name any club that has won the Premier League title",
+    "answers": {
+      "manchester united": {
+        "label": "Manchester United",
+        "score": 100
+      },
+      "liverpool": {
+        "label": "Liverpool",
+        "score": 92
+      },
+      "arsenal": {
+        "label": "Arsenal",
+        "score": 84
+      },
+      "chelsea": {
+        "label": "Chelsea",
+        "score": 80
+      },
+      "manchester city": {
+        "label": "Manchester City",
+        "score": 74
+      },
+      "leicester city": {
+        "label": "Leicester City",
+        "score": 18
+      },
+      "blackburn rovers": {
+        "label": "Blackburn Rovers",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_5_planets_dwarf_planets",
+    "category": "Planets and Dwarf Planets",
+    "question": "Name any planet or official dwarf planet in our Solar System",
+    "answers": {
+      "earth": 100,
+      "mars": 98,
+      "jupiter": 96,
+      "saturn": 92,
+      "venus": 90,
+      "mercury": 84,
+      "neptune": 72,
+      "uranus": 68,
+      "pluto": 56,
+      "ceres": 12,
+      "eris": 8,
+      "makemake": 4,
+      "haumea": 0
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_6_f1_2025_circuits",
+    "category": "F1 2025 Calendar Circuits",
+    "question": "Name any circuit (by its name, not by country) that hosted a Formula 1 race in the 2025 World Championship season",
+    "answers": {
+      "hungaroring": {
+        "label": "Hungaroring",
+        "score": 100
+      },
+      "monaco": {
+        "label": "Circuit de Monaco",
+        "score": 96
+      },
+      "silverstone": {
+        "label": "Silverstone",
+        "score": 92
+      },
+      "monza": {
+        "label": "Monza",
+        "score": 88
+      },
+      "spa-francorchamps": {
+        "label": "Spa-Francorchamps",
+        "score": 84
+      },
+      "suzuka": {
+        "label": "Suzuka",
+        "score": 76
+      },
+      "yas marina": {
+        "label": "Yas Marina",
+        "score": 68
+      },
+      "interlagos": {
+        "label": "Interlagos",
+        "score": 60
+      },
+      "imola": {
+        "label": "Imola",
+        "score": 54
+      },
+      "albert park": {
+        "label": "Albert Park",
+        "score": 48
+      },
+      "zandvoort": {
+        "label": "Zandvoort",
+        "score": 44
+      },
+      "red bull ring": {
+        "label": "Red Bull Ring",
+        "score": 40
+      },
+      "circuit of the americas": {
+        "label": "Circuit of the Americas",
+        "score": 36
+      },
+      "las vegas strip circuit": {
+        "label": "Las Vegas Strip Circuit",
+        "score": 32
+      },
+      "marina bay": {
+        "label": "Marina Bay",
+        "score": 28
+      },
+      "miami international autodrome": {
+        "label": "Miami International Autodrome",
+        "score": 24
+      },
+      "baku city circuit": {
+        "label": "Baku City Circuit",
+        "score": 20
+      },
+      "hermanos rodríguez": {
+        "label": "Autódromo Hermanos Rodríguez",
+        "score": 18
+      },
+      "bahrain international circuit": {
+        "label": "Bahrain International Circuit",
+        "score": 14
+      },
+      "circuit de barcelona-catalunya": {
+        "label": "Circuit de Barcelona-Catalunya",
+        "score": 12
+      },
+      "circuit gilles villeneuve": {
+        "label": "Circuit Gilles Villeneuve",
+        "score": 10
+      },
+      "jeddah corniche circuit": {
+        "label": "Jeddah Corniche Circuit",
+        "score": 6
+      },
+      "shanghai international circuit": {
+        "label": "Shanghai International Circuit",
+        "score": 4
+      },
+      "lusail international circuit": {
+        "label": "Lusail International Circuit",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_7_champions_league_winners",
+    "category": "UEFA Champions League Winners",
+    "question": "Name any club that has ever won the European Cup or UEFA Champions League",
+    "answers": {
+      "real madrid": {
+        "label": "Real Madrid",
+        "score": 100
+      },
+      "barcelona": {
+        "label": "FC Barcelona",
+        "score": 96
+      },
+      "liverpool": {
+        "label": "Liverpool",
+        "score": 94
+      },
+      "manchester united": {
+        "label": "Manchester United",
+        "score": 92
+      },
+      "bayern munich": {
+        "label": "Bayern Munich",
+        "score": 90
+      },
+      "ac milan": {
+        "label": "AC Milan",
+        "score": 86
+      },
+      "inter milan": {
+        "label": "Inter Milan",
+        "score": 78
+      },
+      "juventus": {
+        "label": "Juventus",
+        "score": 74
+      },
+      "chelsea": {
+        "label": "Chelsea",
+        "score": 72
+      },
+      "ajax": {
+        "label": "Ajax",
+        "score": 66
+      },
+      "paris saint-germain": {
+        "label": "Paris Saint-Germain",
+        "score": 60
+      },
+      "manchester city": {
+        "label": "Manchester City",
+        "score": 56
+      },
+      "borussia dortmund": {
+        "label": "Borussia Dortmund",
+        "score": 50
+      },
+      "porto": {
+        "label": "FC Porto",
+        "score": 44
+      },
+      "benfica": {
+        "label": "Benfica",
+        "score": 38
+      },
+      "marseille": {
+        "label": "Olympique de Marseille",
+        "score": 30
+      },
+      "psv eindhoven": {
+        "label": "PSV Eindhoven",
+        "score": 24
+      },
+      "celtic": {
+        "label": "Celtic",
+        "score": 22
+      },
+      "nottingham forest": {
+        "label": "Nottingham Forest",
+        "score": 18
+      },
+      "aston villa": {
+        "label": "Aston Villa",
+        "score": 14
+      },
+      "hamburger sv": {
+        "label": "Hamburger SV",
+        "score": 10
+      },
+      "red star belgrade": {
+        "label": "Red Star Belgrade",
+        "score": 8
+      },
+      "feyenoord": {
+        "label": "Feyenoord",
+        "score": 6
+      },
+      "steaua bucurești": {
+        "label": "Steaua București",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_9_worms_armageddon_weapons",
+    "category": "Worms Armageddon Weapons",
+    "question": "Name any weapon in Worms Armageddon (1999). Pure utilities like Ninja Rope, Teleport, Parachute, Girder, Jet Pack do not count",
+    "answers": {
+      "bazooka": {
+        "label": "Bazooka",
+        "score": 100
+      },
+      "holy hand grenade": {
+        "label": "Holy Hand Grenade",
+        "score": 96
+      },
+      "grenade": {
+        "label": "Grenade",
+        "score": 94
+      },
+      "shotgun": {
+        "label": "Shotgun",
+        "score": 92
+      },
+      "dynamite": {
+        "label": "Dynamite",
+        "score": 88
+      },
+      "banana bomb": {
+        "label": "Banana Bomb",
+        "score": 84
+      },
+      "cluster bomb": {
+        "label": "Cluster Bomb",
+        "score": 78
+      },
+      "super sheep": {
+        "label": "Super Sheep",
+        "score": 76
+      },
+      "concrete donkey": {
+        "label": "Concrete Donkey",
+        "score": 74
+      },
+      "sheep": {
+        "label": "Sheep",
+        "score": 70
+      },
+      "air strike": {
+        "label": "Air Strike",
+        "score": 64
+      },
+      "fire punch": {
+        "label": "Fire Punch",
+        "score": 60
+      },
+      "baseball bat": {
+        "label": "Baseball Bat",
+        "score": 56
+      },
+      "uzi": {
+        "label": "Uzi",
+        "score": 50
+      },
+      "kamikaze": {
+        "label": "Kamikaze",
+        "score": 46
+      },
+      "homing missile": {
+        "label": "Homing Missile",
+        "score": 42
+      },
+      "mortar": {
+        "label": "Mortar",
+        "score": 38
+      },
+      "mine": {
+        "label": "Mine",
+        "score": 34
+      },
+      "dragon ball": {
+        "label": "Dragon Ball",
+        "score": 28
+      },
+      "prod": {
+        "label": "Prod",
+        "score": 24
+      },
+      "homing pigeon": {
+        "label": "Homing Pigeon",
+        "score": 20
+      },
+      "mad cow": {
+        "label": "Mad Cow",
+        "score": 16
+      },
+      "sheep launcher": {
+        "label": "Sheep Launcher",
+        "score": 12
+      },
+      "earthquake": {
+        "label": "Earthquake",
+        "score": 10
+      },
+      "armageddon": {
+        "label": "Armageddon",
+        "score": 8
+      },
+      "sheep strike": {
+        "label": "Sheep Strike",
+        "score": 6
+      },
+      "old woman": {
+        "label": "Old Woman",
+        "score": 4
+      },
+      "carpet bomb": {
+        "label": "Mike's Carpet Bomb",
+        "score": 2
+      },
+      "mb bomb": {
+        "label": "MB Bomb (Salvation Army)",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_11_pokemon_types",
+    "category": "Pokémon Elemental Types",
+    "question": "Name any one of the 18 elemental Pokémon types as of Generation 9",
+    "answers": {
+      "fire": 100,
+      "water": 100,
+      "grass": 98,
+      "electric": 94,
+      "normal": 88,
+      "ice": 82,
+      "ground": 78,
+      "flying": 72,
+      "rock": 64,
+      "fighting": 60,
+      "psychic": 56,
+      "poison": 50,
+      "bug": 44,
+      "ghost": 38,
+      "dragon": 30,
+      "dark": 22,
+      "steel": 14,
+      "fairy": 4
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_12_wow_expansions",
+    "category": "World of Warcraft Expansions",
+    "question": "Name any major paid expansion to World of Warcraft (vanilla doesn't count)",
+    "answers": {
+      "the burning crusade": {
+        "label": "The Burning Crusade",
+        "score": 100
+      },
+      "wrath of the lich king": {
+        "label": "Wrath of the Lich King",
+        "score": 96
+      },
+      "cataclysm": {
+        "label": "Cataclysm",
+        "score": 88
+      },
+      "mists of pandaria": {
+        "label": "Mists of Pandaria",
+        "score": 82
+      },
+      "legion": {
+        "label": "Legion",
+        "score": 64
+      },
+      "dragonflight": {
+        "label": "Dragonflight",
+        "score": 56
+      },
+      "warlords of draenor": {
+        "label": "Warlords of Draenor",
+        "score": 48
+      },
+      "battle for azeroth": {
+        "label": "Battle for Azeroth",
+        "score": 44
+      },
+      "shadowlands": {
+        "label": "Shadowlands",
+        "score": 36
+      },
+      "the war within": {
+        "label": "The War Within",
+        "score": 18
+      },
+      "midnight": {
+        "label": "Midnight",
+        "score": 10
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_13_yugioh_millennium_items",
+    "category": "Yu-Gi-Oh! Millennium Items",
+    "question": "Name any one of the seven Millennium Items in the Yu-Gi-Oh! manga/anime canon",
+    "answers": {
+      "millennium puzzle": {
+        "label": "Millennium Puzzle",
+        "score": 100
+      },
+      "millennium ring": {
+        "label": "Millennium Ring",
+        "score": 70
+      },
+      "millennium eye": {
+        "label": "Millennium Eye",
+        "score": 56
+      },
+      "millennium rod": {
+        "label": "Millennium Rod",
+        "score": 38
+      },
+      "millennium necklace": {
+        "label": "Millennium Necklace",
+        "score": 24
+      },
+      "millennium key": {
+        "label": "Millennium Key",
+        "score": 12
+      },
+      "millennium scale": {
+        "label": "Millennium Scale",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_14_hungarian_dog_breeds",
+    "category": "Hungarian Dog Breeds (FCI)",
+    "question": "Name any dog breed recognised by the FCI as of Hungarian origin",
+    "answers": {
+      "vizsla": {
+        "label": "Vizsla (Magyar Vizsla)",
+        "score": 100
+      },
+      "puli": {
+        "label": "Puli",
+        "score": 92
+      },
+      "komondor": {
+        "label": "Komondor",
+        "score": 84
+      },
+      "kuvasz": {
+        "label": "Kuvasz",
+        "score": 74
+      },
+      "wirehaired vizsla": {
+        "label": "Hungarian Wirehaired Vizsla (Drótszőrű Vizsla)",
+        "score": 50
+      },
+      "pumi": {
+        "label": "Pumi",
+        "score": 32
+      },
+      "mudi": {
+        "label": "Mudi",
+        "score": 22
+      },
+      "hungarian greyhound": {
+        "label": "Hungarian Greyhound (Magyar Agár)",
+        "score": 12
+      },
+      "transylvanian hound": {
+        "label": "Transylvanian Hound (Erdélyi Kopó)",
+        "score": 0
+      }
+    },
+    "enabled": true
+  }
+]
