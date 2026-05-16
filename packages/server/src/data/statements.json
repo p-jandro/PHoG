@@ -3,300 +3,805 @@
     "id": "tf001",
     "statement": "Mercury is the closest planet to the Sun.",
     "answer": true,
-    "explanation": "Mercury has the smallest average orbital distance from the Sun, at about 58 million kilometers. It completes one orbit in just 88 Earth days."
+    "explanation": "Mercury has the smallest average orbital distance from the Sun, at about 58 million kilometers. It completes one orbit in just 88 Earth days.",
+    "enabled": true
   },
   {
     "id": "tf002",
     "statement": "The Sahara is the largest desert on Earth.",
     "answer": false,
-    "explanation": "Antarctica is the largest desert overall because deserts are defined by low precipitation, not heat. The Sahara is the largest hot desert."
+    "explanation": "Antarctica is the largest desert overall because deserts are defined by low precipitation, not heat. The Sahara is the largest hot desert.",
+    "enabled": true
   },
   {
     "id": "tf003",
     "statement": "Sound travels faster through water than through air.",
     "answer": true,
-    "explanation": "Sound waves move much more quickly through water because its particles are packed more closely together. In seawater, sound travels at roughly 1,500 meters per second."
+    "explanation": "Sound waves move much more quickly through water because its particles are packed more closely together. In seawater, sound travels at roughly 1,500 meters per second.",
+    "enabled": true
   },
   {
     "id": "tf004",
     "statement": "An adult human body typically has 206 bones.",
     "answer": true,
-    "explanation": "Most adults have 206 bones, though the exact number can vary slightly because some bones may fuse or remain separate."
+    "explanation": "Most adults have 206 bones, though the exact number can vary slightly because some bones may fuse or remain separate.",
+    "enabled": true
   },
   {
     "id": "tf005",
     "statement": "The Atlantic Ocean is the largest ocean on Earth.",
     "answer": false,
-    "explanation": "The Pacific Ocean is the largest ocean by surface area and volume. The Atlantic is the second largest."
+    "explanation": "The Pacific Ocean is the largest ocean by surface area and volume. The Atlantic is the second largest.",
+    "enabled": true
   },
   {
     "id": "tf006",
     "statement": "Venus is the hottest planet in the Solar System.",
     "answer": true,
-    "explanation": "Although Mercury is closer to the Sun, Venus has a thick carbon-dioxide atmosphere that traps heat extremely efficiently through a runaway greenhouse effect."
+    "explanation": "Although Mercury is closer to the Sun, Venus has a thick carbon-dioxide atmosphere that traps heat extremely efficiently through a runaway greenhouse effect.",
+    "enabled": true
   },
   {
     "id": "tf007",
     "statement": "Bananas grow on trees.",
     "answer": false,
-    "explanation": "Bananas grow on giant herbs, not trees. The 'trunk' is a pseudostem made from tightly packed leaf bases."
+    "explanation": "Bananas grow on giant herbs, not trees. The 'trunk' is a pseudostem made from tightly packed leaf bases.",
+    "enabled": true
   },
   {
     "id": "tf008",
     "statement": "The capital of Canada is Toronto.",
     "answer": false,
-    "explanation": "Ottawa is the capital of Canada. Toronto is the most populous city in the country."
+    "explanation": "Ottawa is the capital of Canada. Toronto is the most populous city in the country.",
+    "enabled": true
   },
   {
     "id": "tf009",
     "statement": "Glass is made primarily from sand.",
     "answer": true,
-    "explanation": "Most ordinary glass is made mainly from silica, which is found in sand. Other ingredients are added to change its melting point and properties."
+    "explanation": "Most ordinary glass is made mainly from silica, which is found in sand. Other ingredients are added to change its melting point and properties.",
+    "enabled": true
   },
   {
     "id": "tf010",
     "statement": "Water expands when it freezes.",
     "answer": true,
-    "explanation": "Ice forms an open crystal structure that takes up more space than liquid water. That is why ice floats."
+    "explanation": "Ice forms an open crystal structure that takes up more space than liquid water. That is why ice floats.",
+    "enabled": true
   },
   {
     "id": "tf011",
     "statement": "Australia lies entirely in the Northern Hemisphere.",
     "answer": false,
-    "explanation": "Australia is entirely in the Southern Hemisphere. The Tropic of Capricorn passes through the country."
+    "explanation": "Australia is entirely in the Southern Hemisphere. The Tropic of Capricorn passes through the country.",
+    "enabled": true
   },
   {
     "id": "tf012",
     "statement": "An octopus has three hearts.",
     "answer": true,
-    "explanation": "Two hearts pump blood to the gills, while a third pumps blood to the rest of the body."
+    "explanation": "Two hearts pump blood to the gills, while a third pumps blood to the rest of the body.",
+    "enabled": true
   },
   {
     "id": "tf013",
     "statement": "Light travels faster than sound.",
     "answer": true,
-    "explanation": "In a vacuum, light travels at about 300,000 kilometers per second. Sound is far slower because it needs a medium such as air or water."
+    "explanation": "In a vacuum, light travels at about 300,000 kilometers per second. Sound is far slower because it needs a medium such as air or water.",
+    "enabled": true
   },
   {
     "id": "tf014",
     "statement": "The chemical symbol for silver is Ag.",
     "answer": true,
-    "explanation": "Ag comes from the Latin word argentum. Many chemical symbols are based on older Latin names."
+    "explanation": "Ag comes from the Latin word argentum. Many chemical symbols are based on older Latin names.",
+    "enabled": true
   },
   {
     "id": "tf015",
     "statement": "Koalas are a type of bear.",
     "answer": false,
-    "explanation": "Koalas are marsupials, not bears. They carry their young in a pouch."
+    "explanation": "Koalas are marsupials, not bears. They carry their young in a pouch.",
+    "enabled": true
   },
   {
     "id": "tf016",
     "statement": "A leap year occurs every four years without exception.",
     "answer": false,
-    "explanation": "Century years are not leap years unless they are divisible by 400. For example, 1900 was not a leap year, but 2000 was."
+    "explanation": "Century years are not leap years unless they are divisible by 400. For example, 1900 was not a leap year, but 2000 was.",
+    "enabled": true
   },
   {
     "id": "tf017",
     "statement": "Machu Picchu is in Peru.",
     "answer": true,
-    "explanation": "Machu Picchu is a famous Inca site high in the Andes Mountains of Peru."
+    "explanation": "Machu Picchu is a famous Inca site high in the Andes Mountains of Peru.",
+    "enabled": true
   },
   {
     "id": "tf018",
     "statement": "Human skin is the body's largest organ.",
     "answer": true,
-    "explanation": "Skin covers the entire body and plays a major role in protection, sensation, and temperature regulation."
+    "explanation": "Skin covers the entire body and plays a major role in protection, sensation, and temperature regulation.",
+    "enabled": true
   },
   {
     "id": "tf019",
     "statement": "Penguins live only in the Arctic.",
     "answer": false,
-    "explanation": "Penguins are native to the Southern Hemisphere. None are naturally found in the Arctic."
+    "explanation": "Penguins are native to the Southern Hemisphere. None are naturally found in the Arctic.",
+    "enabled": true
   },
   {
     "id": "tf020",
     "statement": "The Suez Canal connects the Mediterranean Sea and the Red Sea.",
     "answer": true,
-    "explanation": "The canal cuts across Egypt and provides a direct shipping route between Europe and Asia without rounding Africa."
+    "explanation": "The canal cuts across Egypt and provides a direct shipping route between Europe and Asia without rounding Africa.",
+    "enabled": true
   },
   {
     "id": "tf021",
     "statement": "Bamboo is a type of grass.",
     "answer": true,
-    "explanation": "Despite its woody appearance, bamboo belongs to the grass family Poaceae."
+    "explanation": "Despite its woody appearance, bamboo belongs to the grass family Poaceae.",
+    "enabled": true
   },
   {
     "id": "tf022",
     "statement": "Jupiter has more than 70 known moons.",
     "answer": true,
-    "explanation": "Jupiter has well over 70 known moons and the total continues to change as new moons are confirmed."
+    "explanation": "Jupiter has well over 70 known moons and the total continues to change as new moons are confirmed.",
+    "enabled": true
   },
   {
     "id": "tf023",
     "statement": "The Roman numeral L means 100.",
     "answer": false,
-    "explanation": "L represents 50. The Roman numeral for 100 is C."
+    "explanation": "L represents 50. The Roman numeral for 100 is C.",
+    "enabled": true
   },
   {
     "id": "tf024",
     "statement": "Caffeine occurs naturally in tea leaves.",
     "answer": true,
-    "explanation": "Tea plants naturally produce caffeine, just like coffee plants do."
+    "explanation": "Tea plants naturally produce caffeine, just like coffee plants do.",
+    "enabled": true
   },
   {
     "id": "tf025",
     "statement": "The Pacific Ring of Fire is mainly associated with earthquakes and volcanoes.",
     "answer": true,
-    "explanation": "It follows the edges of several tectonic plates around the Pacific Ocean, which makes it one of the most geologically active regions on Earth."
+    "explanation": "It follows the edges of several tectonic plates around the Pacific Ocean, which makes it one of the most geologically active regions on Earth.",
+    "enabled": true
   },
   {
     "id": "tf026",
     "statement": "Saturn is the only planet in the Solar System with rings.",
     "answer": false,
-    "explanation": "Jupiter, Uranus, and Neptune also have ring systems. Saturn's are simply the most spectacular and easiest to see."
+    "explanation": "Jupiter, Uranus, and Neptune also have ring systems. Saturn's are simply the most spectacular and easiest to see.",
+    "enabled": true
   },
   {
     "id": "tf027",
     "statement": "The blue whale is the largest animal known to have lived.",
     "answer": true,
-    "explanation": "Blue whales exceed even the largest known dinosaurs in overall mass."
+    "explanation": "Blue whales exceed even the largest known dinosaurs in overall mass.",
+    "enabled": true
   },
   {
     "id": "tf028",
     "statement": "The currency used in Japan is the yen.",
     "answer": true,
-    "explanation": "Japan's national currency is the yen, abbreviated as JPY in international finance."
+    "explanation": "Japan's national currency is the yen, abbreviated as JPY in international finance.",
+    "enabled": true
   },
   {
     "id": "tf029",
     "statement": "Shakespeare wrote The Odyssey.",
     "answer": false,
-    "explanation": "The Odyssey is an ancient Greek epic poem traditionally attributed to Homer."
+    "explanation": "The Odyssey is an ancient Greek epic poem traditionally attributed to Homer.",
+    "enabled": true
   },
   {
     "id": "tf030",
     "statement": "The Great Barrier Reef is off the coast of Queensland.",
     "answer": true,
-    "explanation": "It stretches along the northeastern coast of Australia, mostly off the state of Queensland."
+    "explanation": "It stretches along the northeastern coast of Australia, mostly off the state of Queensland.",
+    "enabled": true
   },
   {
     "id": "tf031",
     "statement": "An ostrich's eye is larger than its brain.",
     "answer": true,
-    "explanation": "Ostriches have exceptionally large eyes, each bigger than their relatively small brain."
+    "explanation": "Ostriches have exceptionally large eyes, each bigger than their relatively small brain.",
+    "enabled": true
   },
   {
     "id": "tf032",
     "statement": "Humans have exactly five senses and no more.",
     "answer": false,
-    "explanation": "Beyond sight, hearing, smell, taste, and touch, humans also have senses such as balance, pain, temperature, and body position."
+    "explanation": "Beyond sight, hearing, smell, taste, and touch, humans also have senses such as balance, pain, temperature, and body position.",
+    "enabled": true
   },
   {
     "id": "tf033",
     "statement": "Mount Kilimanjaro is in Kenya.",
     "answer": false,
-    "explanation": "Mount Kilimanjaro is in Tanzania, near the Kenyan border."
+    "explanation": "Mount Kilimanjaro is in Tanzania, near the Kenyan border.",
+    "enabled": true
   },
   {
     "id": "tf034",
     "statement": "Pure honey can remain edible for years.",
     "answer": true,
-    "explanation": "Honey's low moisture and acidic chemistry make it very resistant to spoilage when it is stored properly."
+    "explanation": "Honey's low moisture and acidic chemistry make it very resistant to spoilage when it is stored properly.",
+    "enabled": true
   },
   {
     "id": "tf035",
     "statement": "The Nile flows into the Mediterranean Sea.",
     "answer": true,
-    "explanation": "The Nile runs north through northeastern Africa and empties into the Mediterranean in Egypt."
+    "explanation": "The Nile runs north through northeastern Africa and empties into the Mediterranean in Egypt.",
+    "enabled": true
   },
   {
     "id": "tf036",
     "statement": "The human heart sits exactly in the center of the chest.",
     "answer": false,
-    "explanation": "The heart sits slightly left of center, although much of it remains behind the breastbone."
+    "explanation": "The heart sits slightly left of center, although much of it remains behind the breastbone.",
+    "enabled": true
   },
   {
     "id": "tf037",
     "statement": "A standard piano has 88 keys.",
     "answer": true,
-    "explanation": "Most modern full-size pianos have 52 white keys and 36 black keys, for a total of 88."
+    "explanation": "Most modern full-size pianos have 52 white keys and 36 black keys, for a total of 88.",
+    "enabled": true
   },
   {
     "id": "tf038",
     "statement": "Mandarin Chinese has more native speakers than English.",
     "answer": true,
-    "explanation": "English is dominant globally as a second language, but Mandarin has more first-language speakers."
+    "explanation": "English is dominant globally as a second language, but Mandarin has more first-language speakers.",
+    "enabled": true
   },
   {
     "id": "tf039",
     "statement": "Gold is denser than silver.",
     "answer": true,
-    "explanation": "Gold is significantly denser than silver, which is why equal-sized pieces of gold weigh more."
+    "explanation": "Gold is significantly denser than silver, which is why equal-sized pieces of gold weigh more.",
+    "enabled": true
   },
   {
     "id": "tf040",
     "statement": "The Moon produces its own light.",
     "answer": false,
-    "explanation": "Moonlight is reflected sunlight. The Moon does not generate visible light of its own."
+    "explanation": "Moonlight is reflected sunlight. The Moon does not generate visible light of its own.",
+    "enabled": true
   },
   {
     "id": "tf041",
     "statement": "Mario first appeared in the arcade game Donkey Kong.",
     "answer": true,
-    "explanation": "Nintendo first introduced the character later known as Mario in the 1981 arcade game Donkey Kong."
+    "explanation": "Nintendo first introduced the character later known as Mario in the 1981 arcade game Donkey Kong.",
+    "enabled": true
   },
   {
     "id": "tf042",
     "statement": "The original Tetris was created in Japan.",
     "answer": false,
-    "explanation": "Tetris was designed in 1984 by Alexey Pajitnov in the Soviet Union, not in Japan."
+    "explanation": "Tetris was designed in 1984 by Alexey Pajitnov in the Soviet Union, not in Japan.",
+    "enabled": true
   },
   {
     "id": "tf043",
     "statement": "Valve developed the original Half-Life.",
     "answer": true,
-    "explanation": "Half-Life was Valve's debut game and was released in 1998."
+    "explanation": "Half-Life was Valve's debut game and was released in 1998.",
+    "enabled": true
   },
   {
     "id": "tf044",
     "statement": "In most Legend of Zelda games, the main playable hero is named Zelda.",
     "answer": false,
-    "explanation": "The playable hero is usually Link. Zelda is the princess after whom the series is named."
+    "explanation": "The playable hero is usually Link. Zelda is the princess after whom the series is named.",
+    "enabled": true
   },
   {
     "id": "tf045",
     "statement": "The Nintendo Wii launched before the Nintendo Switch.",
     "answer": true,
-    "explanation": "The Wii launched in 2006, while the Nintendo Switch launched in 2017."
+    "explanation": "The Wii launched in 2006, while the Nintendo Switch launched in 2017.",
+    "enabled": true
   },
   {
     "id": "tf046",
     "statement": "The Premier League was founded in 1992.",
     "answer": true,
-    "explanation": "England's top division broke away from the Football League in 1992, with the first Premier League season beginning in 1992-93."
+    "explanation": "England's top division broke away from the Football League in 1992, with the first Premier League season beginning in 1992-93.",
+    "enabled": true
   },
   {
     "id": "tf047",
     "statement": "Anfield is the home stadium of Manchester United.",
     "answer": false,
-    "explanation": "Anfield is Liverpool's home ground. Manchester United play at Old Trafford."
+    "explanation": "Anfield is Liverpool's home ground. Manchester United play at Old Trafford.",
+    "enabled": true
   },
   {
     "id": "tf048",
     "statement": "Arsenal are nicknamed the Gunners.",
     "answer": true,
-    "explanation": "Arsenal's long-standing nickname is the Gunners, a reference to the club's roots in Woolwich's armaments industry."
+    "explanation": "Arsenal's long-standing nickname is the Gunners, a reference to the club's roots in Woolwich's armaments industry.",
+    "enabled": true
   },
   {
     "id": "tf049",
     "statement": "A win in the Premier League is worth two points.",
     "answer": false,
-    "explanation": "A win is worth three points, a draw is worth one, and a loss is worth none."
+    "explanation": "A win is worth three points, a draw is worth one, and a loss is worth none.",
+    "enabled": true
   },
   {
     "id": "tf050",
     "statement": "Chelsea play their home league matches at Stamford Bridge.",
     "answer": true,
-    "explanation": "Chelsea's home stadium is Stamford Bridge in west London."
+    "explanation": "Chelsea's home stadium is Stamford Bridge in west London.",
+    "enabled": true
+  },
+  {
+    "id": "tf051",
+    "statement": "The 2020 Trackmania reboot (\"Trackmania\", by Nadeo / Ubisoft Nadeo) ships with only the Stadium environment, like TMNF before it.",
+    "answer": true,
+    "explanation": "Stadium only — Bay, Coast, Island and the other Trackmania environments are not part of the 2020 reboot.",
+    "enabled": true
+  },
+  {
+    "id": "tf052",
+    "statement": "The Cup of the Day (COTD) in Trackmania (2020) is decided in a 64-player head-to-head knockout bracket after an open qualifier.",
+    "answer": true,
+    "explanation": "The top 64 from the daily qualifier advance into a single-elimination knockout to win the cup.",
+    "enabled": true
+  },
+  {
+    "id": "tf053",
+    "statement": "Ubisoft acquired Nadeo in 2009.",
+    "answer": true,
+    "explanation": "Ubisoft acquired the French studio behind Trackmania in 2009.",
+    "enabled": true
+  },
+  {
+    "id": "tf054",
+    "statement": "The official Trackmania World Tour finals were held at the Accor Arena in Paris in 2022, in front of around 15,000 spectators.",
+    "answer": true,
+    "explanation": "The ZrT Trackmania Cup final filled the Accor Arena in 2022 — widely treated as the headline live event of the year.",
+    "enabled": true
+  },
+  {
+    "id": "tf055",
+    "statement": "Age of Empires II: The Age of Kings was originally released by Ensemble Studios in 1999.",
+    "answer": true,
+    "explanation": "Released in September 1999 by Ensemble Studios, published by Microsoft.",
+    "enabled": true
+  },
+  {
+    "id": "tf056",
+    "statement": "In Age of Empires II, the Trebuchet first becomes available in the Castle Age.",
+    "answer": false,
+    "explanation": "The Trebuchet is an Imperial-Age unit — castles can train them only after the Imperial Age upgrade.",
+    "enabled": true
+  },
+  {
+    "id": "tf057",
+    "statement": "William Wallace serves as the in-game learning campaign in Age of Empires II.",
+    "answer": true,
+    "explanation": "The Wallace campaign is the official tutorial for The Age of Kings.",
+    "enabled": true
+  },
+  {
+    "id": "tf058",
+    "statement": "The Aztecs were a playable civilisation in Age of Empires II: The Age of Kings on launch in 1999.",
+    "answer": false,
+    "explanation": "Aztecs were added with The Conquerors expansion in 2000.",
+    "enabled": true
+  },
+  {
+    "id": "tf059",
+    "statement": "Age of Empires IV was developed by Relic Entertainment and released in 2021.",
+    "answer": true,
+    "explanation": "Relic Entertainment developed AoE IV, released October 2021.",
+    "enabled": true
+  },
+  {
+    "id": "tf060",
+    "statement": "The \"wololo\" chant in Age of Empires belongs to the Priest / Monk unit converting enemies.",
+    "answer": true,
+    "explanation": "The Monk's conversion ability is famously voiced as \"wololo\".",
+    "enabled": true
+  },
+  {
+    "id": "tf061",
+    "statement": "Charmander evolves directly into Charizard.",
+    "answer": false,
+    "explanation": "Charmander → Charmeleon → Charizard. Charmeleon is the middle stage.",
+    "enabled": true
+  },
+  {
+    "id": "tf062",
+    "statement": "Mew, the 151st Pokémon, was famously hidden in Pokémon Red and Blue by Game Freak programmer Shigeki Morimoto after the game had already gone gold.",
+    "answer": true,
+    "explanation": "Morimoto squeezed Mew into the ROM with no official approval; it was discovered later by players and event distributors.",
+    "enabled": true
+  },
+  {
+    "id": "tf063",
+    "statement": "Pokémon Gold and Silver were released worldwide in 1999.",
+    "answer": false,
+    "explanation": "Japan only in 1999. North America in October 2000; Europe in 2001.",
+    "enabled": true
+  },
+  {
+    "id": "tf064",
+    "statement": "Eevee can evolve into more different Pokémon than any other Pokémon in the franchise.",
+    "answer": true,
+    "explanation": "Eight different evolutions across the series (the \"Eeveelutions\") — more than any other line.",
+    "enabled": true
+  },
+  {
+    "id": "tf065",
+    "statement": "Pokémon Scarlet and Violet introduced the Paldea region.",
+    "answer": true,
+    "explanation": "Released November 2022 — Paldea is the Iberian-inspired ninth-generation region.",
+    "enabled": true
+  },
+  {
+    "id": "tf066",
+    "statement": "The three \"Egyptian God\" cards in Yu-Gi-Oh! are Slifer the Sky Dragon, Obelisk the Tormentor, and The Winged Dragon of Ra.",
+    "answer": true,
+    "explanation": "These are the three God cards from the original Battle City arc.",
+    "enabled": true
+  },
+  {
+    "id": "tf067",
+    "statement": "Seto Kaiba's signature monster is the Red-Eyes Black Dragon.",
+    "answer": false,
+    "explanation": "Kaiba's signature is Blue-Eyes White Dragon. Red-Eyes Black Dragon belongs to Joey Wheeler (Jonouchi Katsuya).",
+    "enabled": true
+  },
+  {
+    "id": "tf068",
+    "statement": "Yu-Gi-Oh! was originally a manga by Kazuki Takahashi serialised in Weekly Shōnen Jump.",
+    "answer": true,
+    "explanation": "Takahashi's manga ran in Weekly Shōnen Jump from 1996 to 2004.",
+    "enabled": true
+  },
+  {
+    "id": "tf069",
+    "statement": "In the Trading Card Game, Dark Magician's original Attack stat is 2500.",
+    "answer": true,
+    "explanation": "2500 ATK / 2100 DEF — Yugi's signature monster.",
+    "enabled": true
+  },
+  {
+    "id": "tf070",
+    "statement": "Cabal Online is a Korean MMORPG developed by ESTsoft, first released in 2005.",
+    "answer": true,
+    "explanation": "Korean release was in October 2005; global service expanded over the following years.",
+    "enabled": true
+  },
+  {
+    "id": "tf071",
+    "statement": "At Cabal Online's original 2005 launch, six classes were playable.",
+    "answer": true,
+    "explanation": "Warrior, Blader, Wizard, Force Archer, Force Shielder, Force Blader were the original six.",
+    "enabled": true
+  },
+  {
+    "id": "tf072",
+    "statement": "Cabal Online's Force Gunner class was introduced in 2014.",
+    "answer": true,
+    "explanation": "Force Gunner was the first class added after the original six, debuting in 2014.",
+    "enabled": true
+  },
+  {
+    "id": "tf073",
+    "statement": "World of Warcraft was first released in North America on 23 November 2004.",
+    "answer": true,
+    "explanation": "23 November 2004 — WoW's North American launch date.",
+    "enabled": true
+  },
+  {
+    "id": "tf074",
+    "statement": "The Burning Crusade introduced the Draenei to the Alliance and the Blood Elves to the Horde.",
+    "answer": true,
+    "explanation": "TBC (2007) added both new races simultaneously, one per faction.",
+    "enabled": true
+  },
+  {
+    "id": "tf075",
+    "statement": "At launch in 2004, World of Warcraft shipped with nine playable classes.",
+    "answer": true,
+    "explanation": "Druid, Hunter, Mage, Paladin, Priest, Rogue, Shaman, Warlock, Warrior.",
+    "enabled": true
+  },
+  {
+    "id": "tf076",
+    "statement": "The Death Knight was the first \"hero class\" added to WoW, in Wrath of the Lich King (2008).",
+    "answer": true,
+    "explanation": "The Death Knight launched as WoW's first hero class with WotLK in 2008.",
+    "enabled": true
+  },
+  {
+    "id": "tf077",
+    "statement": "The maximum raid size in vanilla WoW was forty players.",
+    "answer": true,
+    "explanation": "40-man raids: Molten Core, Onyxia's Lair, Blackwing Lair, AQ40, Naxxramas.",
+    "enabled": true
+  },
+  {
+    "id": "tf078",
+    "statement": "Kékestető, in the Mátra range, is Hungary's highest point at 1,014 metres.",
+    "answer": true,
+    "explanation": "Kékestető — 1,014 m above sea level — is the highest peak in Hungary.",
+    "enabled": true
+  },
+  {
+    "id": "tf079",
+    "statement": "The Tisza flows for a longer stretch inside Hungary's borders than the Danube does.",
+    "answer": true,
+    "explanation": "Tisza ~597 km in-country versus Danube ~417 km.",
+    "enabled": true
+  },
+  {
+    "id": "tf080",
+    "statement": "The Hortobágy National Park was Hungary's first national park, founded in 1973.",
+    "answer": true,
+    "explanation": "Hortobágy was Hungary's first national park — established 1 January 1973.",
+    "enabled": true
+  },
+  {
+    "id": "tf081",
+    "statement": "Lake Velence is larger than Lake Balaton.",
+    "answer": false,
+    "explanation": "Balaton (~594 km²) is about 24× the surface area of Lake Velence (~26 km²).",
+    "enabled": true
+  },
+  {
+    "id": "tf082",
+    "statement": "Aggtelek and the Baradla cave system are a UNESCO World Heritage Site shared with Slovakia.",
+    "answer": true,
+    "explanation": "Joint listing as \"Caves of Aggtelek Karst and Slovak Karst\" since 1995.",
+    "enabled": true
+  },
+  {
+    "id": "tf083",
+    "statement": "Saul fia (Son of Saul, 2015), directed by László Nemes, won the Academy Award for Best Foreign Language Film.",
+    "answer": true,
+    "explanation": "Won at the 88th Academy Awards ceremony in 2016.",
+    "enabled": true
+  },
+  {
+    "id": "tf084",
+    "statement": "István Szabó's Mephisto (1981) was the first Hungarian film to win the Best Foreign Language Film Oscar.",
+    "answer": true,
+    "explanation": "Mephisto took the Foreign Language Film Oscar at the 1982 ceremony — the first Hungarian winner.",
+    "enabled": true
+  },
+  {
+    "id": "tf085",
+    "statement": "Omega's signature ballad \"Gyöngyhajú lány\" was originally released in 1969.",
+    "answer": true,
+    "explanation": "Released in 1969 on Omega's second studio album.",
+    "enabled": true
+  },
+  {
+    "id": "tf086",
+    "statement": "Hungarian rock band Tankcsapda formed in Budapest in 1985.",
+    "answer": false,
+    "explanation": "Tankcsapda formed in Debrecen in 1989, not Budapest in 1985.",
+    "enabled": true
+  },
+  {
+    "id": "tf087",
+    "statement": "\"LGT\" stands for Locomotiv GT.",
+    "answer": true,
+    "explanation": "Locomotiv GT — the iconic Hungarian rock band formed in 1971.",
+    "enabled": true
+  },
+  {
+    "id": "tf088",
+    "statement": "Béla Bartók and Zoltán Kodály jointly devised a system of Hungarian folk-song collection at the start of the 20th century.",
+    "answer": true,
+    "explanation": "Bartók and Kodály began their joint folk-music collection expeditions in 1905-06.",
+    "enabled": true
+  },
+  {
+    "id": "tf089",
+    "statement": "Quimby's song \"Most múlik pontosan\" was originally written and recorded by another Hungarian artist before Quimby covered it.",
+    "answer": false,
+    "explanation": "It is a Quimby original, off the 2003 album Ékszerelmére.",
+    "enabled": true
+  },
+  {
+    "id": "tf090",
+    "statement": "The 2017 Cannes-winning Hungarian film \"Testről és lélekről\" (On Body and Soul) was directed by Ildikó Enyedi.",
+    "answer": true,
+    "explanation": "Won the Golden Bear at Berlin in 2017 and was nominated for the Best Foreign Language Film Oscar.",
+    "enabled": true
+  },
+  {
+    "id": "tf091",
+    "statement": "The French Bulldog has been the American Kennel Club's most-registered breed in the United States every year since 2022.",
+    "answer": true,
+    "explanation": "Frenchies overtook the Labrador in 2022 (AKC registration data) and have held the top spot since.",
+    "enabled": true
+  },
+  {
+    "id": "tf092",
+    "statement": "Dachshunds were originally bred to hunt badgers.",
+    "answer": true,
+    "explanation": "\"Dachs\" = badger in German. Their long bodies and short legs were bred for going underground after them.",
+    "enabled": true
+  },
+  {
+    "id": "tf093",
+    "statement": "A Komondor's distinctive corded coat is fully formed by the age of two months.",
+    "answer": false,
+    "explanation": "Cords take roughly two years to fully develop — puppies start out fluffy.",
+    "enabled": true
+  },
+  {
+    "id": "tf094",
+    "statement": "The Hungarian Vizsla and the Wirehaired Vizsla are recognised as two separate FCI breeds.",
+    "answer": true,
+    "explanation": "Magyar Vizsla (short-haired) and Drótszőrű Magyar Vizsla (wirehaired) are listed as distinct FCI breeds.",
+    "enabled": true
+  },
+  {
+    "id": "tf095",
+    "statement": "Border Collies were ranked the most intelligent dog breed by Stanley Coren's The Intelligence of Dogs (1994).",
+    "answer": true,
+    "explanation": "Coren's ranking placed Border Collies at #1 for working/obedience intelligence.",
+    "enabled": true
+  },
+  {
+    "id": "tf096",
+    "statement": "Valve released the Steam Deck in February 2022.",
+    "answer": true,
+    "explanation": "The original Steam Deck shipped to early reservers on 25 February 2022.",
+    "enabled": true
+  },
+  {
+    "id": "tf097",
+    "statement": "Microsoft's acquisition of Activision Blizzard closed in October 2023.",
+    "answer": true,
+    "explanation": "Closed on 13 October 2023 after the UK CMA approved a restructured deal.",
+    "enabled": true
+  },
+  {
+    "id": "tf098",
+    "statement": "The first \"Souls-like\" game by FromSoftware was Dark Souls (2011).",
+    "answer": false,
+    "explanation": "Demon's Souls (2009) preceded Dark Souls and is the original of the lineage.",
+    "enabled": true
+  },
+  {
+    "id": "tf099",
+    "statement": "Baldur's Gate 3 won The Game Awards \"Game of the Year\" in 2023.",
+    "answer": true,
+    "explanation": "Larian Studios' Baldur's Gate 3 took GOTY at TGA 2023.",
+    "enabled": true
+  },
+  {
+    "id": "tf100",
+    "statement": "Elden Ring had sold over 25 million copies worldwide by the end of 2024.",
+    "answer": true,
+    "explanation": "FromSoftware/Bandai Namco reported 25+ million units by mid-2024 and 28+ million by early 2025.",
+    "enabled": true
+  },
+  {
+    "id": "tf101",
+    "statement": "Pálinka is an EU-protected geographical designation: only Hungarian-made fruit spirits (and apricot pálinka from four Austrian states) may use the name commercially.",
+    "answer": true,
+    "explanation": "Pálinka has EU PDO status restricting commercial use of the name.",
+    "enabled": true
+  },
+  {
+    "id": "tf102",
+    "statement": "Unicum has been produced by the Zwack family since 1790.",
+    "answer": true,
+    "explanation": "The Zwack family has produced Unicum, the iconic Hungarian herbal liqueur, since 1790.",
+    "enabled": true
+  },
+  {
+    "id": "tf103",
+    "statement": "Tokaji Aszú is made primarily from grapes affected by noble rot (Botrytis cinerea).",
+    "answer": true,
+    "explanation": "The noble-rot-shrivelled aszú berries give Tokaji Aszú its concentrated sweetness.",
+    "enabled": true
+  },
+  {
+    "id": "tf104",
+    "statement": "Louis XIV of France famously called Tokaji Aszú \"the wine of devils.\"",
+    "answer": false,
+    "explanation": "He called it \"vinum regum, rex vinorum\" — \"the wine of kings, the king of wines.\"",
+    "enabled": true
+  },
+  {
+    "id": "tf105",
+    "statement": "Egri Bikavér (\"Bull's Blood of Eger\") must be a red wine blend, not a single varietal.",
+    "answer": true,
+    "explanation": "Hungarian wine law defines Egri Bikavér as a cuvée of at least three permitted varieties.",
+    "enabled": true
+  },
+  {
+    "id": "tf106",
+    "statement": "Marco Rossi has been head coach of the Hungarian men's national football team since 2018.",
+    "answer": true,
+    "explanation": "Appointed in June 2018 and still in charge for the 2024-25 cycle and beyond.",
+    "enabled": true
+  },
+  {
+    "id": "tf107",
+    "statement": "Hungary held France to a 1–1 draw at Euro 2020, in Budapest.",
+    "answer": true,
+    "explanation": "Group F, 19 June 2021 at the Puskás Aréna — Attila Fiola opened the scoring before Griezmann equalised.",
+    "enabled": true
+  },
+  {
+    "id": "tf108",
+    "statement": "Dominik Szoboszlai scored a late winner against Iceland in the Euro 2020 playoff final.",
+    "answer": true,
+    "explanation": "November 2020 — Szoboszlai's late strike booked Hungary's Euro 2020 ticket.",
+    "enabled": true
+  },
+  {
+    "id": "tf109",
+    "statement": "Hungary has qualified for three consecutive UEFA European Championships: 2016, 2020 and 2024.",
+    "answer": true,
+    "explanation": "Hungary qualified for Euro 2016 (first time since 1972), Euro 2020 and Euro 2024 in succession.",
+    "enabled": true
+  },
+  {
+    "id": "tf110",
+    "statement": "Roland Sallai joined the German Bundesliga club SC Freiburg in 2018.",
+    "answer": true,
+    "explanation": "Sallai moved to Freiburg in 2018 from APOEL Nicosia.",
+    "enabled": true
+  },
+  {
+    "id": "tf111",
+    "statement": "Cristiano Ronaldo is the all-time top scorer in the UEFA Champions League / European Cup.",
+    "answer": true,
+    "explanation": "Ronaldo sits at the top of the all-time scoring chart with ~140 goals.",
+    "enabled": true
+  },
+  {
+    "id": "tf112",
+    "statement": "Paris Saint-Germain won their first ever European Cup / UEFA Champions League in the 2024-25 season, beating Inter Milan 5–0 in the final.",
+    "answer": true,
+    "explanation": "Final played 31 May 2025 at the Allianz Arena, Munich.",
+    "enabled": true
+  },
+  {
+    "id": "tf113",
+    "statement": "The UEFA Champions League anthem was composed by Hans Zimmer.",
+    "answer": false,
+    "explanation": "Composed by Tony Britten in 1992, inspired by Handel's \"Zadok the Priest\".",
+    "enabled": true
+  },
+  {
+    "id": "tf114",
+    "statement": "The 2024-25 season was the first to use a single 36-team \"league phase\" replacing the traditional group stage.",
+    "answer": true,
+    "explanation": "UEFA replaced the eight-group format with a Swiss-model 36-team league phase from 2024-25.",
+    "enabled": true
+  },
+  {
+    "id": "tf115",
+    "statement": "No club has ever won the European Cup / Champions League three years in a row except Real Madrid.",
+    "answer": true,
+    "explanation": "Real Madrid have done it twice — the original five-in-a-row (1956–1960) and the 2016/17/18 three-peat.",
+    "enabled": true
   }
 ]
