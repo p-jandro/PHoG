@@ -4,59 +4,59 @@
     "options": [
       {
         "id": "r1_option1",
-        "category": "History",
+        "category": "Trackmania",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "In what year did World War II end?",
+        "question": "Which French studio developed the Trackmania series?",
         "answers": {
-          "A": "1943",
-          "B": "1945",
-          "C": "1947",
-          "D": "1950"
+          "A": "Nadeo",
+          "B": "Quantic Dream",
+          "C": "DONTNOD",
+          "D": "Asobo"
+        },
+        "correct": "A"
+      },
+      {
+        "id": "r1_option2",
+        "category": "NB1 Football",
+        "difficulty": "medium",
+        "color": "#0066FF",
+        "question": "Which Hungarian footballer is the only Hungarian ever to win the Ballon d'Or?",
+        "answers": {
+          "A": "Ferenc Puskás",
+          "B": "Flórián Albert",
+          "C": "Nándor Hidegkuti",
+          "D": "Sándor Kocsis"
         },
         "correct": "B"
       },
       {
-        "id": "r1_option2",
-        "category": "Geography",
-        "difficulty": "medium",
-        "color": "#0066FF",
-        "question": "What is the capital city of Australia?",
+        "id": "r1_option3",
+        "category": "UCL",
+        "difficulty": "hard",
+        "color": "#FFA502",
+        "question": "How many UEFA Champions League / European Cup titles does Real Madrid hold at the end of the 2024-25 season?",
         "answers": {
-          "A": "Sydney",
-          "B": "Melbourne",
-          "C": "Canberra",
-          "D": "Perth"
+          "A": "13",
+          "B": "14",
+          "C": "15",
+          "D": "16"
         },
         "correct": "C"
       },
       {
-        "id": "r1_option3",
-        "category": "Science",
-        "difficulty": "hard",
-        "color": "#FFA502",
-        "question": "Which metal is liquid at standard room temperature?",
-        "answers": {
-          "A": "Mercury",
-          "B": "Bromine",
-          "C": "Gallium",
-          "D": "Cesium"
-        },
-        "correct": "A"
-      },
-      {
         "id": "r1_option4",
-        "category": "Literature",
+        "category": "Yu-Gi-Oh!",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Which Bronte sister wrote Jane Eyre?",
+        "question": "In what year did Yu-Gi-Oh! manga creator Kazuki Takahashi die?",
         "answers": {
-          "A": "Charlotte Bronte",
-          "B": "Emily Bronte",
-          "C": "Anne Bronte",
-          "D": "None of them"
+          "A": "2020",
+          "B": "2022",
+          "C": "2018",
+          "D": "2024"
         },
-        "correct": "A"
+        "correct": "B"
       }
     ],
     "enabled": true
@@ -66,59 +66,59 @@
     "options": [
       {
         "id": "r2_option1",
-        "category": "Movies",
+        "category": "Pokémon",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "Which film won the first Academy Award for Best Animated Feature?",
+        "question": "Which Pokémon has the Pokédex number 150?",
         "answers": {
-          "A": "Shrek",
-          "B": "Monsters, Inc.",
-          "C": "Finding Nemo",
-          "D": "Toy Story 2"
+          "A": "Mew",
+          "B": "Mewtwo",
+          "C": "Articuno",
+          "D": "Zapdos"
         },
-        "correct": "A"
+        "correct": "B"
       },
       {
         "id": "r2_option2",
-        "category": "Premier League",
+        "category": "Modern Gaming",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "Which club is nicknamed the Gunners?",
+        "question": "Which game won The Game Awards \"Game of the Year\" in 2023?",
         "answers": {
-          "A": "Chelsea",
-          "B": "Arsenal",
-          "C": "Tottenham Hotspur",
-          "D": "West Ham United"
+          "A": "The Legend of Zelda: Tears of the Kingdom",
+          "B": "Baldur's Gate 3",
+          "C": "Alan Wake 2",
+          "D": "Super Mario Bros. Wonder"
         },
         "correct": "B"
       },
       {
         "id": "r2_option3",
-        "category": "Music",
+        "category": "Age of Empires",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "Which Beatles album includes both 'Come Together' and 'Something'?",
+        "question": "Which expansion to Age of Empires II first added the Aztecs, Mayans, and Spanish civilisations?",
         "answers": {
-          "A": "Let It Be",
-          "B": "Revolver",
-          "C": "Abbey Road",
-          "D": "Rubber Soul"
+          "A": "The Forgotten",
+          "B": "The Conquerors",
+          "C": "The African Kingdoms",
+          "D": "Rise of the Rajas"
         },
-        "correct": "C"
+        "correct": "B"
       },
       {
         "id": "r2_option4",
-        "category": "Art",
+        "category": "Cabal Online",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Who painted The Garden of Earthly Delights?",
+        "question": "Which of these is NOT one of the six classes available at Cabal Online's 2005 launch?",
         "answers": {
-          "A": "Hieronymus Bosch",
-          "B": "Pieter Bruegel the Elder",
-          "C": "Albrecht Durer",
-          "D": "El Greco"
+          "A": "Force Shielder",
+          "B": "Force Blader",
+          "C": "Force Gunner",
+          "D": "Force Archer"
         },
-        "correct": "A"
+        "correct": "C"
       }
     ],
     "enabled": true
@@ -128,59 +128,59 @@
     "options": [
       {
         "id": "r3_option1",
-        "category": "Food",
+        "category": "Hungarian Geography",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "Guacamole is primarily made from which fruit?",
+        "question": "What is Hungary's highest mountain peak?",
         "answers": {
-          "A": "Avocado",
-          "B": "Tomato",
-          "C": "Lime",
-          "D": "Mango"
+          "A": "Galyatető",
+          "B": "Pilis-tető",
+          "C": "Kékestető",
+          "D": "Dobogókő"
         },
-        "correct": "A"
+        "correct": "C"
       },
       {
         "id": "r3_option2",
-        "category": "Gaming",
+        "category": "Drinking",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "Which company developed the original Portal?",
+        "question": "Which Hungarian herbal liqueur has been produced by the Zwack family since 1790?",
         "answers": {
-          "A": "Valve",
-          "B": "Ubisoft",
-          "C": "Blizzard Entertainment",
-          "D": "Bungie"
+          "A": "Pálinka",
+          "B": "Unicum",
+          "C": "Vilmos",
+          "D": "Bénédictine"
         },
-        "correct": "A"
+        "correct": "B"
       },
       {
         "id": "r3_option3",
-        "category": "Nature",
+        "category": "Hungarian Movies",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "What is the largest living reptile?",
+        "question": "Which Hungarian film won the Best Foreign Language Film Oscar at the 2016 Academy Awards?",
         "answers": {
-          "A": "Komodo dragon",
-          "B": "Saltwater crocodile",
-          "C": "Green anaconda",
-          "D": "Leatherback sea turtle"
+          "A": "Mephisto",
+          "B": "Saul fia (Son of Saul)",
+          "C": "On Body and Soul",
+          "D": "Hideg napok"
         },
         "correct": "B"
       },
       {
         "id": "r3_option4",
-        "category": "Language",
+        "category": "World of Warcraft",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Basque is best described as which of the following?",
+        "question": "How many original 40-player raids did vanilla World of Warcraft eventually contain (including the late-vanilla addition of Naxxramas)?",
         "answers": {
-          "A": "A Romance language",
-          "B": "A Germanic language",
-          "C": "A Celtic language",
-          "D": "A language isolate"
+          "A": "Four",
+          "B": "Five",
+          "C": "Six",
+          "D": "Seven"
         },
-        "correct": "D"
+        "correct": "B"
       }
     ],
     "enabled": true
@@ -190,59 +190,59 @@
     "options": [
       {
         "id": "r4_option1",
-        "category": "Space",
+        "category": "Age of Empires",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "Which planet is known as the Red Planet?",
+        "question": "How many civilisations were playable in the original 1999 release of Age of Empires II: The Age of Kings?",
         "answers": {
-          "A": "Venus",
-          "B": "Jupiter",
-          "C": "Mars",
-          "D": "Mercury"
+          "A": "Nine",
+          "B": "Thirteen",
+          "C": "Fifteen",
+          "D": "Eighteen"
         },
-        "correct": "C"
+        "correct": "B"
       },
       {
         "id": "r4_option2",
-        "category": "Architecture",
+        "category": "Trackmania",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "In which city would you find the Sagrada Familia?",
+        "question": "In which year was Trackmania Nations Forever (TMNF) released as a free download?",
         "answers": {
-          "A": "Madrid",
-          "B": "Barcelona",
-          "C": "Valencia",
-          "D": "Seville"
+          "A": "2006",
+          "B": "2008",
+          "C": "2010",
+          "D": "2012"
         },
         "correct": "B"
       },
       {
         "id": "r4_option3",
-        "category": "Mythology",
+        "category": "UCL",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "In Greek mythology, who solved the riddle of the Sphinx?",
+        "question": "Who composed the UEFA Champions League anthem in 1992, adapted from Handel's \"Zadok the Priest\"?",
         "answers": {
-          "A": "Perseus",
-          "B": "Theseus",
-          "C": "Oedipus",
-          "D": "Orpheus"
+          "A": "Hans Zimmer",
+          "B": "John Williams",
+          "C": "Tony Britten",
+          "D": "Howard Shore"
         },
         "correct": "C"
       },
       {
         "id": "r4_option4",
-        "category": "History",
+        "category": "NB1 Football",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Which English king sealed the Magna Carta in 1215?",
+        "question": "Which Hungarian forward scored 11 goals at the 1954 FIFA World Cup — a single-tournament record at the time?",
         "answers": {
-          "A": "King John",
-          "B": "Henry II",
-          "C": "Richard I",
-          "D": "Edward I"
+          "A": "Ferenc Puskás",
+          "B": "Nándor Hidegkuti",
+          "C": "Sándor Kocsis",
+          "D": "Zoltán Czibor"
         },
-        "correct": "A"
+        "correct": "C"
       }
     ],
     "enabled": true
@@ -252,59 +252,59 @@
     "options": [
       {
         "id": "r5_option1",
-        "category": "Science",
+        "category": "World of Warcraft",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "Which gas do plants absorb during photosynthesis?",
+        "question": "In what year did World of Warcraft originally launch in North America?",
         "answers": {
-          "A": "Oxygen",
-          "B": "Helium",
-          "C": "Hydrogen",
-          "D": "Carbon dioxide"
+          "A": "2002",
+          "B": "2004",
+          "C": "2006",
+          "D": "2008"
+        },
+        "correct": "B"
+      },
+      {
+        "id": "r5_option2",
+        "category": "Pokémon",
+        "difficulty": "medium",
+        "color": "#0066FF",
+        "question": "Eevee can evolve into how many different Pokémon as of the latest main-series games?",
+        "answers": {
+          "A": "Five",
+          "B": "Six",
+          "C": "Seven",
+          "D": "Eight"
         },
         "correct": "D"
       },
       {
-        "id": "r5_option2",
-        "category": "Geography",
-        "difficulty": "medium",
-        "color": "#0066FF",
-        "question": "Which mountain range is commonly used as part of the boundary between Europe and Asia?",
-        "answers": {
-          "A": "The Ural Mountains",
-          "B": "The Alps",
-          "C": "The Caucasus Mountains",
-          "D": "The Carpathians"
-        },
-        "correct": "A"
-      },
-      {
         "id": "r5_option3",
-        "category": "Literature",
+        "category": "Yu-Gi-Oh!",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "Which novel opens with the line 'Call me Ishmael'?",
+        "question": "Which of the three original Egyptian God cards has a printed Attack stat of exactly 4000?",
         "answers": {
-          "A": "Treasure Island",
-          "B": "Moby-Dick",
-          "C": "The Old Man and the Sea",
-          "D": "Twenty Thousand Leagues Under the Sea"
+          "A": "Slifer the Sky Dragon",
+          "B": "Obelisk the Tormentor",
+          "C": "The Winged Dragon of Ra",
+          "D": "None of them"
         },
         "correct": "B"
       },
       {
         "id": "r5_option4",
-        "category": "Art",
+        "category": "Cabal Online",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Who created the sculpture The Thinker?",
+        "question": "What is the in-game name of Cabal Online's signature move-cancelling combat mechanic that gives the game its frantic feel?",
         "answers": {
-          "A": "Michelangelo",
-          "B": "Donatello",
-          "C": "Auguste Rodin",
-          "D": "Gian Lorenzo Bernini"
+          "A": "Force Cancel",
+          "B": "Battle Mode",
+          "C": "Burst Combo",
+          "D": "Skill Cancel"
         },
-        "correct": "C"
+        "correct": "B"
       }
     ],
     "enabled": true
@@ -314,57 +314,57 @@
     "options": [
       {
         "id": "r6_option1",
-        "category": "Gaming",
+        "category": "Hungarian Cities",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "Which character is Nintendo's famous plumber mascot?",
+        "question": "Which Hungarian city is nicknamed the 'Calvinist Rome'?",
         "answers": {
-          "A": "Luigi",
-          "B": "Wario",
-          "C": "Mario",
-          "D": "Yoshi"
+          "A": "Pécs",
+          "B": "Sopron",
+          "C": "Debrecen",
+          "D": "Miskolc"
         },
         "correct": "C"
       },
       {
         "id": "r6_option2",
-        "category": "Medicine",
+        "category": "NB1 Football",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "Which blood type is known as the universal donor for red blood cells?",
+        "question": "In which year did Hungary lose the FIFA World Cup final to West Germany in the so-called 'Miracle of Bern'?",
         "answers": {
-          "A": "AB positive",
-          "B": "A negative",
-          "C": "B negative",
-          "D": "O negative"
+          "A": "1950",
+          "B": "1954",
+          "C": "1958",
+          "D": "1962"
         },
-        "correct": "D"
+        "correct": "B"
       },
       {
         "id": "r6_option3",
-        "category": "Music",
+        "category": "Modern Gaming",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "Who composed The Planets suite?",
+        "question": "Which Polish studio developed The Witcher 3: Wild Hunt (2015)?",
         "answers": {
-          "A": "Edward Elgar",
-          "B": "Gustav Holst",
-          "C": "Ralph Vaughan Williams",
-          "D": "Claude Debussy"
+          "A": "Techland",
+          "B": "CD Projekt Red",
+          "C": "People Can Fly",
+          "D": "Bloober Team"
         },
         "correct": "B"
       },
       {
         "id": "r6_option4",
-        "category": "Science",
+        "category": "Hungarian Music",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Which physicist is most closely associated with the uncertainty principle?",
+        "question": "Zoltán Kodály wrote which 1926 opera about a comic Hungarian peasant-hero who claims to have single-handedly defeated Napoleon?",
         "answers": {
-          "A": "Werner Heisenberg",
-          "B": "Erwin Schrodinger",
-          "C": "Niels Bohr",
-          "D": "Paul Dirac"
+          "A": "Háry János",
+          "B": "Bluebeard's Castle",
+          "C": "The Wooden Prince",
+          "D": "Psalmus Hungaricus"
         },
         "correct": "A"
       }
@@ -376,59 +376,59 @@
     "options": [
       {
         "id": "r7_option1",
-        "category": "Animals",
+        "category": "Drinking",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "What is the largest animal known to have lived on Earth?",
+        "question": "Which Hungarian wine is known internationally as 'Bull's Blood of Eger'?",
         "answers": {
-          "A": "African elephant",
-          "B": "Giraffe",
-          "C": "Tyrannosaurus rex",
-          "D": "Blue whale"
+          "A": "Tokaji Aszú",
+          "B": "Egri Bikavér",
+          "C": "Furmint",
+          "D": "Hárslevelű"
         },
-        "correct": "D"
+        "correct": "B"
       },
       {
         "id": "r7_option2",
-        "category": "Premier League",
+        "category": "UCL",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "Which stadium is the home ground of Liverpool FC?",
+        "question": "Which club won the 2024-25 UEFA Champions League final, beating Inter Milan 5–0?",
         "answers": {
-          "A": "Etihad Stadium",
-          "B": "Stamford Bridge",
-          "C": "Anfield",
-          "D": "Villa Park"
+          "A": "Real Madrid",
+          "B": "Manchester City",
+          "C": "Paris Saint-Germain",
+          "D": "Bayern Munich"
         },
         "correct": "C"
       },
       {
         "id": "r7_option3",
-        "category": "Exploration",
+        "category": "Trackmania",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "What was the name of the ship on which Charles Darwin sailed?",
+        "question": "On 23 May 2021, a community investigation by Wirtual and donadigo exposed which top Trackmania record-holder for using slow-motion cheats over a nine-year span?",
         "answers": {
-          "A": "HMS Endeavour",
-          "B": "HMS Resolution",
-          "C": "HMS Beagle",
-          "D": "HMS Victory"
+          "A": "Pac",
+          "B": "Spam",
+          "C": "Riolu",
+          "D": "Bren"
         },
         "correct": "C"
       },
       {
         "id": "r7_option4",
-        "category": "Geography",
+        "category": "Dogs",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "What is the official capital of Benin?",
+        "question": "Which long-running #1 breed did the French Bulldog overtake to claim the AKC's most-registered breed in 2022?",
         "answers": {
-          "A": "Cotonou",
-          "B": "Parakou",
-          "C": "Ouidah",
-          "D": "Porto-Novo"
+          "A": "Labrador Retriever",
+          "B": "Golden Retriever",
+          "C": "German Shepherd",
+          "D": "Beagle"
         },
-        "correct": "D"
+        "correct": "A"
       }
     ],
     "enabled": true
@@ -438,59 +438,59 @@
     "options": [
       {
         "id": "r8_option1",
-        "category": "Language",
+        "category": "Pokémon",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "Which language is primarily spoken in Brazil?",
+        "question": "Which Pokémon is famously hidden as the 151st in the original Pokémon Red and Blue games?",
         "answers": {
-          "A": "Spanish",
-          "B": "Portuguese",
-          "C": "French",
-          "D": "Italian"
+          "A": "Mewtwo",
+          "B": "Mew",
+          "C": "Celebi",
+          "D": "Ditto"
         },
         "correct": "B"
       },
       {
         "id": "r8_option2",
-        "category": "History",
+        "category": "Hungarian Geography",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "Who was the first woman to fly solo across the Atlantic Ocean?",
+        "question": "Which Hungarian national park was the country's first, founded in 1973?",
         "answers": {
-          "A": "Bessie Coleman",
-          "B": "Valentina Tereshkova",
-          "C": "Amelia Earhart",
-          "D": "Harriet Quimby"
+          "A": "Bükk",
+          "B": "Aggtelek",
+          "C": "Hortobágy",
+          "D": "Kiskunság"
         },
         "correct": "C"
       },
       {
         "id": "r8_option3",
-        "category": "Gaming",
+        "category": "Age of Empires",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "Which studio created the Dark Souls series?",
+        "question": "Which expansion-style update (free with the Definitive Edition) added the Bulgarians, Cumans, Lithuanians, and Tatars to Age of Empires II?",
         "answers": {
-          "A": "Capcom",
-          "B": "FromSoftware",
-          "C": "Square Enix",
-          "D": "CD Projekt Red"
+          "A": "The Forgotten",
+          "B": "Lords of the West",
+          "C": "The Last Khans",
+          "D": "Rise of the Rajas"
         },
-        "correct": "B"
+        "correct": "C"
       },
       {
         "id": "r8_option4",
-        "category": "Math",
+        "category": "Yu-Gi-Oh!",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "The English word 'algorithm' ultimately comes from the Latinized name of which scholar?",
+        "question": "Who holds the Millennium Eye throughout the Duelist Kingdom arc of the original Yu-Gi-Oh! anime?",
         "answers": {
-          "A": "Euclid",
-          "B": "Fibonacci",
-          "C": "Al-Khwarizmi",
-          "D": "Gauss"
+          "A": "Marik Ishtar",
+          "B": "Maximillion Pegasus",
+          "C": "Seto Kaiba",
+          "D": "Shadi"
         },
-        "correct": "C"
+        "correct": "B"
       }
     ],
     "enabled": true
@@ -500,59 +500,59 @@
     "options": [
       {
         "id": "r9_option1",
-        "category": "Nature",
+        "category": "Gaming",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "What is the tallest land animal?",
+        "question": "Which company developed and released the Steam Deck handheld PC in February 2022?",
         "answers": {
-          "A": "Giraffe",
-          "B": "Elephant",
-          "C": "Camel",
-          "D": "Moose"
+          "A": "Valve",
+          "B": "Nintendo",
+          "C": "Sony",
+          "D": "Microsoft"
         },
         "correct": "A"
       },
       {
         "id": "r9_option2",
-        "category": "Food",
+        "category": "F1",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "Which cheese is traditionally used in a Greek salad?",
+        "question": "In which year did Ayrton Senna die at the San Marino Grand Prix at Imola?",
         "answers": {
-          "A": "Halloumi",
-          "B": "Mozzarella",
-          "C": "Feta",
-          "D": "Ricotta"
+          "A": "1992",
+          "B": "1993",
+          "C": "1994",
+          "D": "1995"
         },
         "correct": "C"
       },
       {
         "id": "r9_option3",
-        "category": "Space",
+        "category": "Hungarian Movies",
         "difficulty": "hard",
         "color": "#FFA502",
-        "question": "What is the largest moon of Saturn?",
+        "question": "Who directed Mephisto (1981), the first Hungarian film to win the Best Foreign Language Film Oscar?",
         "answers": {
-          "A": "Europa",
-          "B": "Titan",
-          "C": "Ganymede",
-          "D": "Enceladus"
+          "A": "Miklós Jancsó",
+          "B": "István Szabó",
+          "C": "Béla Tarr",
+          "D": "László Nemes"
         },
         "correct": "B"
       },
       {
         "id": "r9_option4",
-        "category": "Literature",
+        "category": "Drinking",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Which author created the detective C. Auguste Dupin?",
+        "question": "Tokaji Aszú is traditionally classified by 'puttonyos'. What is the highest number on the standard puttonyos scale?",
         "answers": {
-          "A": "Edgar Allan Poe",
-          "B": "Arthur Conan Doyle",
-          "C": "Wilkie Collins",
-          "D": "Agatha Christie"
+          "A": "Four",
+          "B": "Five",
+          "C": "Six",
+          "D": "Eight"
         },
-        "correct": "A"
+        "correct": "C"
       }
     ],
     "enabled": true
@@ -562,59 +562,59 @@
     "options": [
       {
         "id": "r10_option1",
-        "category": "Geography",
+        "category": "NB1 Football",
         "difficulty": "easy",
         "color": "#00D4AA",
-        "question": "Which ocean lies along the west coast of the United States?",
+        "question": "Who has been the head coach of the Hungarian men's national football team since 2018?",
         "answers": {
-          "A": "Atlantic Ocean",
-          "B": "Pacific Ocean",
-          "C": "Indian Ocean",
-          "D": "Arctic Ocean"
+          "A": "Pál Dárdai",
+          "B": "Marco Rossi",
+          "C": "Bernd Storck",
+          "D": "Sergei Rebrov"
         },
         "correct": "B"
       },
       {
         "id": "r10_option2",
-        "category": "Science",
+        "category": "World of Warcraft",
         "difficulty": "medium",
         "color": "#0066FF",
-        "question": "Which element has the chemical symbol Ag?",
+        "question": "Which WoW expansion introduced the Death Knight as the game's first 'hero class'?",
         "answers": {
-          "A": "Gold",
-          "B": "Argon",
-          "C": "Silver",
-          "D": "Tin"
-        },
-        "correct": "C"
-      },
-      {
-        "id": "r10_option3",
-        "category": "History",
-        "difficulty": "hard",
-        "color": "#FFA502",
-        "question": "Which empire was ruled by Mansa Musa?",
-        "answers": {
-          "A": "Songhai Empire",
-          "B": "Mali Empire",
-          "C": "Ottoman Empire",
-          "D": "Aksumite Empire"
+          "A": "The Burning Crusade",
+          "B": "Wrath of the Lich King",
+          "C": "Cataclysm",
+          "D": "Mists of Pandaria"
         },
         "correct": "B"
       },
       {
+        "id": "r10_option3",
+        "category": "Modern Gaming",
+        "difficulty": "hard",
+        "color": "#FFA502",
+        "question": "OG is the only team in Dota 2 history to win The International back-to-back. In which two years did they do it?",
+        "answers": {
+          "A": "2016 and 2017",
+          "B": "2017 and 2018",
+          "C": "2018 and 2019",
+          "D": "2019 and 2020"
+        },
+        "correct": "C"
+      },
+      {
         "id": "r10_option4",
-        "category": "Premier League",
+        "category": "UCL",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "Which club won the inaugural Premier League title in 1992-93?",
+        "question": "Which English club was the first ever to win the European Cup, in 1968 at Wembley?",
         "answers": {
-          "A": "Blackburn Rovers",
-          "B": "Arsenal",
-          "C": "Liverpool",
-          "D": "Manchester United"
+          "A": "Liverpool",
+          "B": "Manchester United",
+          "C": "Nottingham Forest",
+          "D": "Aston Villa"
         },
-        "correct": "D"
+        "correct": "B"
       }
     ],
     "enabled": true
