@@ -358,9 +358,9 @@
   },
   {
     "id": "tf052",
-    "statement": "The Cup of the Day (COTD) in Trackmania (2020) is decided in a 64-player head-to-head knockout bracket after an open qualifier.",
+    "statement": "In the Cup of the Day (COTD) in Trackmania (2020), the top 64 from the open qualifier face off in a knockout where the slowest racers are eliminated each round.",
     "answer": true,
-    "explanation": "The top 64 from the daily qualifier advance into a single-elimination knockout to win the cup.",
+    "explanation": "The Division-1 knockout races all 64 players together; the four lowest finishers drop, then two, then one — until only the champion is left.",
     "enabled": true
   },
   {
@@ -372,9 +372,9 @@
   },
   {
     "id": "tf054",
-    "statement": "The official Trackmania World Tour finals were held at the Accor Arena in Paris in 2022, in front of around 15,000 spectators.",
+    "statement": "The ZrT Trackmania Cup final was held at the Accor Arena in Paris in 2022, in front of around 15,000 spectators.",
     "answer": true,
-    "explanation": "The ZrT Trackmania Cup final filled the Accor Arena in 2022 — widely treated as the headline live event of the year.",
+    "explanation": "The community-run ZrT Trackmania Cup filled the Accor Arena on 4 June 2022 — widely treated as the headline live event of the year, separate from Nadeo's own Trackmania World Tour circuit.",
     "enabled": true
   },
   {
@@ -498,9 +498,9 @@
   },
   {
     "id": "tf072",
-    "statement": "Cabal Online's Force Gunner class was introduced in 2014.",
+    "statement": "Cabal Online's Force Gunner class was introduced in 2016.",
     "answer": true,
-    "explanation": "Force Gunner was the first class added after the original six, debuting in 2014.",
+    "explanation": "Force Gunner debuted on the Korean servers in December 2016 (Episode 17) as the first class added after the original six, with global servers following in 2017.",
     "enabled": true
   },
   {
@@ -799,9 +799,9 @@
   },
   {
     "id": "tf115",
-    "statement": "No club has ever won the European Cup / Champions League three years in a row except Real Madrid.",
+    "statement": "Real Madrid is the only club to have won three UEFA Champions League titles in a row in the rebranded (post-1992) era of the competition.",
     "answer": true,
-    "explanation": "Real Madrid have done it twice — the original five-in-a-row (1956–1960) and the 2016/17/18 three-peat.",
+    "explanation": "Real Madrid 2016/17/18 is the only post-1992 three-peat. The European Cup era before that saw multiple three-peats — Ajax (1971-73), Bayern Munich (1974-76), and Real Madrid's original five-in-a-row (1956-1960).",
     "enabled": true
   }
 ]

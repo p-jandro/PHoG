@@ -49,29 +49,33 @@
     "category": "Nintendo Home Consoles",
     "question": "Name any Nintendo home console",
     "answers": {
+      "switch 2": {
+        "label": "Nintendo Switch 2",
+        "score": 100
+      },
       "switch": {
         "label": "Nintendo Switch",
-        "score": 100
+        "score": 96
       },
       "wii": {
         "label": "Wii",
-        "score": 92
+        "score": 88
       },
       "nintendo 64": {
         "label": "Nintendo 64",
-        "score": 78
+        "score": 74
       },
       "gamecube": {
         "label": "GameCube",
-        "score": 54
+        "score": 50
       },
       "snes": {
         "label": "SNES",
-        "score": 38
+        "score": 34
       },
       "nes": {
         "label": "NES",
-        "score": 20
+        "score": 18
       },
       "wii u": {
         "label": "Wii U",
@@ -582,8 +586,8 @@
     "category": "Age of Empires II — Original 13 Civilisations",
     "question": "Name any of the 13 civilisations playable in the original 1999 release of Age of Empires II: The Age of Kings (before The Conquerors and any later expansion)",
     "answers": {
-      "british": {
-        "label": "British (Britons)",
+      "britons": {
+        "label": "Britons",
         "score": 100
       },
       "japanese": {
@@ -707,6 +711,10 @@
       "the war within": {
         "label": "The War Within",
         "score": 18
+      },
+      "midnight": {
+        "label": "Midnight",
+        "score": 10
       }
     },
     "enabled": true
