@@ -243,7 +243,10 @@ export class TravelGame {
     if (this.gameState.travel.phase !== 'playing') return;
     const ps = this.gameState.travel.players[playerId];
     if (!ps || ps.solved) return;
-    if (ps.guessesUsed >= this.gameState.travel.maxGuesses) return;
+    if (ps.guessesUsed >= this.gameState.travel.maxGuesses) {
+      this._ackInvalid(playerId, 'No guesses remaining');
+      return;
+    }
 
     const resolved = resolveCountry(name);
     if (!resolved) {

@@ -26,6 +26,7 @@ export const Travel = ({ socket }: TravelProps) => {
   const [solved, setSolved] = useState(false);
   const [countries, setCountries] = useState<Country[]>([]);
   const [invalidToast, setInvalidToast] = useState<string | null>(null);
+  const [guessesUsed, setGuessesUsed] = useState(0);
   const [timerMs, setTimerMs] = useState(0);
 
   // Timer effect — unchanged
@@ -54,11 +55,12 @@ export const Travel = ({ socket }: TravelProps) => {
     const onStart = (d: any) => {
       setPhase('playing'); setRoundData(d);
       setFrontChain([{ name: d.start }]); setBackChain([{ name: d.end }]);
-      setSolved(false);
+      setSolved(false); setGuessesUsed(0);
     };
     const onResult = (d: any) => {
       if (Array.isArray(d.frontChain)) setFrontChain(d.frontChain);
       if (Array.isArray(d.backChain)) setBackChain(d.backChain);
+      if (d.guessesUsed != null) setGuessesUsed(d.guessesUsed);
       if (d.solved) setSolved(true);
     };
     const onInvalid = (d: any) => {
@@ -242,7 +244,6 @@ export const Travel = ({ socket }: TravelProps) => {
   }
 
   // ── PLAYING ────────────────────────────────────────────────────────────
-  const guessesUsed = Math.max(0, (frontChain.length - 1) + (backChain.length - 1));
   const guessesLeft = Math.max(0, roundData.maxGuesses - guessesUsed);
   const noBudget = guessesLeft <= 0;
   const seconds = Math.ceil(timerMs / 1000);

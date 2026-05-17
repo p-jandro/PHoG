@@ -158,6 +158,22 @@ export class QuizGame {
     if (socket) {
       socket.emit('quiz:vote:received', { optionId });
     }
+
+    // Early-end: if all connected players have voted, skip the timer
+    this._checkAllVoted();
+  }
+
+  _checkAllVoted() {
+    const connectedIds = Array.from(this.gameState.players.entries())
+      .filter(([, p]) => p.connected)
+      .map(([id]) => id);
+    if (connectedIds.length === 0) return;
+    const allIn = connectedIds.every((id) => this.gameState.quiz.votes.has(id));
+    if (allIn) {
+      console.log('[QUIZ] All connected players voted — advancing early');
+      if (this.timer) { this.timer.stop(); this.timer = null; }
+      this.endVoting();
+    }
   }
 
   /**
@@ -323,6 +339,22 @@ export class QuizGame {
         game: 'quiz',
         isCorrect
       });
+    }
+
+    // Early-end: if all connected players have answered, skip the timer
+    this._checkAllAnswered();
+  }
+
+  _checkAllAnswered() {
+    const connectedIds = Array.from(this.gameState.players.entries())
+      .filter(([, p]) => p.connected)
+      .map(([id]) => id);
+    if (connectedIds.length === 0) return;
+    const allIn = connectedIds.every((id) => this.gameState.quiz.answers.has(id));
+    if (allIn) {
+      console.log('[QUIZ] All connected players answered — advancing early');
+      if (this.timer) { this.timer.stop(); this.timer = null; }
+      this.endQuestion();
     }
   }
 

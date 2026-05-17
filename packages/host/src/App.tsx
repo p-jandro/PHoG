@@ -60,7 +60,12 @@ function App() {
         </div>
       </div>
 
-      {view === 'dashboard' ? <Dashboard /> : <Display />}
+      <div className={view === 'dashboard' ? '' : 'hidden'}>
+        <Dashboard />
+      </div>
+      <div className={view === 'display' ? '' : 'hidden'}>
+        <Display />
+      </div>
     </div>
     </ErrorBoundary>
   );

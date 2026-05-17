@@ -235,6 +235,7 @@ export const Display = () => {
       setQuizVotingResults(null);
       setQuizQuestion(null);
       setQuizResults(null);
+      setQuizInterRound(null);
     });
 
     newSocket.on('quiz:voting:start', (data) => {
@@ -243,6 +244,7 @@ export const Display = () => {
       setQuizVotingResults(null);
       setQuizQuestion(null);
       setQuizResults(null);
+      setQuizInterRound(null);
     });
 
     newSocket.on('quiz:voting:end', (data) => {
@@ -255,6 +257,7 @@ export const Display = () => {
       setQuizVotingResults(null);
       setQuizQuestion(data);
       setQuizResults(null);
+      setQuizInterRound(null);
     });
 
     newSocket.on('quiz:question:end', (data) => {
@@ -272,12 +275,14 @@ export const Display = () => {
       setTrueFalseIntro(data);
       setTfStatement(null);
       setTfReveal(null);
+      setTfInterRound(null);
     });
 
     newSocket.on('truefalse:statement', (data) => {
       setTrueFalseIntro(null);
       setTfStatement(data);
       setTfReveal(null);
+      setTfInterRound(null);
       setTfPerPlayer({});
     });
 
@@ -386,6 +391,12 @@ export const Display = () => {
     });
   };
 
+  const nextChampionshipGame = () => {
+    if (socket) {
+      socket.emit('host:control', { action: 'nextGame' });
+    }
+  };
+
   const displayControl = (
     <>
       {/* Per bug-report 2026-05-14 §A1: the theme toggle is always visible on
@@ -397,6 +408,13 @@ export const Display = () => {
         <div className="fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6">
           <Button variant="action" size="lg" onClick={revealResults}>
             Reveal Pointless Results (Skip Timer)
+          </Button>
+        </div>
+      ) : null}
+      {authenticated && phase === 'leaderboard' && championshipActive ? (
+        <div className="fixed bottom-4 left-4 z-40 sm:bottom-6 sm:left-6">
+          <Button variant="now" size="lg" onClick={nextChampionshipGame}>
+            Next Round
           </Button>
         </div>
       ) : null}
