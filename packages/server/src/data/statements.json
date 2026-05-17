@@ -803,5 +803,355 @@
     "answer": true,
     "explanation": "Real Madrid 2016/17/18 is the only post-1992 three-peat. The European Cup era before that saw multiple three-peats — Ajax (1971-73), Bayern Munich (1974-76), and Real Madrid's original five-in-a-row (1956-1960).",
     "enabled": true
+  },
+  {
+    "id": "tf116",
+    "statement": "Rubik's Cube was invented by Hungarian architecture professor Ernő Rubik in 1974.",
+    "answer": true,
+    "explanation": "Rubik filed the patent in 1975; the cube became a global phenomenon in the 1980s.",
+    "enabled": true
+  },
+  {
+    "id": "tf117",
+    "statement": "The ballpoint pen was invented by Hungarian journalist László Bíró in the 1930s.",
+    "answer": true,
+    "explanation": "The \"biro\" — still the British colloquial name for a ballpoint — is named after László Bíró.",
+    "enabled": true
+  },
+  {
+    "id": "tf118",
+    "statement": "Katalin Karikó shared the 2023 Nobel Prize in Physiology or Medicine for her work on mRNA vaccine technology.",
+    "answer": true,
+    "explanation": "Shared with Drew Weissman; the discovery underpinned the BioNTech/Pfizer and Moderna COVID-19 vaccines.",
+    "enabled": true
+  },
+  {
+    "id": "tf119",
+    "statement": "Hungarian-American physicist Edward Teller is often called \"the father of the hydrogen bomb.\"",
+    "answer": true,
+    "explanation": "Teller, born in Budapest in 1908, played the leading role in the US thermonuclear weapons programme.",
+    "enabled": true
+  },
+  {
+    "id": "tf120",
+    "statement": "John von Neumann, the Hungarian-American mathematician, is considered one of the founders of the modern stored-program computer.",
+    "answer": true,
+    "explanation": "Born Neumann János Lajos in Budapest; the \"von Neumann architecture\" is named after his 1945 EDVAC design.",
+    "enabled": true
+  },
+  {
+    "id": "tf121",
+    "statement": "Albert Szent-Györgyi was awarded the 1937 Nobel Prize in Physiology or Medicine for his work isolating vitamin C.",
+    "answer": true,
+    "explanation": "Szent-Györgyi extracted ascorbic acid from Hungarian paprika and identified its role in cellular respiration.",
+    "enabled": true
+  },
+  {
+    "id": "tf122",
+    "statement": "Ferenc Krausz shared the 2023 Nobel Prize in Physics for his work generating attosecond pulses of light.",
+    "answer": true,
+    "explanation": "Shared with Pierre Agostini and Anne L'Huillier — attosecond physics enables filming electrons in motion.",
+    "enabled": true
+  },
+  {
+    "id": "tf123",
+    "statement": "Dennis Gabor, the Hungarian-born physicist who invented holography, was born in Vienna.",
+    "answer": false,
+    "explanation": "Gabor was born in Budapest in 1900. He later worked in Britain, where he developed holography (Nobel 1971).",
+    "enabled": true
+  },
+  {
+    "id": "tf124",
+    "statement": "The Hungarian Revolution against Soviet rule began on 23 October 1956.",
+    "answer": true,
+    "explanation": "A student demonstration in Budapest on 23 October 1956 escalated into a national uprising, brutally crushed by Soviet forces in early November.",
+    "enabled": true
+  },
+  {
+    "id": "tf125",
+    "statement": "The Treaty of Trianon (1920) reduced the Kingdom of Hungary's territory by approximately two-thirds.",
+    "answer": true,
+    "explanation": "Hungary lost about 72% of its territory and 64% of its population to neighbouring states after WWI.",
+    "enabled": true
+  },
+  {
+    "id": "tf126",
+    "statement": "King Stephen I (Szent István) was crowned the first King of Hungary on Christmas Day in the year 1000.",
+    "answer": true,
+    "explanation": "Crowned 25 December 1000 (or 1 January 1001 depending on calendar) — marks the founding of the Christian Hungarian state.",
+    "enabled": true
+  },
+  {
+    "id": "tf127",
+    "statement": "The Battle of Mohács in 1526 marked the start of Ottoman dominance over central Hungary.",
+    "answer": true,
+    "explanation": "Sultan Suleiman the Magnificent crushed King Louis II's army — Louis died fleeing the field. Ottoman rule lasted ~150 years.",
+    "enabled": true
+  },
+  {
+    "id": "tf128",
+    "statement": "Reformist Hungarian Prime Minister Imre Nagy was executed in 1958 after the failed 1956 Revolution.",
+    "answer": true,
+    "explanation": "Nagy was secretly tried and hanged in June 1958; rehabilitated and reburied with full honours in 1989.",
+    "enabled": true
+  },
+  {
+    "id": "tf129",
+    "statement": "Hungary ranks in the all-time top 10 nations by total Summer Olympic gold medals.",
+    "answer": true,
+    "explanation": "With ~180 summer-Games golds, Hungary punches far above its weight — partly thanks to fencing, water polo, and canoeing.",
+    "enabled": true
+  },
+  {
+    "id": "tf130",
+    "statement": "The Hungarian men's water polo team has won more Olympic gold medals than any other nation.",
+    "answer": true,
+    "explanation": "Hungary leads the Olympic water polo medal table with nine men's golds, well clear of Italy and Yugoslavia/Serbia.",
+    "enabled": true
+  },
+  {
+    "id": "tf131",
+    "statement": "Katinka Hosszú, nicknamed the 'Iron Lady', set world records in multiple individual medley events.",
+    "answer": true,
+    "explanation": "Hosszú set WRs in the 100, 200, and 400 m IM events and won 3 Olympic golds at Rio 2016.",
+    "enabled": true
+  },
+  {
+    "id": "tf132",
+    "statement": "Hungary won every match at the 1954 FIFA World Cup before losing the final.",
+    "answer": true,
+    "explanation": "The \"Mighty Magyars\" steamrolled the group stage and knockouts before falling 3-2 to West Germany at Bern.",
+    "enabled": true
+  },
+  {
+    "id": "tf133",
+    "statement": "In Hungary, gulyás (goulash) is traditionally a thin soup, not the thick stew served abroad under the same name.",
+    "answer": true,
+    "explanation": "Hungarian gulyás is broth-based with chunks of beef, potato, and paprika. The thick stew foreigners call goulash is closer to pörkölt.",
+    "enabled": true
+  },
+  {
+    "id": "tf134",
+    "statement": "Paprika has been grown in the Szeged and Kalocsa regions of Hungary for centuries.",
+    "answer": true,
+    "explanation": "Szeged and Kalocsa are the two protected origin regions for Hungarian paprika powder — both have hundreds of years of cultivation history.",
+    "enabled": true
+  },
+  {
+    "id": "tf135",
+    "statement": "Lángos is a deep-fried flatbread traditionally topped with garlic and sour cream.",
+    "answer": true,
+    "explanation": "Classic toppings are crushed garlic and a smear of sour cream (tejföl), often with grated cheese on top.",
+    "enabled": true
+  },
+  {
+    "id": "tf136",
+    "statement": "Pörkölt is a thicker, paprika-based Hungarian stew, distinct from the lighter, brothier gulyás.",
+    "answer": true,
+    "explanation": "Pörkölt is made by browning meat and onions before simmering — less liquid, more concentrated than gulyás.",
+    "enabled": true
+  },
+  {
+    "id": "tf137",
+    "statement": "Spirited Away (2001), directed by Hayao Miyazaki, won the Academy Award for Best Animated Feature.",
+    "answer": true,
+    "explanation": "Won at the 75th Academy Awards (2003 ceremony) — the first non-English-language film to take the Best Animated Feature Oscar.",
+    "enabled": true
+  },
+  {
+    "id": "tf138",
+    "statement": "The Naruto manga ran from 1999 to 2014 in Weekly Shōnen Jump.",
+    "answer": true,
+    "explanation": "Masashi Kishimoto's Naruto serialised in Jump from issue 43/1999 to issue 50/2014.",
+    "enabled": true
+  },
+  {
+    "id": "tf139",
+    "statement": "One Piece is the best-selling manga series of all time.",
+    "answer": true,
+    "explanation": "Eiichirō Oda's One Piece has sold over 500 million copies worldwide — comfortably ahead of any rival.",
+    "enabled": true
+  },
+  {
+    "id": "tf140",
+    "statement": "Akira Toriyama, the creator of Dragon Ball, died in March 2024.",
+    "answer": true,
+    "explanation": "Toriyama died on 1 March 2024 at age 68; the announcement was made on 8 March.",
+    "enabled": true
+  },
+  {
+    "id": "tf141",
+    "statement": "The Attack on Titan manga ended in 2021 with chapter 139.",
+    "answer": true,
+    "explanation": "Hajime Isayama's manga concluded in April 2021 in Bessatsu Shōnen Magazine.",
+    "enabled": true
+  },
+  {
+    "id": "tf142",
+    "statement": "The first iPhone was unveiled by Steve Jobs in January 2007.",
+    "answer": true,
+    "explanation": "Announced at Macworld 2007 (9 January); went on sale 29 June 2007.",
+    "enabled": true
+  },
+  {
+    "id": "tf143",
+    "statement": "Google was founded in 1998.",
+    "answer": true,
+    "explanation": "Larry Page and Sergey Brin incorporated Google Inc. on 4 September 1998.",
+    "enabled": true
+  },
+  {
+    "id": "tf144",
+    "statement": "Microsoft acquired GitHub in 2018 for approximately 7.5 billion dollars.",
+    "answer": true,
+    "explanation": "Announced June 2018, closed October 2018 — $7.5B in Microsoft stock.",
+    "enabled": true
+  },
+  {
+    "id": "tf145",
+    "statement": "Counter-Strike 2 replaced CS:GO as Valve's flagship competitive shooter in 2023.",
+    "answer": true,
+    "explanation": "CS2 launched 27 September 2023 as a free upgrade, retiring the original CS:GO build.",
+    "enabled": true
+  },
+  {
+    "id": "tf146",
+    "statement": "Riot Games developed both League of Legends and VALORANT.",
+    "answer": true,
+    "explanation": "LoL (2009) and VALORANT (2020) are both Riot titles.",
+    "enabled": true
+  },
+  {
+    "id": "tf147",
+    "statement": "LeBron James became the all-time leading scorer in NBA history in February 2023.",
+    "answer": true,
+    "explanation": "James passed Kareem Abdul-Jabbar's 38,387-point record on 7 February 2023.",
+    "enabled": true
+  },
+  {
+    "id": "tf148",
+    "statement": "Michael Jordan won six NBA championships, all with the Chicago Bulls.",
+    "answer": true,
+    "explanation": "Two three-peats: 1991-93 and 1996-98. Finals MVP in all six.",
+    "enabled": true
+  },
+  {
+    "id": "tf149",
+    "statement": "The Boston Celtics have won more NBA championships than any other franchise.",
+    "answer": true,
+    "explanation": "Boston holds 18 titles after their 2024 win — tied historically with the Lakers but ahead after 2024.",
+    "enabled": true
+  },
+  {
+    "id": "tf150",
+    "statement": "Novak Djokovic surpassed 24 men's singles Grand Slam titles by the end of 2023.",
+    "answer": true,
+    "explanation": "Djokovic's 2023 US Open win was his 24th major, breaking Margaret Court's open-era record.",
+    "enabled": true
+  },
+  {
+    "id": "tf151",
+    "statement": "Wimbledon is the only Grand Slam still played on grass courts.",
+    "answer": true,
+    "explanation": "Australian (hard), Roland Garros (clay), US Open (hard), Wimbledon (grass) — the only major still on grass.",
+    "enabled": true
+  },
+  {
+    "id": "tf152",
+    "statement": "The French Open is played at Stade Roland-Garros in Paris.",
+    "answer": true,
+    "explanation": "Named after the WWI fighter ace; the clay-court Slam has been held there since 1928.",
+    "enabled": true
+  },
+  {
+    "id": "tf153",
+    "statement": "The Beatles' final UK studio album Let It Be was released in 1970, even though most of it was recorded before Abbey Road.",
+    "answer": true,
+    "explanation": "Recorded January 1969 (\"Get Back\" sessions), shelved, then released May 1970 — after Abbey Road (September 1969).",
+    "enabled": true
+  },
+  {
+    "id": "tf154",
+    "statement": "Queen's 'Bohemian Rhapsody' was first released in 1975.",
+    "answer": true,
+    "explanation": "Released 31 October 1975 as the lead single from the album A Night at the Opera.",
+    "enabled": true
+  },
+  {
+    "id": "tf155",
+    "statement": "Michael Jackson's Thriller is the best-selling studio album of all time.",
+    "answer": true,
+    "explanation": "Estimated 70 million-plus copies sold worldwide.",
+    "enabled": true
+  },
+  {
+    "id": "tf156",
+    "statement": "The Eurovision Song Contest was first held in 1956.",
+    "answer": true,
+    "explanation": "First Eurovision held in Lugano, Switzerland, 24 May 1956 — won by host country Switzerland (Lys Assia).",
+    "enabled": true
+  },
+  {
+    "id": "tf157",
+    "statement": "Avatar (2009) was the first film to gross over 2 billion dollars worldwide.",
+    "answer": true,
+    "explanation": "Crossed the $2B mark in early 2010; later re-released to push past $2.9B before Endgame briefly overtook it.",
+    "enabled": true
+  },
+  {
+    "id": "tf158",
+    "statement": "Oppenheimer won the Academy Award for Best Picture at the 2024 ceremony.",
+    "answer": true,
+    "explanation": "Christopher Nolan's film won 7 Oscars at the 96th Academy Awards (March 2024), including Best Picture.",
+    "enabled": true
+  },
+  {
+    "id": "tf159",
+    "statement": "Avengers: Endgame was the highest-grossing film of all time briefly in 2019, before Avatar reclaimed the spot in a re-release.",
+    "answer": true,
+    "explanation": "Endgame passed Avatar in July 2019; Avatar took it back during its 2021 China re-release.",
+    "enabled": true
+  },
+  {
+    "id": "tf160",
+    "statement": "Pulp Fiction (1994) was directed by Quentin Tarantino.",
+    "answer": true,
+    "explanation": "Tarantino's second feature, won the Palme d'Or at Cannes 1994.",
+    "enabled": true
+  },
+  {
+    "id": "tf161",
+    "statement": "de_dust2 is widely regarded as one of the most iconic maps in Counter-Strike's history.",
+    "answer": true,
+    "explanation": "Originally designed by David Johnston for Counter-Strike 1.6 in 2001; still a competitive staple.",
+    "enabled": true
+  },
+  {
+    "id": "tf162",
+    "statement": "Hearthstone, Blizzard's digital collectible card game, was released in 2014.",
+    "answer": true,
+    "explanation": "Hearthstone launched out of beta on 11 March 2014.",
+    "enabled": true
+  },
+  {
+    "id": "tf163",
+    "statement": "Magic: The Gathering, released in 1993, is generally credited as the first modern trading card game.",
+    "answer": true,
+    "explanation": "Wizards of the Coast launched Magic in August 1993 — Richard Garfield's design defined the TCG genre.",
+    "enabled": true
+  },
+  {
+    "id": "tf164",
+    "statement": "Sándor Petőfi, often called Hungary's national poet, disappeared in 1849 and is presumed to have died in the Battle of Segesvár.",
+    "answer": true,
+    "explanation": "Petőfi was last seen at Segesvár on 31 July 1849; his body was never identified, fuelling decades of legend.",
+    "enabled": true
+  },
+  {
+    "id": "tf165",
+    "statement": "Imre Kertész became the first Hungarian to win the Nobel Prize in Literature, in 2002.",
+    "answer": true,
+    "explanation": "Awarded for \"writing that upholds the fragile experience of the individual against the barbaric arbitrariness of history\" — based on his Holocaust novel Fatelessness.",
+    "enabled": true
   }
 ]

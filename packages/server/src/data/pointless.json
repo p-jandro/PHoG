@@ -191,5 +191,333 @@
       }
     },
     "enabled": true
+  },
+  {
+    "id": "round_15_miyazaki_films",
+    "category": "Hayao Miyazaki Feature Films",
+    "question": "Name any animated feature film directed by Hayao Miyazaki",
+    "answers": {
+      "spirited away": {
+        "label": "Spirited Away",
+        "score": 100
+      },
+      "my neighbor totoro": {
+        "label": "My Neighbor Totoro",
+        "score": 96
+      },
+      "howl's moving castle": {
+        "label": "Howl's Moving Castle",
+        "score": 88
+      },
+      "princess mononoke": {
+        "label": "Princess Mononoke",
+        "score": 80
+      },
+      "castle in the sky": {
+        "label": "Castle in the Sky",
+        "score": 64
+      },
+      "kiki's delivery service": {
+        "label": "Kiki's Delivery Service",
+        "score": 58
+      },
+      "ponyo": {
+        "label": "Ponyo",
+        "score": 50
+      },
+      "nausicaä of the valley of the wind": {
+        "label": "Nausicaä of the Valley of the Wind",
+        "score": 36
+      },
+      "porco rosso": {
+        "label": "Porco Rosso",
+        "score": 30
+      },
+      "the wind rises": {
+        "label": "The Wind Rises",
+        "score": 18
+      },
+      "the boy and the heron": {
+        "label": "The Boy and the Heron",
+        "score": 10
+      },
+      "lupin iii: the castle of cagliostro": {
+        "label": "Lupin III: The Castle of Cagliostro",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_16_beatles_uk_studio_albums",
+    "category": "The Beatles — UK Studio Albums",
+    "question": "Name any of The Beatles' 12 UK studio albums (1963-1970)",
+    "answers": {
+      "abbey road": {
+        "label": "Abbey Road (1969)",
+        "score": 100
+      },
+      "let it be": {
+        "label": "Let It Be (1970)",
+        "score": 96
+      },
+      "sgt. pepper's lonely hearts club band": {
+        "label": "Sgt. Pepper's Lonely Hearts Club Band (1967)",
+        "score": 92
+      },
+      "the beatles": {
+        "label": "The Beatles (\"White Album\", 1968)",
+        "score": 84
+      },
+      "revolver": {
+        "label": "Revolver (1966)",
+        "score": 70
+      },
+      "rubber soul": {
+        "label": "Rubber Soul (1965)",
+        "score": 60
+      },
+      "help!": {
+        "label": "Help! (1965)",
+        "score": 50
+      },
+      "a hard day's night": {
+        "label": "A Hard Day's Night (1964)",
+        "score": 40
+      },
+      "please please me": {
+        "label": "Please Please Me (1963)",
+        "score": 30
+      },
+      "with the beatles": {
+        "label": "With the Beatles (1963)",
+        "score": 18
+      },
+      "beatles for sale": {
+        "label": "Beatles for Sale (1964)",
+        "score": 10
+      },
+      "yellow submarine": {
+        "label": "Yellow Submarine (1969)",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_17_hungarian_nobel_laureates",
+    "category": "Hungarian-born Nobel Laureates",
+    "question": "Name any Hungarian-born person who has won (or shared) a Nobel Prize in any category",
+    "answers": {
+      "albert szent-györgyi": {
+        "label": "Albert Szent-Györgyi (Medicine 1937)",
+        "score": 100
+      },
+      "imre kertész": {
+        "label": "Imre Kertész (Literature 2002)",
+        "score": 92
+      },
+      "katalin karikó": {
+        "label": "Katalin Karikó (Medicine 2023)",
+        "score": 84
+      },
+      "ferenc krausz": {
+        "label": "Ferenc Krausz (Physics 2023)",
+        "score": 78
+      },
+      "eugene wigner": {
+        "label": "Eugene Wigner (Physics 1963)",
+        "score": 64
+      },
+      "dennis gabor": {
+        "label": "Dennis Gabor (Physics 1971)",
+        "score": 56
+      },
+      "george a. olah": {
+        "label": "George A. Olah (Chemistry 1994)",
+        "score": 44
+      },
+      "john harsanyi": {
+        "label": "John Harsanyi (Economics 1994)",
+        "score": 36
+      },
+      "avram hershko": {
+        "label": "Avram Hershko (Chemistry 2004)",
+        "score": 24
+      },
+      "george de hevesy": {
+        "label": "George de Hevesy (Chemistry 1943)",
+        "score": 18
+      },
+      "georg von békésy": {
+        "label": "Georg von Békésy (Medicine 1961)",
+        "score": 12
+      },
+      "robert bárány": {
+        "label": "Robert Bárány (Medicine 1914)",
+        "score": 6
+      },
+      "richard adolf zsigmondy": {
+        "label": "Richard Adolf Zsigmondy (Chemistry 1925)",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_18_hungarian_rivers",
+    "category": "Major Rivers of Hungary",
+    "question": "Name any major river that flows through Hungary (length ≥ 100 km in-country or canonical border river)",
+    "answers": {
+      "duna": {
+        "label": "Duna (Danube)",
+        "score": 100
+      },
+      "tisza": {
+        "label": "Tisza",
+        "score": 96
+      },
+      "dráva": {
+        "label": "Dráva",
+        "score": 78
+      },
+      "rába": {
+        "label": "Rába",
+        "score": 70
+      },
+      "sajó": {
+        "label": "Sajó",
+        "score": 58
+      },
+      "körös": {
+        "label": "Körös",
+        "score": 50
+      },
+      "maros": {
+        "label": "Maros (Mureș)",
+        "score": 42
+      },
+      "hernád": {
+        "label": "Hernád",
+        "score": 34
+      },
+      "mura": {
+        "label": "Mura",
+        "score": 26
+      },
+      "ipoly": {
+        "label": "Ipoly",
+        "score": 18
+      },
+      "bodrog": {
+        "label": "Bodrog",
+        "score": 10
+      },
+      "zagyva": {
+        "label": "Zagyva",
+        "score": 0
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "round_19_mcu_infinity_saga",
+    "category": "MCU Infinity Saga (Phases 1-3)",
+    "question": "Name any film in the Marvel Cinematic Universe Infinity Saga (Phases 1, 2 and 3) — 23 films released 2008-2019",
+    "answers": {
+      "avengers: endgame": {
+        "label": "Avengers: Endgame (2019)",
+        "score": 100
+      },
+      "iron man": {
+        "label": "Iron Man (2008)",
+        "score": 98
+      },
+      "the avengers": {
+        "label": "The Avengers (2012)",
+        "score": 96
+      },
+      "avengers: infinity war": {
+        "label": "Avengers: Infinity War (2018)",
+        "score": 94
+      },
+      "black panther": {
+        "label": "Black Panther (2018)",
+        "score": 90
+      },
+      "spider-man: homecoming": {
+        "label": "Spider-Man: Homecoming (2017)",
+        "score": 84
+      },
+      "guardians of the galaxy": {
+        "label": "Guardians of the Galaxy (2014)",
+        "score": 80
+      },
+      "thor: ragnarok": {
+        "label": "Thor: Ragnarok (2017)",
+        "score": 74
+      },
+      "captain america: the winter soldier": {
+        "label": "Captain America: The Winter Soldier (2014)",
+        "score": 68
+      },
+      "captain america: civil war": {
+        "label": "Captain America: Civil War (2016)",
+        "score": 62
+      },
+      "doctor strange": {
+        "label": "Doctor Strange (2016)",
+        "score": 56
+      },
+      "iron man 2": {
+        "label": "Iron Man 2 (2010)",
+        "score": 52
+      },
+      "iron man 3": {
+        "label": "Iron Man 3 (2013)",
+        "score": 48
+      },
+      "thor": {
+        "label": "Thor (2011)",
+        "score": 44
+      },
+      "captain america: the first avenger": {
+        "label": "Captain America: The First Avenger (2011)",
+        "score": 40
+      },
+      "avengers: age of ultron": {
+        "label": "Avengers: Age of Ultron (2015)",
+        "score": 36
+      },
+      "ant-man": {
+        "label": "Ant-Man (2015)",
+        "score": 30
+      },
+      "spider-man: far from home": {
+        "label": "Spider-Man: Far From Home (2019)",
+        "score": 24
+      },
+      "captain marvel": {
+        "label": "Captain Marvel (2019)",
+        "score": 18
+      },
+      "guardians of the galaxy vol. 2": {
+        "label": "Guardians of the Galaxy Vol. 2 (2017)",
+        "score": 14
+      },
+      "ant-man and the wasp": {
+        "label": "Ant-Man and the Wasp (2018)",
+        "score": 10
+      },
+      "thor: the dark world": {
+        "label": "Thor: The Dark World (2013)",
+        "score": 4
+      },
+      "the incredible hulk": {
+        "label": "The Incredible Hulk (2008)",
+        "score": 0
+      }
+    },
+    "enabled": true
   }
 ]
