@@ -359,6 +359,10 @@
       },
       "richard adolf zsigmondy": {
         "label": "Richard Adolf Zsigmondy (Chemistry 1925)",
+        "score": 4
+      },
+      "philipp lenard": {
+        "label": "Philipp Lenard (Physics 1905)",
         "score": 0
       }
     },
@@ -409,9 +413,17 @@
         "label": "Ipoly",
         "score": 18
       },
+      "szamos": {
+        "label": "Szamos",
+        "score": 14
+      },
       "bodrog": {
         "label": "Bodrog",
         "score": 10
+      },
+      "sió": {
+        "label": "Sió",
+        "score": 6
       },
       "zagyva": {
         "label": "Zagyva",

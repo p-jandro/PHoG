@@ -297,11 +297,11 @@
         "category": "Cabal Online",
         "difficulty": "impossible",
         "color": "#FF4757",
-        "question": "What is the in-game name of Cabal Online's signature move-cancelling combat mechanic that gives the game its frantic feel?",
+        "question": "What is the in-game name of Cabal Online's signature skill-chaining mechanic — the timed cancel/chain system that gives the game its frantic combat feel?",
         "answers": {
           "A": "Force Cancel",
-          "B": "Battle Mode",
-          "C": "Burst Combo",
+          "B": "Combo",
+          "C": "Burst Mode",
           "D": "Skill Cancel"
         },
         "correct": "B"
